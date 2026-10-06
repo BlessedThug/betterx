@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/chassis.css">
+    <link rel="stylesheet" href="css/main-bg.css">
+    <title>CHOOSE | BETTER-X</title>
+    <link rel="icon" href="img/logo.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:ital,wght@0,100..900;1,100..900&display=swap"
+        rel="stylesheet">
+</head>
+
+<body>
+    <header>
+        <ul>
+            <li id="web-name">
+                <a href="main.html"><img src="img/logo.png" alt="logo" id="web-logo">BETTER-X</a>
+            </li>
+            <li id="balance">Баланс: <p id="bal-header">0</p>₽</li>
+            <li id="refill"><a href="#" id="depBtn">Пополнение</a></li>
+        </ul>
+    </header>
+
+    <!-- Оверлей и модальное окно -->
+    <div id="dep-overlay"
+        style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 999;">
+    </div>
+
+    <div id="dep-block"
+        style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgb(30, 30, 30); padding: 30px; border-radius: 12px; border: 3px solid orange; z-index: 1000; width: 400px; box-shadow: 0 0 40px rgba(255, 165, 0, 0.3);">
+        <h3 style="color: orange; text-align: center; margin-bottom: 20px; font-size: 24px;">Пополнение баланса</h3>
+        <input type="number" placeholder="Сумма, руб" id="depAmount" min="10" max="100000">
+        <input type="text" placeholder="Номер карты" id="cardNumber" maxlength="19">
+        <input type="text" placeholder="CVV-код" id="cardCvv" maxlength="3">
+        <input type="text" placeholder="Срок действия (MM/YY)" id="cardExpiry" maxlength="5">
+        <div style="display: flex; justify-content: space-between; gap: 10px; margin-top: 20px;">
+            <button id="confirmDepBtn"
+                style="background: linear-gradient(45deg, #ff7e33, #ffb400); color: black; padding: 10px; border: none; border-radius: 6px; width: 48%; cursor: pointer; font-weight: bold;">Пополнить</button>
+            <button id="closeDepBtn"
+                style="background: #555; color: white; padding: 10px; border: none; border-radius: 6px; width: 48%; cursor: pointer;">Отмена</button>
+        </div>
+    </div>
+
+    <a href="pages/info.html" id="info-fab" title="Информация о сайте">
+        <span>i</span>
+    </a>
+
+    <main>
+        <div id="general">
+            <h1>Выберите режим игры</h1>
+            <div class="mode-selection">
+                <a href="pages/crash.html" class="block-choose" id="fp">
+                    <div id="block-crash">
+                        <p>CRASH</p>
+                        <img src="img/crash.png" alt="crash">
+                    </div>
+                </a>
+                <a href="pages/cases.html" class="block-choose">
+                    <div id="block-cases">
+                        <p>CASES</p>
+                        <img src="img/cases0.png" alt="cases">
+                    </div>
+                </a>
+                <a href="pages/wheel.html" class="block-choose">
+                    <div id="block-wheel">
+                        <p>WHEEL</p>
+                        <img src="img/wheel.png" alt="wheel">
+                    </div>
+                </a>
+                <a href="pages/slots.html" class="block-choose">
+                    <div id="block-slots">
+                        <p>SLOTS</p>
+                        <img src="img/slots.png" alt="slots">
+                    </div>
+                </a>
+                <a href="pages/roulette.html" class="block-choose">
+                    <div id="block-roulette">
+                        <p>ROULETTE</p>
+                        <img src="img/roulette.png" alt="roulette">
+                    </div>
+                </a>
+            </div>
+        </div>
+    </main>
+    <script src="js/deposit.js"></script>
+    <script src="js/main-bg.js"></script>
+</body>
+
+</html>
