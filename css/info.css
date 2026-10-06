@@ -391,6 +391,36 @@ main.info-page {
     color: #000;
 }
 
+/* Вступление к блоку режимов */
+.modes-intro {
+    color: #999;
+    font-size: 14.5px;
+    line-height: 1.6;
+    margin-bottom: 18px;
+    padding-left: 18px;
+    position: relative;
+}
+
+.modes-intro::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 7px;
+    width: 3px;
+    height: 16px;
+    border-radius: 2px;
+    background: rgba(255, 165, 0, 0.4);
+}
+
+/* Сетка режимов — 2 колонки на десктопе, 1 на планшете/мобиле */
+.modes-grid {
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+}
+
+/* Универсальный data-color для новых карточек */
+.mode-card[data-color="#ff5555"] { --accent: #ff5555; }
+.mode-card[data-color="#7db8ff"] { --accent: #7db8ff; }
+
 /* ========== Адаптив ========== */
 @media (max-width: 768px) {
     main.info-page {
