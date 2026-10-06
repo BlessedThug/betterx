@@ -1,0 +1,53 @@
+// ================================================================
+//   cs2_skins_data.js – все скины CS2 кейса
+//   Добавляйте новые объекты в этот массив – они появятся автоматически.
+// ================================================================
+
+window.CS2_SKINS = [
+    // ---- TIER 1 (синие) ----
+    { name: "Револьвер R8 | Кованая кость", image: "../img/case-cs2/tier1/r8-bone.png", price: 70, tier: "tier1" },
+    { name: "Револьвер R8 | Танго", image: "../img/case-cs2/tier1/r8-tango.png", price: 197, tier: "tier1" },
+    { name: "Револьвер R8 | Пламя", image: "../img/case-cs2/tier1/r8-flame.png", price: 360, tier: "tier1" },
+    { name: "CZ75-Auto | Полимер", image: "../img/case-cs2/tier1/cz75auto-polymer.png", price: 123, tier: "tier1" },
+    { name: "CZ75-Auto | Смокинг", image: "../img/case-cs2/tier1/cz75auto-tuxedo.png", price: 218, tier: "tier1" },
+    { name: "CZ75-Auto | Настоящий змееяд", image: "../img/case-cs2/tier1/cz75auto-circaetus.png", price: 134, tier: "tier1" },
+    { name: "Desert Eagle | Метеорит", image: "../img/case-cs2/tier1/deserteagle-meteorite.png", price: 179, tier: "tier1" },
+    { name: "Desert Eagle | Городской щебень", image: "../img/case-cs2/tier1/deserteagle-urbanrubble.png", price: 106, tier: "tier1" },
+    { name: "Desert Eagle | Бронзовая декорация", image: "../img/case-cs2/tier1/deserteagle-bronzedeco.png", price: 87, tier: "tier1" },
+    { name: "Dual Berettas | Убежище", image: "../img/case-cs2/tier1/dualberettas-hideout.png", price: 59, tier: "tier1" },
+    { name: "Dual Berettas | Духовики", image: "../img/case-cs2/tier1/dualberettas-ventilators.png", price: 67, tier: "tier1" },
+    { name: "Dual Berettas | Клочки", image: "../img/case-cs2/tier1/dualberettas-shred.png", price: 85, tier: "tier1" },
+    { name: "Five-SeveN | Серебряный кварц", image: "../img/case-cs2/tier1/fiveseven-silverquartz.png", price: 76, tier: "tier1" },
+    { name: "Five-SeveN | Городская опасность", image: "../img/case-cs2/tier1/fiveseven-urbanhazard.png", price: 365, tier: "tier1" },
+    { name: "Five-SeveN | Ками", image: "../img/case-cs2/tier1/fiveseven-kami.png", price: 445, tier: "tier1" },
+    { name: "Glock-18 | Карамельное яблоко", image: "../img/case-cs2/tier1/glock18-candyapple.png", price: 264, tier: "tier1" },
+    { name: "Glock-18 | Расписная бирюза", image: "../img/case-cs2/tier1/glock18-tealgraf.png", price: 202, tier: "tier1" },
+    { name: "Glock-18 | Коралловое цветение", image: "../img/case-cs2/tier1/glock18-coralbloom.png", price: 433, tier: "tier1" },
+    { name: "P2000 | Королевское барокко", image: "../img/case-cs2/tier1/p2000-royalbaroque.png", price: 259, tier: "tier1" },
+    { name: "P2000 | Красное крыло", image: "../img/case-cs2/tier1/p2000-redwing.png", price: 124, tier: "tier1" },
+    { name: "P2000 | Защитник империи", image: "../img/case-cs2/tier1/p2000-imperial.png", price: 112, tier: "tier1" },
+    { name: "P250 | Кассета", image: "../img/case-cs2/tier1/p250-cassette.png", price: 57, tier: "tier1" },
+    { name: "P250 | Мелкая дичь", image: "../img/case-cs2/tier1/p250-smallgame.png", price: 192, tier: "tier1" },
+    { name: "P250 | Обменник", image: "../img/case-cs2/tier1/p250-exchanger.png", price: 101, tier: "tier1" },
+    { name: "Tec-9 | Ледниковый покров", image: "../img/case-cs2/tier1/tec9-icecap.png", price: 126, tier: "tier1" },
+    { name: "Tec-9 | Защитная сетка", image: "../img/case-cs2/tier1/tec9-safetynet.png", price: 744, tier: "tier1" },
+    { name: "Tec-9 | Шлак", image: "../img/case-cs2/tier1/tec9-slag.png", price: 111, tier: "tier1" },
+    { name: "USP-S | Горный камуфляж", image: "../img/case-cs2/tier1/usps-alpinecamo.png", price: 427, tier: "tier1" },
+    { name: "USP-S | Ночные операции", image: "../img/case-cs2/tier1/usps-nightops.png", price: 167, tier: "tier1" },
+    { name: "USP-S | Тропический бриз", image: "../img/case-cs2/tier1/usps-tropicalbreeze.png", price: 365, tier: "tier1" },
+    { name: "ПП-19 \"Бизон\" | Латунь", image: "../img/case-cs2/tier1/pp19bizon-brass.png", price: 320, tier: "tier1" },
+    { name: "ПП-19 \"Бизон\" | Рунопись", image: "../img/case-cs2/tier1/pp19bizon-runic.png", price: 109, tier: "tier1" },
+    { name: "ПП-19 \"Бизон\" | Шквал джунглей", image: "../img/case-cs2/tier1/pp19bizon-jungleslipstream.png", price: 69, tier: "tier1" },
+    { name: "MAC-10 | Тополиная чаща", image: "../img/case-cs2/tier1/mac10-poplarthicket.png", price: 193, tier: "tier1" },
+    { name: "MAC-10 | Океанские мотивы", image: "../img/case-cs2/tier1/mac10-oceanic.png", price: 82, tier: "tier1" },
+    { name: "MAC-10 | Пискля", image: "../img/case-cs2/tier1/mac10-pipsqueak.png", price: 663, tier: "tier1" },
+    { name: "MP5-SD | Сопроцессор", image: "../img/case-cs2/tier1/mp5sd-coprocessor.png", price: 99, tier: "tier1" },
+    { name: "MP5-SD | Фокус", image: "../img/case-cs2/tier1/mp5sd-focus.png", price: 121, tier: "tier1" },
+    { name: "MP5-SD | Ликвидация", image: "../img/case-cs2/tier1/mp5sd-liquidation.png", price: 122, tier: "tier1" },
+    { name: "MP7 | Анодированная синева", image: "../img/case-cs2/tier1/mp7-anodizednavy.png", price: 134, tier: "tier1" },
+    { name: "MP7 | Городская опасность", image: "../img/case-cs2/tier1/mp7-urbanhazard.png", price: 155, tier: "tier1" },
+    { name: "MP7 | Перистое облако", image: "../img/case-cs2/tier1/mp7-cirrus.png", price: 698, tier: "tier1" },
+    { name: "MP9 | Кромсание", image: "../img/case-cs2/tier1/mp9-shredded.png", price: 201, tier: "tier1" },
+    { name: "MP9 | Утечка отходов", image: "../img/case-cs2/tier1/mp9-bioleak.png", price: 80, tier: "tier1" },
+    { name: "MP9 | Кобальтовый пейсли", image: "../img/case-cs2/tier1/mp9-cobaltpasley.png", price: 262, tier: "tier1" }
+];
