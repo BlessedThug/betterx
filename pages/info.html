@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../css/chassis.css">
+    <link rel="stylesheet" href="../css/info.css">
+    <title>О сайте | BETTER-X</title>
+    <link rel="icon" href="../img/logo.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:ital,wght@0,100..900;1,100..900&display=swap"
+        rel="stylesheet">
+</head>
+
+<body>
+    <header>
+        <ul>
+            <li id="web-name">
+                <a href="../main.html"><img src="../img/logo.png" alt="logo" id="web-logo">BETTER-X</a>
+            </li>
+            <li id="balance">Баланс: <span id="bal-header">0.00</span> ₽</li>
+            <li id="refill"><a href="#" id="depBtn">Пополнение</a></li>
+        </ul>
+    </header>
+
+    <!-- Оверлей и модальное окно пополнения (совместимость с deposit.js) -->
+    <div id="dep-overlay"
+        style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 999;">
+    </div>
+    <div id="dep-block"
+        style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgb(30, 30, 30); padding: 30px; border-radius: 12px; border: 3px solid orange; z-index: 1000; width: 400px; box-shadow: 0 0 40px rgba(255, 165, 0, 0.3);">
+        <h3 style="color: orange; text-align: center; margin-bottom: 20px; font-size: 24px;">Пополнение баланса</h3>
+        <input type="number" placeholder="Сумма, руб" id="depAmount" min="10" max="100000">
+        <input type="text" placeholder="Номер карты" id="cardNumber" maxlength="19">
+        <input type="text" placeholder="CVV-код" id="cardCvv" maxlength="3">
+        <input type="text" placeholder="Срок действия (MM/YY)" id="cardExpiry" maxlength="5">
+        <div style="display: flex; justify-content: space-between; gap: 10px; margin-top: 20px;">
+            <button id="confirmDepBtn"
+                style="background: linear-gradient(45deg, #ff7e33, #ffb400); color: black; padding: 10px; border: none; border-radius: 6px; width: 48%; cursor: pointer; font-weight: bold;">Пополнить</button>
+            <button id="closeDepBtn"
+                style="background: #555; color: white; padding: 10px; border: none; border-radius: 6px; width: 48%; cursor: pointer;">Отмена</button>
+        </div>
+    </div>
+
+    <main class="info-page">
+        <div class="info-container">
+
+            <!-- Кнопка "Назад" -->
+            <a href="../main.html" class="back-link">← Назад к режимам</a>
+
+            <div class="page-hero">
+                <h1>О проекте</h1>
+                <p class="info-subtitle">Виртуальная игровая платформа</p>
+            </div>
+
+            <!-- ВАЖНОЕ ПРЕДУПРЕЖДЕНИЕ -->
+            <section class="warning-banner">
+                <div class="warning-icon">⚠️</div>
+                <div class="warning-content">
+                    <h2>Это не азартная игра!</h2>
+                    <p>
+                        <strong>BETTER-X</strong> — это полностью <strong>виртуальная симуляция</strong> игровых
+                        механик. Все ставки, балансы, «выигрыши» и предметы являются <strong>вымышленными</strong>
+                        и не имеют никакой реальной денежной ценности. Никакие настоящие деньги не принимаются,
+                        не выводятся и не выплачиваются.
+                    </p>
+                    <p>
+                        Все транзакции внутри платформы — это <strong>игровая имитация</strong> для развлечения
+                        и демонстрации игровых алгоритмов.
+                    </p>
+                </div>
+            </section>
+
+            <!-- О сайте -->
+            <section class="info-section">
+                <h2>🎮 Что такое BETTER-X?</h2>
+                <p>
+                    BETTER-X — это учебный веб-проект, имитирующий интерфейс и логику популярных азартных
+                    игр (crash, кейсы, колесо фортуны, слоты). Проект создан для:
+                </p>
+                <ul>
+                    <li>Демонстрации игровых алгоритмов и математики генераторов случайных чисел;</li>
+                    <li>Отработки веб-разработки (Canvas API, анимации, работа с localStorage);</li>
+                    <li>Развлечения пользователей без риска потери реальных средств.</li>
+                </ul>
+            </section>
+
+            <!-- Правовая информация -->
+            <section class="info-section law-section">
+                <h2>⚖️ Правовая информация</h2>
+                <p>
+                    В соответствии с законодательством Российской Федерации, в частности
+                    <strong>Федеральным законом № 244-ФЗ «О государственном регулировании деятельности
+                    по организации и проведению азартных игр...»</strong>, организация и проведение азартных
+                    игр на территории РФ допускается исключительно в специально отведённых игорных зонах
+                    и при наличии соответствующей лицензии.
+                </p>
+                <p>
+                    Данный сайт <strong>не является</strong> игорным заведением, букмекерской конторой,
+                    тотализатором или иным организатором азартных игр. Сайт не принимает денежные средства
+                    и не выплачивает выигрыши. Все действия на сайте — <strong>виртуальная симуляция</strong>,
+                    не подпадающая под действие указанного закона.
+                </p>
+                <p>
+                    Сайт также соответствует требованиям <strong>Федерального закона № 436-ФЗ
+                    «О защите детей от информации, причиняющей вред их здоровью и развитию»</strong> —
+                    игра позиционируется исключительно как развлекательный симулятор.
+                </p>
+            </section>
+
+            <!-- Режимы игры -->
+            <section class="info-section">
+                <h2>🕹️ Игровые режимы</h2>
+
+                <div class="modes-grid">
+
+                    <div class="mode-card" data-color="#ff3333">
+                        <div class="mode-card-header">
+                            <span class="mode-emoji">📈</span>
+                            <h3>CRASH</h3>
+                        </div>
+                        <p>
+                            Динамичная игра на растущем множителе. Кривая растёт от <strong>1.00x</strong>
+                            и в случайный момент «крашится». Задача — вовремя нажать «Забрать», чтобы
+                            зафиксировать текущий множитель. Если multiplier обрушится раньше — ставка
+                            сгорает. Ставка и авто-стоп настраиваются вручную.
+                        </p>
+                        <div class="mode-tag">Множитель 1.00x — ∞</div>
+                    </div>
+
+                    <div class="mode-card" data-color="#9C27B0">
+                        <div class="mode-card-header">
+                            <span class="mode-emoji">🎁</span>
+                            <h3>CASES</h3>
+                        </div>
+                        <p>
+                            Открытие виртуальных кейсов с предметами разных уровней редкости
+                            (tier 1 — tier 5). Кейсы: <em>Денежный</em>, <em>Предметный</em>,
+                            <em>Игровой</em>, <em>CS2</em>. Выигранные предметы попадают в инвентарь,
+                            откуда их можно продать или использовать в качестве ставки в других режимах.
+                        </p>
+                        <div class="mode-tag">5 уровней редкости</div>
+                    </div>
+
+                    <div class="mode-card" data-color="#4CAF50">
+                        <div class="mode-card-header">
+                            <span class="mode-emoji">🎡</span>
+                            <h3>WHEEL</h3>
+                        </div>
+                        <p>
+                            Колесо фортуны с секторами <strong>0x, 1.5x, 2x, 5x, 10x</strong>.
+                            Чем выше множитель — тем меньше шанс выпадения. Крутите колесо,
+                            ждите остановки и получайте выплату, если стрелка указала на
+                            сектор с множителем больше нуля.
+                        </p>
+                        <div class="mode-tag">Множители до x10</div>
+                    </div>
+
+                    <div class="mode-card" data-color="#ffb400">
+                        <div class="mode-card-header">
+                            <span class="mode-emoji">🎰</span>
+                            <h3>SLOTS</h3>
+                        </div>
+                        <p>
+                            Классические игровые автоматы 3×3 с <strong>5 линиями выплат</strong>
+                            (3 горизонтали и 2 диагонали). Семь символов — от 🍒 до ⭐
+                            с множителями от <strong>x2 до x50</strong>. Собери три одинаковых
+                            символа на линии — получи выплату. Полная таблица — внутри игры.
+                        </p>
+                        <div class="mode-tag">Множители до x50</div>
+                    </div>
+
+                </div>
+            </section>
+
+            <!-- Инвентарь -->
+            <section class="info-section">
+                <h2>🎒 Инвентарь и ставки предметами</h2>
+                <p>
+                    Все выигранные в кейсах предметы попадают в раздел
+                    <strong>«Инвентарь»</strong>. Оттуда их можно:
+                </p>
+                <ul>
+                    <li>💰 <strong>Продать</strong> за виртуальные ₽ и увеличить игровой баланс;</li>
+                    <li>🎲 <strong>Использовать как ставку</strong> в режимах CRASH, WHEEL и SLOTS —
+                        тогда сумма ставки автоматически равна стоимости предмета.</li>
+                </ul>
+                <p class="hint">
+                    💡 Предметы хранятся в localStorage браузера. Очистка данных сайта удалит
+                    инвентарь и баланс.
+                </p>
+            </section>
+
+            <!-- Как играть -->
+            <section class="info-section">
+                <h2>🚀 Как начать играть</h2>
+                <ol class="steps-list">
+                    <li>
+                        <strong>Пополните виртуальный баланс.</strong>
+                        Кнопка «Пополнение» в шапке сайта. Сумма зачисляется <em>только в игровом
+                        контексте</em> и ни к каким реальным картам не привязана.
+                    </li>
+                    <li>
+                        <strong>Выберите режим.</strong> CRASH, CASES, WHEEL или SLOTS — на главной странице.
+                    </li>
+                    <li>
+                        <strong>Сделайте ставку.</strong> Введите сумму или выберите предмет из инвентаря.
+                    </li>
+                    <li>
+                        <strong>Играйте и получайте удовольствие.</strong> Все результаты — случайны.
+                    </li>
+                </ol>
+            </section>
+
+            <!-- Ответственная игра -->
+            <section class="info-section responsible-section">
+                <h2>💚 Ответственная игра</h2>
+                <p>
+                    Даже будучи симуляцией, игры на BETTER-X могут увлекать. Мы напоминаем:
+                </p>
+                <ul>
+                    <li>Игра — это <strong>развлечение</strong>, а не способ заработка.</li>
+                    <li>Если в реальной жизни вы чувствуете тягу к азартным играм —
+                        обратитесь за поддержкой к специалистам.</li>
+                    <li>Азартные игры могут вызывать зависимость. Берегите себя и близких.</li>
+                </ul>
+            </section>
+
+            <!-- Футер -->
+            <footer class="info-footer">
+                <p>© BETTER-X — учебный проект. Все «ставки» и «выигрыши» — симуляция.</p>
+                <a href="../main.html" class="back-home">Вернуться на главную</a>
+            </footer>
+
+        </div>
+    </main>
+
+    <script src="../js/deposit.js"></script>
+</body>
+
+</html>
