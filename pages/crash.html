@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../css/crash.css">
+    <link rel="stylesheet" href="../css/chassis.css">
+    <link rel="stylesheet" href="../css/crash-bg.css">
+    <title>CRASH | BETTER-X</title>
+    <link rel="icon" href="../img/logo.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:ital,wght@0,100..900;1,100..900&display=swap"
+        rel="stylesheet">
+</head>
+
+<body>
+    <header>
+        <ul>
+            <li id="web-name">
+                <a href="../main.html"><img src="../img/logo.png" alt="logo" id="web-logo">BETTER-X</a>
+            </li>
+            <li id="balance">Баланс: <span id="bal-header">0.00</span> ₽</li>
+            <li id="refill"><a href="#" id="depBtn">Пополнение</a></li>
+        </ul>
+    </header>
+
+    <!-- Оверлей и модальное окно -->
+    <div id="dep-overlay"
+        style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 999;">
+    </div>
+
+    <div id="dep-block"
+        style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgb(30, 30, 30); padding: 30px; border-radius: 12px; border: 3px solid orange; z-index: 1000; width: 400px; box-shadow: 0 0 40px rgba(255, 165, 0, 0.3);">
+        <h3 style="color: orange; text-align: center; margin-bottom: 20px; font-size: 24px;">Пополнение баланса</h3>
+        <input type="number" placeholder="Сумма, руб" id="depAmount" min="10" max="100000">
+        <input type="text" placeholder="Номер карты" id="cardNumber" maxlength="19">
+        <input type="text" placeholder="CVV-код" id="cardCvv" maxlength="3">
+        <input type="text" placeholder="Срок действия (MM/YY)" id="cardExpiry" maxlength="5">
+        <div style="display: flex; justify-content: space-between; gap: 10px; margin-top: 20px;">
+            <button id="confirmDepBtn"
+                style="background: linear-gradient(45deg, #ff7e33, #ffb400); color: black; padding: 10px; border: none; border-radius: 6px; width: 48%; cursor: pointer; font-weight: bold;">Пополнить</button>
+            <button id="closeDepBtn"
+                style="background: #555; color: white; padding: 10px; border: none; border-radius: 6px; width: 48%; cursor: pointer;">Отмена</button>
+        </div>
+    </div>
+
+    <main>
+        <div id="bet">
+            <div id="bet-place">
+                <h2 id="bet-h">Поле ставки</h2>
+                <div class="inputs-container">
+                    <input type="number" placeholder="Введите сумму, руб" min="1" id="betAmount">
+                    <input type="number" placeholder="Введите икс (авто-стоп, 1.5)" min="1.00" step="0.01"
+                        id="betMultiplier">
+                </div>
+
+                <!-- Блок инвентаря -->
+                <div class="inventory-section">
+                    <h4>🎒 Инвентарь</h4>
+                    <div id="inventory-list" class="inventory-list"></div>
+                </div>
+
+                <!-- Текущая ставка -->
+                <div class="current-bet-display">
+                    <div class="label">ТЕКУЩАЯ СТАВКА</div>
+                    <div class="amount" id="current-bet-amount">0 ₽</div>
+                    <div class="item-name" id="current-bet-item"></div>
+                </div>
+
+                <div class="bottom-row">
+                    <div id="divstatus">Статус: <span id="status">Ожидание</span></div>
+                    <button id="startBtn">ПОДТВЕРДИТЬ СТАВКУ</button>
+                </div>
+            </div>
+
+            <div id="history-game">
+                <h2>История игры</h2>
+                <div id="slots-container">
+                    <div id="slots"></div>
+                </div>
+            </div>
+            <div id="history-bal">
+                <h2>Изменение баланса</h2>
+                <div id="hb"></div>
+            </div>
+        </div>
+
+        <div id="game">
+            <h2 id="game-bc">Поле игры</h2>
+            <h3 id="x-block">Множитель: <span id="x">1.00</span> x</h3>
+        </div>
+    </main>
+
+    <script src="../js/deposit.js"></script>
+    <script src="../js/inventory.js"></script>
+    <script src="../js/crash.js"></script>
+    <script src="../js/multiplayer.js"></script>
+    <script src="../js/crash-bg.js"></script>
+</body>
+
+</html>

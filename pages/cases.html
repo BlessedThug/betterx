@@ -1,0 +1,168 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="../css/cases.css">
+    <link rel="stylesheet" href="../css/chassis.css">
+    <link rel="stylesheet" href="../css/cases-nav-bar.css">
+    <link rel="stylesheet" href="../css/cases-catalog.css">
+    <link rel="stylesheet" href="../css/cases-inventory.css">
+    <title>CASES | BETTER-X</title>
+    <link rel="icon" href="../img/logo.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:ital,wght@0,100..900;1,100..900&display=swap"
+        rel="stylesheet">
+</head>
+
+<body>
+    <header>
+        <ul>
+            <li id="web-name">
+                <a href="../main.html"><img src="../img/logo.png" alt="logo" id="web-logo">BETTER-X</a>
+            </li>
+            <li id="catalog"><a href="#"><img src="../img/catalog.png" alt="catalog">Каталог</a></li>
+            <li id="inventory"><a href="#"><img src="../img/inventory.png" alt="inventory">Инвентарь</a></li>
+            <li id="balance">Баланс: <span id="bal-header">0.00</span> ₽</li>
+            <li id="refill"><a href="#" id="depBtn">Пополнение</a></li>
+        </ul>
+    </header>
+
+    <main>
+        <!-- Оверлей и модальное окно -->
+        <div id="dep-overlay"
+            style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 999;">
+        </div>
+
+        <div id="dep-block"
+            style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgb(30, 30, 30); padding: 30px; border-radius: 12px; border: 3px solid orange; z-index: 1000; width: 400px; box-shadow: 0 0 40px rgba(255, 165, 0, 0.3);">
+            <h3 style="color: orange; text-align: center; margin-bottom: 20px; font-size: 24px;">Пополнение баланса</h3>
+            <input type="number" placeholder="Сумма, руб" id="depAmount" min="10" max="100000">
+            <input type="text" placeholder="Номер карты" id="cardNumber" maxlength="19">
+            <input type="text" placeholder="CVV-код" id="cardCvv" maxlength="3">
+            <input type="text" placeholder="Срок действия (MM/YY)" id="cardExpiry" maxlength="5">
+            <div style="display: flex; justify-content: space-between; gap: 10px; margin-top: 20px;">
+                <button id="confirmDepBtn"
+                    style="background: linear-gradient(45deg, #ff7e33, #ffb400); color: black; padding: 10px; border: none; border-radius: 6px; width: 48%; cursor: pointer; font-weight: bold;">Пополнить</button>
+                <button id="closeDepBtn"
+                    style="background: #555; color: white; padding: 10px; border: none; border-radius: 6px; width: 48%; cursor: pointer;">Отмена</button>
+            </div>
+        </div>
+
+        <!-- Блок каталога -->
+        <div id="m-catalog" style="display: none;">
+            <h1>Каталог кейсов</h1>
+            <div id="case-choose">
+                <a href="#" class="block-choose">
+                    <div id="block-money">
+                        <img src="../img/case-money.png" alt="Денежный кейс">
+                        <p>Денежный кейс</p>
+                    </div>
+                </a>
+                <a href="#" class="block-choose">
+                    <div id="block-items">
+                        <img src="../img/case-items.png" alt="Кейс с вещами">
+                        <p>Предметный кейс</p>
+                    </div>
+                </a>
+                <a href="#" class="block-choose">
+                    <div id="block-games">
+                        <img src="../img/case-games.png" alt="Кейс с играми">
+                        <p>Игровой кейс</p>
+                    </div>
+                </a>
+                <a href="#" class="block-choose">
+                    <div id="block-cs2">
+                        <img src="../img/case-cs2.png" alt="Кейс CS2">
+                        <p>Кейс CS2</p>
+                    </div>
+                </a>
+            </div>
+        </div>
+
+        <!-- Блок инвентаря -->
+        <div id="m-inventory" style="display: none;">
+            <h1>Инвентарь</h1>
+            <div id="m-inf-inv">
+                <p>Общая стоимость: <span id="rub">0</span>₽</p>
+            </div>
+        </div>
+
+        <!-- Блок Денежного кейса -->
+        <div id="case-money" class="case-base" style="display: none;">
+            <h1>Денежный кейс</h1>
+            <!-- Анимация рулетки кейса -->
+            <div class="case-open" style="display: none;"></div>
+
+            <div class="case-open-btn">
+                <button>Открыть: 500 ₽</button>
+            </div>
+            <h2>Содержимое кейса</h2>
+            <div class="case-content"></div>
+        </div>
+
+        <!-- Блок Предметного кейса -->
+        <div id="case-items" class="case-base" style="display: none;">
+            <h1>Предметный кейс</h1>
+            <!-- Анимация рулетки кейса -->
+            <div class="case-open" style="display: none;"></div>
+
+            <div class="case-open-btn">
+                <button>Открыть: 1599 ₽</button>
+            </div>
+            <h2>Содержимое кейса</h2>
+            <div class="case-content"></div>
+        </div>
+
+        <!-- Блок Игрового кейса -->
+        <div id="case-games" class="case-base" style="display: none;">
+            <h1>Игровой кейс</h1>
+            <div class="case-open" style="display: none;"></div>
+
+            <div class="case-open-btn">
+                <button>Открыть: 749 ₽</button>
+            </div>
+            <h2>Содержимое кейса</h2>
+            <div class="case-content"></div>
+        </div>
+
+        <!-- Блок CS2 кейса -->
+        <div id="case-cs2" class="case-base" style="display: none;">
+            <h1>Кейс COUNTER STRIKE 2</h1>
+            <!-- Анимация рулетки кейса -->
+            <div class="case-open" style="display: none;"></div>
+
+            <div class="case-open-btn">
+                <button>Открыть: 200 ₽</button>
+            </div>
+            <h2>Содержимое кейса</h2>
+            <div class="case-content"></div>
+    </main>
+
+    <script src="../js/cases/visual-cases.js"></script>
+    <script src="../js/deposit.js"></script>
+
+    <!-- Денежный кейс -->
+    <script src="../js/cases/case-money-data.js"></script>
+    <script src="../js/cases/case-money.js"></script>
+
+    <!-- Предметный кейс -->
+    <script src="../js/cases/case-items-data.js"></script>
+    <script src="../js/cases/case-items.js"></script>
+
+    <!-- CS2 кейс -->
+    <script src="../js/cases/cs2-skins-data.js"></script>
+    <script src="../js/cases/case-cs2.js"></script>
+
+    <!-- Игровой кейс -->
+    <script src="../js/cases/case-games-data.js"></script>
+    <script src="../js/cases/case-games.js"></script>
+
+    <!-- Общие -->
+    <script src="../js/inventory.js"></script>
+    <script src="../js/cases/multiplayer-cases.js"></script>
+</body>
+
+</html>
