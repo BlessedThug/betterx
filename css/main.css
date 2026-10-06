@@ -366,6 +366,49 @@ a {
     }
 }
 
+#block-memory {
+    width: 500px;
+    height: 500px;
+    padding: 30px;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+#block-memory p {
+    font-size: 64px;
+    font-weight: 800;
+    background: linear-gradient(90deg, #ff8a00, #ffcc00);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 30px;
+    letter-spacing: 2px;
+}
+
+#block-memory:hover p {
+    background: linear-gradient(90deg, #ffcc00, #ffffff);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+#block-memory .block-emoji {
+    font-size: 240px;
+    line-height: 1;
+    filter: drop-shadow(0 5px 15px rgba(255, 140, 0, 0.4));
+    transition: all 0.4s ease;
+}
+
+#block-memory:hover .block-emoji {
+    transform: scale(1.08) rotate(-6deg);
+    filter: drop-shadow(0 10px 25px rgba(255, 200, 0, 0.7));
+}
+
+@media (max-width: 1200px) { #block-memory { width: 450px; height: 450px; } #block-memory .block-emoji { font-size: 200px; } }
+@media (max-width: 992px)  { #block-memory { width: 400px; height: 400px; } #block-memory p { font-size: 56px; } #block-memory .block-emoji { font-size: 180px; } }
+@media (max-width: 480px)  { #block-memory p { font-size: 48px; } #block-memory .block-emoji { font-size: 150px; } }
+
 /* Плавающая кнопка информации в правом нижнем углу */
 #info-fab {
     position: fixed;
