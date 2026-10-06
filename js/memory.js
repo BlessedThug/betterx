@@ -1,17 +1,10 @@
 (function () {
     // ============ КОНСТАНТЫ ============
     const SYMBOLS = ['🍎', '🍊', '🍋', '🍌', '🍉', '🍇', '🍓', '🍒'];
-    const MULTIPLIERS = [3, 6, 12, 16, 20, 24, 28, 32];
+    const MULTIPLIERS = [4, 8, 12, 16, 20, 24, 28, 32];
     const CARD_FLIP_DELAY = 900;
     const TOTAL_PAIRS = 8;
-
-    // Попытки на пару в зависимости от количества найденных пар
-    // 0–3 → 3 попытки | 4–5 → 2 попытки | 6–7 → 1 попытка
-    function getMaxAttempts(pairsFound) {
-        if (pairsFound >= 6) return 1;
-        if (pairsFound >= 4) return 2;
-        return 3;
-    }
+    const TOTAL_ATTEMPTS = 3;   // всего попыток на всю игру
 
     // ============ DOM ============
     const boardEl = document.getElementById('memory-board');
@@ -39,8 +32,7 @@
         board: [],
         firstPick: null,
         pairsFound: 0,
-        attemptsLeft: 3,
-        maxAttempts: 3,
+        attemptsLeft: TOTAL_ATTEMPTS,
         phase: 'idle',      // idle | playing | decision | resolving | gameover
         bet: 0,
         usedItem: null,
@@ -147,9 +139,8 @@
     function updateProgress() {
         pairsCountEl.textContent = `${state.pairsFound} / ${TOTAL_PAIRS}`;
 
-        // Попытки
         if (attemptsEl) {
-            attemptsEl.textContent = `${state.attemptsLeft} / ${state.maxAttempts}`;
+            attemptsEl.textContent = `${state.attemptsLeft} / ${TOTAL_ATTEMPTS}`;
             const low = state.attemptsLeft <= 1;
             attemptsEl.classList.toggle('danger', low);
             attemptsEl.classList.toggle('gold', !low);
@@ -288,8 +279,7 @@
         state.bet = betAmount;
         state.usedItem = usedItem;
         state.pairsFound = 0;
-        state.maxAttempts = getMaxAttempts(0); // = 3
-        state.attemptsLeft = state.maxAttempts;
+        state.attemptsLeft = TOTAL_ATTEMPTS;   // всегда 3 на старте
         state.firstPick = null;
         state.board = generateBoard();
         state.phase = 'playing';
@@ -297,7 +287,7 @@
 
         startBtn.disabled = true;
         startBtn.textContent = '🎯 ИГРА ИДЁТ...';
-        setStatus(`🎯 Найдите пару! У вас ${state.attemptsLeft} попытки.`);
+        setStatus(`🎯 Найдите пару! Всего попыток: ${TOTAL_ATTEMPTS}.`);
         hideDecision();
         renderBoard();
         updateProgress();
@@ -330,20 +320,16 @@
 
         const first = state.board[state.firstPick];
         const second = card;
+        const firstIdx = state.firstPick;
 
         if (first.symbol === second.symbol) {
-            // ✅ MATCH
+            // ✅ MATCH — попытки НЕ пополняются
             state.locked = true;
             setTimeout(() => {
                 first.matched = true;
                 second.matched = true;
                 state.pairsFound++;
                 state.firstPick = null;
-
-                // Обновляем попытки для следующей пары
-                state.maxAttempts = getMaxAttempts(state.pairsFound);
-                state.attemptsLeft = state.maxAttempts;
-
                 state.locked = false;
 
                 updateCardVisual(state.board.indexOf(first));
@@ -365,14 +351,12 @@
 
             first.wrong = true;
             second.wrong = true;
-            updateCardVisual(state.firstPick);
+            updateCardVisual(firstIdx);
             updateCardVisual(idx);
-
-            const firstIdx = state.firstPick;
 
             if (state.attemptsLeft <= 0) {
                 // Попытки кончились → проигрыш
-                setStatus(`💀 Попытки кончились! Все ${state.maxAttempts} использованы.`, 'error');
+                setStatus(`💀 Попытки кончились! Все ${TOTAL_ATTEMPTS} использованы.`, 'error');
                 state.phase = 'resolving';
                 state.revealTimer = setTimeout(() => {
                     first.wrong = false;
@@ -385,7 +369,7 @@
                     loseGame();
                 }, CARD_FLIP_DELAY);
             } else {
-                // Ещё есть попытки → продолжаем
+                // Остались попытки → продолжаем
                 setStatus(`❌ Не пара! Осталось попыток: ${state.attemptsLeft}.`, 'error');
                 state.phase = 'resolving';
                 state.revealTimer = setTimeout(() => {
@@ -410,13 +394,13 @@
         const mult = MULTIPLIERS[state.pairsFound - 1];
         const nextMult = MULTIPLIERS[state.pairsFound];
         const win = state.bet * mult;
-        const nextAttempts = getMaxAttempts(state.pairsFound);
 
         decisionTitleEl.textContent = `🎉 ПАРА НАЙДЕНА!`;
         decisionTextEl.innerHTML = `
             Множитель <b style="color:#ffb400;">x${mult}</b> · К выплате <b style="color:#4CAF50;">${formatMoney(win)} ₽</b>
             <div style="font-size:13px;color:#888;margin-top:8px;">
-                Следующая пара: попыток <b style="color:#ffb400;">${nextAttempts}</b>
+                Осталось попыток: <b style="color:${state.attemptsLeft <= 1 ? '#ff5555' : '#ffb400'};">${state.attemptsLeft}</b>
+                · Следующая пара → x${nextMult}
             </div>
         `;
 
@@ -621,7 +605,7 @@
             };
         }
 
-        console.log('Memory: 4×4, множители x4..x32. Попытки: 3/3/3/3/2/2/1/1');
+        console.log('Memory: 3 попытки на всю игру. Множители x4..x32.');
     }
 
     if (document.readyState === 'loading') {
