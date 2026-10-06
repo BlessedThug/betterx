@@ -5,7 +5,8 @@
 /* ============ ЦЕНТРИРОВАНИЕ КОНТЕНТА ============ */
 main .wheel-game-area,
 main .roulette-game-area,
-main .slots-game-area {
+main .slots-game-area,
+main .memory-game area {
     display: flex;
     flex-direction: column;
     justify-content: center;   /* ← вот это центрирует по вертикали */
@@ -19,7 +20,8 @@ main .slots-game-area {
 /* ============ ФОН ============ */
 main .wheel-game-area,
 main .roulette-game-area,
-main .slots-game-area {
+main .slots-game-area,
+main .memory-game area {
     position: relative;
     overflow: hidden;
     isolation: isolate;
@@ -40,7 +42,8 @@ main .slots-game-area {
 /* Виньетка по краям — фокусирует взгляд на центре */
 main .wheel-game-area::before,
 main .roulette-game-area::before,
-main .slots-game-area::before {
+main .slots-game-area::before,
+main .memory-game area::before {
     content: '';
     position: absolute;
     inset: 0;
@@ -52,7 +55,8 @@ main .slots-game-area::before {
 /* Угловые акценты по бокам */
 main .wheel-game-area::after,
 main .roulette-game-area::after,
-main .slots-game-area::after {
+main .slots-game-area::after,
+main .memory-game area::after {
     content: '';
     position: absolute;
     inset: 0;
@@ -66,7 +70,8 @@ main .slots-game-area::after {
 /* Контент поверх фона — но НЕ партиклы и не орбы */
 main .wheel-game-area > *:not(.game-particles):not(.game-orb),
 main .roulette-game-area > *:not(.game-particles):not(.game-orb),
-main .slots-game-area > *:not(.game-particles):not(.game-orb) {
+main .slots-game-area > *:not(.game-particles):not(.game-orb),
+main .memory-game area > *:not(.game-particles):not(.game-orb) {
     position: relative;
     z-index: 1;
 }
