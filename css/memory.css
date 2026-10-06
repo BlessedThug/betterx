@@ -408,6 +408,17 @@
     to   { transform: scale(1); opacity: 1; }
 }
 
+/* Подсветка низких попыток */
+#memory-attempts.danger {
+    color: #ff5555 !important;
+    animation: attemptsPulse 0.7s ease-in-out infinite alternate;
+}
+
+@keyframes attemptsPulse {
+    from { text-shadow: 0 0 6px rgba(255, 60, 60, 0.4); }
+    to   { text-shadow: 0 0 18px rgba(255, 60, 60, 0.9); }
+}
+
 /* ============ Адаптив ============ */
 @media (max-width: 900px) {
     .memory-board-wrapper {
