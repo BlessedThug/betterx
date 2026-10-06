@@ -1,9 +1,17 @@
 (function () {
     // ============ КОНСТАНТЫ ============
     const SYMBOLS = ['🍎', '🍊', '🍋', '🍌', '🍉', '🍇', '🍓', '🍒'];
-    const MULTIPLIERS = [4, 8, 12, 16, 20, 24, 28, 50];
-    const CARD_FLIP_DELAY = 800;  // ms — задержка после неправильной пары
+    const MULTIPLIERS = [3, 6, 12, 16, 20, 24, 28, 32];
+    const CARD_FLIP_DELAY = 900;
     const TOTAL_PAIRS = 8;
+
+    // Попытки на пару в зависимости от количества найденных пар
+    // 0–3 → 3 попытки | 4–5 → 2 попытки | 6–7 → 1 попытка
+    function getMaxAttempts(pairsFound) {
+        if (pairsFound >= 6) return 1;
+        if (pairsFound >= 4) return 2;
+        return 3;
+    }
 
     // ============ DOM ============
     const boardEl = document.getElementById('memory-board');
@@ -19,6 +27,7 @@
     const currentBetAmountEl = document.getElementById('current-bet-amount');
     const currentBetItemEl = document.getElementById('current-bet-item');
     const pairsCountEl = document.getElementById('memory-pairs-count');
+    const attemptsEl = document.getElementById('memory-attempts');
     const currentMultEl = document.getElementById('memory-current-mult');
     const currentWinEl = document.getElementById('memory-current-win');
     const ladderEl = document.getElementById('memory-ladder');
@@ -30,6 +39,8 @@
         board: [],
         firstPick: null,
         pairsFound: 0,
+        attemptsLeft: 3,
+        maxAttempts: 3,
         phase: 'idle',      // idle | playing | decision | resolving | gameover
         bet: 0,
         usedItem: null,
@@ -135,6 +146,14 @@
     // ============ ПРОГРЕСС ============
     function updateProgress() {
         pairsCountEl.textContent = `${state.pairsFound} / ${TOTAL_PAIRS}`;
+
+        // Попытки
+        if (attemptsEl) {
+            attemptsEl.textContent = `${state.attemptsLeft} / ${state.maxAttempts}`;
+            const low = state.attemptsLeft <= 1;
+            attemptsEl.classList.toggle('danger', low);
+            attemptsEl.classList.toggle('gold', !low);
+        }
 
         if (state.pairsFound === 0) {
             currentMultEl.textContent = '—';
@@ -269,6 +288,8 @@
         state.bet = betAmount;
         state.usedItem = usedItem;
         state.pairsFound = 0;
+        state.maxAttempts = getMaxAttempts(0); // = 3
+        state.attemptsLeft = state.maxAttempts;
         state.firstPick = null;
         state.board = generateBoard();
         state.phase = 'playing';
@@ -276,7 +297,7 @@
 
         startBtn.disabled = true;
         startBtn.textContent = '🎯 ИГРА ИДЁТ...';
-        setStatus('🎯 Найдите первую пару! Кликните по карточке, затем по её паре.');
+        setStatus(`🎯 Найдите пару! У вас ${state.attemptsLeft} попытки.`);
         hideDecision();
         renderBoard();
         updateProgress();
@@ -299,7 +320,7 @@
             card.revealed = true;
             state.firstPick = idx;
             updateCardVisual(idx);
-            setStatus('🤔 Теперь найдите её пару...');
+            setStatus(`🤔 Ищите пару... (попыток: ${state.attemptsLeft})`);
             return;
         }
 
@@ -318,6 +339,11 @@
                 second.matched = true;
                 state.pairsFound++;
                 state.firstPick = null;
+
+                // Обновляем попытки для следующей пары
+                state.maxAttempts = getMaxAttempts(state.pairsFound);
+                state.attemptsLeft = state.maxAttempts;
+
                 state.locked = false;
 
                 updateCardVisual(state.board.indexOf(first));
@@ -332,27 +358,50 @@
                 }
             }, 350);
         } else {
-            // ❌ MISMATCH
+            // ❌ MISMATCH — тратим попытку
             state.locked = true;
+            state.attemptsLeft--;
+            updateProgress();
+
             first.wrong = true;
             second.wrong = true;
             updateCardVisual(state.firstPick);
             updateCardVisual(idx);
 
-            setStatus('❌ Не пара! Ставка сгорела...', 'error');
+            const firstIdx = state.firstPick;
 
-            state.phase = 'resolving';
-            state.revealTimer = setTimeout(() => {
-                first.wrong = false;
-                second.wrong = false;
-                first.revealed = false;
-                second.revealed = false;
-                updateCardVisual(state.board.indexOf(first));
-                updateCardVisual(state.board.indexOf(second));
-
-                state.firstPick = null;
-                loseGame();
-            }, CARD_FLIP_DELAY);
+            if (state.attemptsLeft <= 0) {
+                // Попытки кончились → проигрыш
+                setStatus(`💀 Попытки кончились! Все ${state.maxAttempts} использованы.`, 'error');
+                state.phase = 'resolving';
+                state.revealTimer = setTimeout(() => {
+                    first.wrong = false;
+                    second.wrong = false;
+                    first.revealed = false;
+                    second.revealed = false;
+                    updateCardVisual(firstIdx);
+                    updateCardVisual(idx);
+                    state.firstPick = null;
+                    loseGame();
+                }, CARD_FLIP_DELAY);
+            } else {
+                // Ещё есть попытки → продолжаем
+                setStatus(`❌ Не пара! Осталось попыток: ${state.attemptsLeft}.`, 'error');
+                state.phase = 'resolving';
+                state.revealTimer = setTimeout(() => {
+                    first.wrong = false;
+                    second.wrong = false;
+                    first.revealed = false;
+                    second.revealed = false;
+                    updateCardVisual(firstIdx);
+                    updateCardVisual(idx);
+                    state.firstPick = null;
+                    state.locked = false;
+                    state.phase = 'playing';
+                    updateAllCardsVisual();
+                    setStatus(`🎯 Попробуйте снова! Попыток: ${state.attemptsLeft}.`);
+                }, CARD_FLIP_DELAY);
+            }
         }
     }
 
@@ -361,9 +410,15 @@
         const mult = MULTIPLIERS[state.pairsFound - 1];
         const nextMult = MULTIPLIERS[state.pairsFound];
         const win = state.bet * mult;
+        const nextAttempts = getMaxAttempts(state.pairsFound);
 
         decisionTitleEl.textContent = `🎉 ПАРА НАЙДЕНА!`;
-        decisionTextEl.innerHTML = `Множитель <b style="color:#ffb400;">x${mult}</b> · К выплате <b style="color:#4CAF50;">${formatMoney(win)} ₽</b>`;
+        decisionTextEl.innerHTML = `
+            Множитель <b style="color:#ffb400;">x${mult}</b> · К выплате <b style="color:#4CAF50;">${formatMoney(win)} ₽</b>
+            <div style="font-size:13px;color:#888;margin-top:8px;">
+                Следующая пара: попыток <b style="color:#ffb400;">${nextAttempts}</b>
+            </div>
+        `;
 
         cashoutBtn.textContent = `💰 ЗАБРАТЬ ${formatMoney(win)} ₽`;
         continueBtn.textContent = `➡ ПРОДОЛЖИТЬ → x${nextMult}`;
@@ -437,7 +492,7 @@
         state.locked = false;
         updateAllCardsVisual();
         updateProgress();
-        setStatus(`🎯 Найдите пару #${state.pairsFound + 1}!`);
+        setStatus(`🎯 Найдите пару #${state.pairsFound + 1}! Попыток: ${state.attemptsLeft}.`);
     }
 
     // ============ ЭФФЕКТЫ ============
@@ -566,7 +621,7 @@
             };
         }
 
-        console.log('Memory: 4×4, 8 пар, множители x4→x8→x12→...→x32. Без preview.');
+        console.log('Memory: 4×4, множители x4..x32. Попытки: 3/3/3/3/2/2/1/1');
     }
 
     if (document.readyState === 'loading') {
