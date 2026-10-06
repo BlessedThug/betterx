@@ -1,0 +1,994 @@
+.case-base {
+    width: 100%;
+    height: 100%;
+    padding: 40px 20px;
+    overflow-y: auto;
+    background: linear-gradient(135deg, rgba(20, 20, 20, 0.9) 0%, rgba(30, 30, 30, 0.95) 100%);
+    border-radius: 20px;
+    margin: 20px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+}
+
+.case-base h1 {
+    color: #fff;
+    font-size: 40px;
+    text-align: center;
+    margin-bottom: 50px;
+    padding-bottom: 20px;
+    position: relative;
+    background: linear-gradient(90deg, #ff8a00, #ffcc00);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-shadow: 0 5px 15px rgba(255, 140, 0, 0.2);
+    letter-spacing: 2px;
+}
+
+.case-base h1::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 200px;
+    height: 4px;
+    background: linear-gradient(90deg, #ff8a00, #ffcc00, #ff8a00);
+    border-radius: 2px;
+}
+
+/* Заголовок "Содержимое кейса" */
+.case-base h2 {
+    color: #fff;
+    font-size: 32px;
+    text-align: center;
+    margin: 140px auto 40px;
+    padding-bottom: 15px;
+    width: 90%;
+    max-width: 800px;
+    position: relative;
+    background: linear-gradient(90deg, #ff8a00, #ffcc00);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    letter-spacing: 1.2px;
+    font-weight: 600;
+}
+
+.case-base h2::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 150px;
+    height: 3px;
+    background: linear-gradient(90deg, transparent, #ff8a00, #ffcc00, #ff8a00, transparent);
+    border-radius: 1.5px;
+}
+
+/* Кнопка открытия кейса */
+.case-open-btn {
+    text-align: center;
+    margin: 140px 0 10px;
+    padding: 0 20px;
+}
+
+.case-open-btn button {
+    background: linear-gradient(135deg, #ff8a00, #ffcc00, #ff8a00);
+    color: #1a1a1a;
+    border: none;
+    padding: 18px 50px;
+    font-size: 26px;
+    font-weight: 700;
+    border-radius: 15px;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow:
+        0 10px 25px rgba(255, 140, 0, 0.4),
+        0 0 0 3px rgba(255, 165, 0, 0.3),
+        inset 0 1px 0 rgba(255, 255, 255, 0.4);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    position: relative;
+    overflow: hidden;
+    min-width: 300px;
+}
+
+.case-open-btn button::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+    transition: left 0.6s;
+}
+
+.case-open-btn button:hover {
+    transform: translateY(-5px);
+    box-shadow:
+        0 15px 35px rgba(255, 140, 0, 0.6),
+        0 0 0 3px rgba(255, 165, 0, 0.5),
+        inset 0 1px 0 rgba(255, 255, 255, 0.5);
+    background: linear-gradient(135deg, #ffcc00, #ff8a00, #ffcc00);
+}
+
+.case-open-btn button:hover::before {
+    left: 100%;
+}
+
+.case-open-btn button:active {
+    transform: translateY(-2px);
+    box-shadow:
+        0 8px 20px rgba(255, 140, 0, 0.5),
+        0 0 0 3px rgba(255, 165, 0, 0.4);
+}
+
+/* Контейнер содержимого кейса */
+.case-content {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 30px;
+    background: rgba(35, 31, 25, 0.219);
+    border-radius: 20px;
+    border: 2px solid rgba(255, 165, 0, 0.2);
+    box-shadow:
+        inset 0 0 20px rgba(0, 0, 0, 0.3),
+        0 5px 15px rgba(0, 0, 0, 0.2);
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 25px;
+}
+
+/* Элементы содержимого */
+.content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+    background: rgba(50, 46, 40, 0.8);
+    border-radius: 15px;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+    text-align: center;
+    border: 2px solid transparent;
+}
+
+.content:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.4);
+}
+
+.content img {
+    height: 180px;
+    width: 180px;
+    object-fit: contain;
+    margin-bottom: 20px;
+    filter: drop-shadow(0 5px 10px rgba(0, 0, 0, 0.3));
+    transition: all 0.3s ease;
+}
+
+.content:hover img {
+    transform: scale(1.1);
+    filter: drop-shadow(0 10px 20px rgba(255, 255, 255, 0.2));
+}
+
+.content p {
+    font-size: 22px;
+    font-weight: 700;
+    margin: 0;
+    padding: 12px 20px;
+    border-radius: 10px;
+    width: 100%;
+    transition: all 0.3s ease;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+/* Цветовые уровни с градиентами */
+.tier1 {
+    border-color: #3880ec;
+    background: linear-gradient(135deg, rgba(56, 128, 236, 0.15), rgba(56, 128, 236, 0.05));
+}
+
+.tier1 p {
+    background: rgba(56, 128, 236, 0.25);
+    color: #64b5f6;
+    border: 2px solid rgba(56, 128, 236, 0.4);
+}
+
+.tier1:hover {
+    border-color: #64b5f6;
+    box-shadow: 0 15px 30px rgba(100, 181, 246, 0.25);
+}
+
+.tier1:hover p {
+    background: rgba(56, 128, 236, 0.35);
+    color: #90caf9;
+}
+
+.tier2 {
+    border-color: #7e1a7e;
+    background: linear-gradient(135deg, rgba(126, 26, 126, 0.15), rgba(126, 26, 126, 0.05));
+}
+
+.tier2 p {
+    background: rgba(126, 26, 126, 0.25);
+    color: #ab47bc;
+    border: 2px solid rgba(126, 26, 126, 0.4);
+}
+
+.tier2:hover {
+    border-color: #ab47bc;
+    box-shadow: 0 15px 30px rgba(171, 71, 188, 0.25);
+}
+
+.tier2:hover p {
+    background: rgba(126, 26, 126, 0.35);
+    color: #ce93d8;
+}
+
+.tier3 {
+    border-color: #f14df1;
+    background: linear-gradient(135deg, rgba(241, 77, 241, 0.15), rgba(241, 77, 241, 0.05));
+}
+
+.tier3 p {
+    background: rgba(241, 77, 241, 0.25);
+    color: #f48fb1;
+    border: 2px solid rgba(241, 77, 241, 0.4);
+}
+
+.tier3:hover {
+    border-color: #f48fb1;
+    box-shadow: 0 15px 30px rgba(244, 143, 177, 0.25);
+}
+
+.tier3:hover p {
+    background: rgba(241, 77, 241, 0.35);
+    color: #f8bbd0;
+}
+
+.tier4 {
+    border-color: #dd3131;
+    background: linear-gradient(135deg, rgba(221, 49, 49, 0.15), rgba(221, 49, 49, 0.05));
+}
+
+.tier4 p {
+    background: rgba(221, 49, 49, 0.25);
+    color: #ef5350;
+    border: 2px solid rgba(221, 49, 49, 0.4);
+}
+
+.tier4:hover {
+    border-color: #ef5350;
+    box-shadow: 0 15px 30px rgba(239, 83, 80, 0.25);
+}
+
+.tier4:hover p {
+    background: rgba(221, 49, 49, 0.35);
+    color: #e57373;
+}
+
+.tier5 {
+    border-color: #f7f723;
+    background: linear-gradient(135deg, rgba(247, 247, 35, 0.15), rgba(247, 247, 35, 0.05));
+}
+
+.tier5 p {
+    background: rgba(247, 247, 35, 0.25);
+    color: #fff176;
+    border: 2px solid rgba(247, 247, 35, 0.4);
+}
+
+.tier5:hover {
+    border-color: #fff176;
+    box-shadow: 0 15px 30px rgba(255, 241, 118, 0.3);
+}
+
+.tier5:hover p {
+    background: rgba(247, 247, 35, 0.35);
+    color: #fff9c4;
+}
+
+/* Индикаторы редкости */
+.content::before {
+    content: '';
+    position: absolute;
+    top: 10px;
+    right: 10px;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background: currentColor;
+    opacity: 0.4;
+    z-index: 1;
+}
+
+.content:hover::before {
+    opacity: 0.7;
+    transform: scale(1.3);
+}
+
+/* Эффект свечения для редких предметов */
+.tier4::after,
+.tier5::after {
+    content: '';
+    position: absolute;
+    top: -2px;
+    left: -2px;
+    right: -2px;
+    bottom: -2px;
+    border-radius: 17px;
+    background: linear-gradient(45deg,
+            transparent,
+            currentColor,
+            transparent,
+            currentColor,
+            transparent);
+    opacity: 0;
+    z-index: -1;
+    transition: opacity 0.3s;
+}
+
+.tier4:hover::after,
+.tier5:hover::after {
+    opacity: 0.3;
+    animation: glow 1.5s infinite;
+}
+
+@keyframes glow {
+
+    0%,
+    100% {
+        opacity: 0.3;
+    }
+
+    50% {
+        opacity: 0.5;
+    }
+}
+
+/* Адаптивность */
+@media (max-width: 1200px) {
+    .case-content {
+        grid-template-columns: repeat(3, 1fr);
+    }
+}
+
+@media (max-width: 992px) {
+    .case-content {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .case-open-btn button {
+        padding: 16px 40px;
+        font-size: 24px;
+        min-width: 250px;
+    }
+
+    .case-base h2 {
+        font-size: 28px;
+    }
+}
+
+@media (max-width: 768px) {
+    .case-content {
+        grid-template-columns: 1fr;
+        gap: 20px;
+        padding: 20px;
+    }
+
+    .case-base {
+        padding: 30px 15px;
+        margin: 10px;
+    }
+
+    .case-open-btn {
+        margin: 25px 0 40px;
+    }
+
+    .case-open-btn button {
+        padding: 14px 30px;
+        font-size: 22px;
+        width: 100%;
+        max-width: 300px;
+        min-width: auto;
+    }
+
+    .content {
+        padding: 15px;
+    }
+
+    .content img {
+        height: 150px;
+        width: 150px;
+    }
+
+    .content p {
+        font-size: 20px;
+        padding: 10px 15px;
+    }
+}
+
+@media (max-width: 480px) {
+    .case-base h2 {
+        font-size: 24px;
+        margin-bottom: 30px;
+    }
+
+    .content img {
+        height: 120px;
+        width: 120px;
+    }
+
+    .content p {
+        font-size: 18px;
+    }
+}
+
+/* Прокрутка */
+.case-base::-webkit-scrollbar {
+    width: 10px;
+}
+
+.case-base::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 10px;
+}
+
+.case-base::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, #ff8a00, #ffcc00);
+    border-radius: 10px;
+}
+
+.case-base::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(180deg, #ffcc00, #ff8a00);
+}
+
+/* Стили для рулетки кейса */
+#case-wheel-container {
+    display: none;
+    position: relative;
+    width: 100%;
+    height: 300px;
+    margin: 40px auto;
+    overflow: hidden;
+    background: linear-gradient(135deg, rgba(15, 15, 25, 0.9), rgba(25, 25, 35, 0.9));
+    border-radius: 20px;
+    border: 3px solid orange;
+    box-shadow:
+        inset 0 0 30px rgba(0, 0, 0, 0.5),
+        0 10px 30px rgba(255, 165, 0, 0.2);
+}
+
+#case-wheel-track {
+    display: flex;
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    height: 200px;
+    gap: 20px;
+    padding: 0 20px;
+    transition: transform 0.1s linear;
+}
+
+#case-wheel-pointer {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 4px;
+    height: 220px;
+    background: linear-gradient(to bottom, #ff8a00, #ffcc00, #ff8a00);
+    z-index: 10;
+    box-shadow:
+        0 0 20px rgba(255, 140, 0, 0.7),
+        0 0 40px rgba(255, 140, 0, 0.4);
+}
+
+.wheel-item {
+    min-width: 180px;
+    height: 180px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: rgba(40, 40, 50, 0.8);
+    border-radius: 15px;
+    padding: 15px;
+    transition: all 0.3s ease;
+}
+
+.wheel-item:hover {
+    transform: scale(1.05);
+}
+
+#case-win-display {
+    display: none;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: linear-gradient(135deg, rgba(30, 30, 40, 0.95), rgba(40, 40, 50, 0.95));
+    padding: 40px;
+    border-radius: 20px;
+    border: 4px solid gold;
+    text-align: center;
+    z-index: 100;
+    box-shadow:
+        0 0 50px rgba(255, 215, 0, 0.5),
+        inset 0 0 30px rgba(255, 215, 0, 0.2);
+    animation: winPulse 1s infinite alternate;
+}
+
+@keyframes winPulse {
+    0% {
+        box-shadow: 0 0 30px rgba(255, 215, 0, 0.5),
+            inset 0 0 20px rgba(255, 215, 0, 0.2);
+        transform: translate(-50%, -50%) scale(1);
+    }
+
+    100% {
+        box-shadow: 0 0 60px rgba(255, 215, 0, 0.8),
+            inset 0 0 40px rgba(255, 215, 0, 0.3);
+        transform: translate(-50%, -50%) scale(1.02);
+    }
+}
+
+/* Анимация свечения для элементов рулетки */
+.wheel-item.tier4,
+.wheel-item.tier5 {
+    animation: itemGlow 2s infinite;
+}
+
+@keyframes itemGlow {
+
+    0%,
+    100% {
+        box-shadow: 0 0 10px currentColor;
+    }
+
+    50% {
+        box-shadow: 0 0 25px currentColor;
+    }
+}
+
+/* Адаптивность для рулетки */
+@media (max-width: 768px) {
+    #case-wheel-container {
+        height: 250px;
+    }
+
+    #case-wheel-track {
+        height: 160px;
+        gap: 15px;
+    }
+
+    .wheel-item {
+        min-width: 140px;
+        height: 140px;
+        padding: 10px;
+    }
+
+    .wheel-item img {
+        width: 80px !important;
+        height: 80px !important;
+    }
+
+    .wheel-item p {
+        font-size: 14px !important;
+    }
+
+    #case-win-display {
+        padding: 20px;
+    }
+
+    #case-win-image {
+        width: 100px !important;
+        height: 100px !important;
+    }
+
+    #case-win-text {
+        font-size: 20px !important;
+    }
+}
+
+@media (max-width: 480px) {
+    #case-wheel-container {
+        height: 200px;
+        margin: 20px auto;
+    }
+
+    #case-wheel-track {
+        height: 130px;
+        gap: 10px;
+        padding: 0 10px;
+    }
+
+    .wheel-item {
+        min-width: 110px;
+        height: 110px;
+    }
+
+    .wheel-item img {
+        width: 60px !important;
+        height: 60px !important;
+    }
+
+    .wheel-item p {
+        font-size: 12px !important;
+        margin-top: 5px !important;
+    }
+}
+
+.case-open-btn {
+    text-align: center !important;
+    margin: 140px 0 10px !important;
+    padding: 0 20px !important;
+    width: 100% !important;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+}
+
+.case-open-btn button {
+    margin: 0 auto !important;
+    display: block !important;
+}
+
+/* Адаптивность для рулетки */
+@media (max-width: 768px) {
+    #case-wheel-container {
+        height: 250px !important;
+    }
+
+    #case-wheel-track {
+        height: 160px !important;
+        gap: 15px !important;
+    }
+
+    .wheel-item {
+        min-width: 140px !important;
+        height: 140px !important;
+        padding: 10px !important;
+    }
+
+    .wheel-item img {
+        width: 80px !important;
+        height: 80px !important;
+    }
+
+    .wheel-item p {
+        font-size: 14px !important;
+    }
+
+    #case-win-display {
+        padding: 20px !important;
+    }
+
+    #case-win-image {
+        width: 100px !important;
+        height: 100px !important;
+    }
+
+    #case-win-text {
+        font-size: 20px !important;
+    }
+}
+
+@media (max-width: 480px) {
+    #case-wheel-container {
+        height: 200px !important;
+        margin: 20px auto !important;
+    }
+
+    #case-wheel-track {
+        height: 130px !important;
+        gap: 10px !important;
+        padding: 0 10px !important;
+    }
+
+    .wheel-item {
+        min-width: 110px !important;
+        height: 110px !important;
+    }
+
+    .wheel-item img {
+        width: 60px !important;
+        height: 60px !important;
+    }
+
+    .wheel-item p {
+        font-size: 12px !important;
+        margin-top: 5px !important;
+    }
+}
+
+/* ===== Панель последних выигрышей (Live Drops) ===== */
+#live-drop-panel {
+    width: 360px;
+    flex-shrink: 0;
+    background: rgba(17, 17, 17, 0.95);
+    border-left: 3px solid orange;
+    display: flex;
+    flex-direction: column;
+    height: calc(100vh - 65px);
+    position: sticky;
+    top: 0;
+    overflow: hidden;
+    font-family: 'Noto Sans', sans-serif;
+}
+
+#live-drop-panel .panel-header {
+    background: linear-gradient(135deg, #ff7e33, #ffb400);
+    padding: 15px 20px;
+    text-align: center;
+    font-weight: bold;
+    font-size: 18px;
+    color: #1a1a1a;
+    border-bottom: 2px solid rgba(255, 165, 0, 0.5);
+    flex-shrink: 0;
+    letter-spacing: 1px;
+}
+
+#live-drop-panel .panel-header span {
+    font-size: 22px;
+    margin-right: 8px;
+}
+
+#live-drop-list {
+    flex: 1;
+    overflow-y: auto;
+    padding: 12px 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    background: rgb(20, 20, 20);
+}
+
+#live-drop-list::-webkit-scrollbar {
+    width: 6px;
+}
+
+#live-drop-list::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 3px;
+}
+
+#live-drop-list::-webkit-scrollbar-thumb {
+    background: orange;
+    border-radius: 3px;
+}
+
+.drop-item {
+    background: rgba(30, 30, 35, 0.9);
+    border-radius: 10px;
+    padding: 10px 14px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    border-left: 4px solid #888;
+    animation: dropSlideIn 0.4s ease-out;
+    transition: background 0.2s;
+    flex-shrink: 0;
+}
+
+.drop-item:hover {
+    background: rgba(40, 40, 45, 0.9);
+}
+
+.drop-item .drop-icon {
+    width: 48px;
+    height: 48px;
+    object-fit: contain;
+    border-radius: 6px;
+    background: rgba(0, 0, 0, 0.3);
+    padding: 4px;
+    flex-shrink: 0;
+}
+
+.drop-item .drop-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.drop-item .drop-nick {
+    font-weight: bold;
+    color: orange;
+    font-size: 14px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.drop-item .drop-name {
+    color: #fff;
+    font-size: 13px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    margin-top: 2px;
+}
+
+.drop-item .drop-price {
+    font-weight: bold;
+    color: #4CAF50;
+    font-size: 14px;
+    white-space: nowrap;
+}
+
+.drop-item .drop-time {
+    color: #888;
+    font-size: 11px;
+    margin-top: 2px;
+}
+
+.drop-item .drop-tier {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    align-self: center;
+    margin-left: auto;
+}
+
+.tier1 {
+    border-left-color: #3880ec;
+}
+
+.tier2 {
+    border-left-color: #7e1a7e;
+}
+
+.tier3 {
+    border-left-color: #f14df1;
+}
+
+.tier4 {
+    border-left-color: #dd3131;
+}
+
+.tier5 {
+    border-left-color: #f7f723;
+}
+
+@keyframes dropSlideIn {
+    from {
+        opacity: 0;
+        transform: translateY(-20px) scale(0.95);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+/* Адаптивность панели */
+@media (max-width: 1200px) {
+    #live-drop-panel {
+        width: 300px;
+    }
+
+    .drop-item .drop-icon {
+        width: 40px;
+        height: 40px;
+    }
+
+    .drop-item .drop-nick {
+        font-size: 13px;
+    }
+
+    .drop-item .drop-name {
+        font-size: 12px;
+    }
+
+    .drop-item .drop-price {
+        font-size: 13px;
+    }
+}
+
+@media (max-width: 992px) {
+    .cases-main-wrapper {
+        flex-direction: column;
+    }
+
+    #live-drop-panel {
+        width: 100%;
+        height: 300px;
+        border-left: none;
+        border-top: 3px solid orange;
+        position: relative;
+        flex-shrink: 0;
+    }
+
+    #live-drop-list {
+        flex-direction: row;
+        overflow-x: auto;
+        overflow-y: hidden;
+        padding: 10px;
+        gap: 12px;
+        flex-wrap: nowrap;
+    }
+
+    .drop-item {
+        min-width: 220px;
+        flex-shrink: 0;
+        animation: dropSlideInHorizontal 0.4s ease-out;
+    }
+
+    @keyframes dropSlideInHorizontal {
+        from {
+            opacity: 0;
+            transform: translateX(-20px) scale(0.95);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateX(0) scale(1);
+        }
+    }
+}
+
+@media (max-width: 768px) {
+    #live-drop-panel {
+        height: 250px;
+    }
+
+    .drop-item {
+        min-width: 180px;
+        padding: 8px 12px;
+    }
+
+    .drop-item .drop-icon {
+        width: 32px;
+        height: 32px;
+    }
+
+    .drop-item .drop-nick {
+        font-size: 12px;
+    }
+
+    .drop-item .drop-name {
+        font-size: 11px;
+    }
+
+    .drop-item .drop-price {
+        font-size: 12px;
+    }
+}
+
+@media (max-width: 480px) {
+    #live-drop-panel {
+        height: 200px;
+    }
+
+    .drop-item {
+        min-width: 150px;
+        padding: 6px 10px;
+        gap: 8px;
+    }
+
+    .drop-item .drop-icon {
+        width: 28px;
+        height: 28px;
+    }
+
+    .drop-item .drop-nick {
+        font-size: 11px;
+    }
+
+    .drop-item .drop-name {
+        font-size: 10px;
+    }
+
+    .drop-item .drop-price {
+        font-size: 11px;
+    }
+
+    .drop-item .drop-time {
+        font-size: 10px;
+    }
+}

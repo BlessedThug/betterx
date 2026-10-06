@@ -1,0 +1,205 @@
+#inventory {
+    display: flex;
+    padding: 0 16px;
+    align-items: center;
+    height: 100%;
+    position: absolute;
+    left: 50%;
+    transform: translateX(-120%);
+}
+
+#inventory img {
+    height: 32px;
+    width: 32px;
+    filter: invert(100%);
+    margin: 0 8px;
+}
+
+#catalog {
+    display: flex;
+    padding: 0 16px;
+    align-items: center;
+    height: 100%;
+    position: absolute;
+    left: 50%;
+    transform: translateX(20%);
+}
+
+#catalog img {
+    height: 32px;
+    width: 32px;
+    filter: invert(100%);
+    margin: 0 8px;
+}
+
+#catalog a {
+    color: azure;
+    font-size: 24px;
+    text-decoration: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    height: 100%;
+}
+
+#catalog a:hover {
+    color: orange;
+    background: rgba(255, 165, 0, 0.1);
+    cursor: pointer;
+}
+
+#inventory a {
+    color: azure;
+    font-size: 24px;
+    text-decoration: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    height: 100%;
+}
+
+#inventory a:hover {
+    color: orange;
+    background: rgba(255, 165, 0, 0.1);
+    cursor: pointer;
+}
+
+/* Для центрирования на больших экранах */
+@media (min-width: 1400px) {
+    #inventory {
+        transform: translateX(-130%);
+    }
+    #catalog {
+        transform: translateX(30%);
+    }
+}
+
+@media (max-width: 1200px) {
+    #inventory {
+        transform: translateX(-110%);
+    }
+    #catalog {
+        transform: translateX(10%);
+    }
+}
+
+@media (max-width: 992px) {
+    header ul {
+        flex-wrap: wrap;
+        justify-content: space-between;
+        padding: 0 20px;
+    }
+    
+    #web-name {
+        order: 1;
+        margin-right: 0;
+        width: 100%;
+        justify-content: center;
+        margin-bottom: 10px;
+        height: auto;
+    }
+    
+    #inventory {
+        order: 2;
+        position: static;
+        transform: none;
+        left: auto;
+        width: 50%;
+        justify-content: flex-end;
+        padding-right: 20px;
+    }
+    
+    #catalog {
+        order: 3;
+        position: static;
+        transform: none;
+        left: auto;
+        width: 50%;
+        justify-content: flex-start;
+        padding-left: 20px;
+    }
+    
+    #balance {
+        order: 4;
+        width: 50%;
+        justify-content: flex-end;
+        padding-right: 20px;
+    }
+    
+    #refill {
+        order: 5;
+        width: 50%;
+        justify-content: flex-start;
+        padding-left: 20px;
+        margin-left: 0;
+    }
+}
+
+@media (max-width: 768px) {
+    header {
+        height: auto;
+        padding: 10px 0;
+    }
+    
+    header ul {
+        flex-direction: column;
+        gap: 15px;
+        padding: 0 15px;
+    }
+    
+    header li {
+        width: 100%;
+        justify-content: center;
+        height: auto;
+        margin: 5px 0;
+    }
+    
+    #web-name {
+        margin-bottom: 5px;
+    }
+    
+    #inventory, #catalog, #balance, #refill {
+        width: 100%;
+        justify-content: center;
+        padding: 0;
+    }
+    
+    #inventory a, #catalog a, #refill a {
+        justify-content: center;
+        width: 100%;
+        text-align: center;
+        padding: 12px 20px;
+        border-radius: 6px;
+    }
+    
+    #balance {
+        padding: 10px;
+        justify-content: center;
+        border-radius: 6px;
+        background: rgba(0,0,0,0.2);
+    }
+}
+
+/* Стили для активных кнопок навигации */
+#inventory a.active, #catalog a.active {
+    color: orange !important;
+    background: rgba(255, 165, 0, 0.2) !important;
+    border-radius: 4px;
+    position: relative;
+}
+
+#inventory a.active::after, #catalog a.active::after {
+    content: '';
+    position: absolute;
+    bottom: -8px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80%;
+    height: 3px;
+    background: linear-gradient(90deg, transparent, orange, transparent);
+    border-radius: 2px;
+}

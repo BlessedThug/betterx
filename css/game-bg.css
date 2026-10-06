@@ -1,0 +1,134 @@
+/* ============================================================
+   GAME BACKGROUND ENHANCEMENT
+   ============================================================ */
+
+/* ============ ЦЕНТРИРОВАНИЕ КОНТЕНТА ============ */
+main .wheel-game-area,
+main .roulette-game-area,
+main .slots-game-area {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;   /* ← вот это центрирует по вертикали */
+    align-items: center;
+    min-height: calc(100vh - 64px);
+    box-sizing: border-box;
+    padding-top: 40px;
+    padding-bottom: 40px;
+}
+
+/* ============ ФОН ============ */
+main .wheel-game-area,
+main .roulette-game-area,
+main .slots-game-area {
+    position: relative;
+    overflow: hidden;
+    isolation: isolate;
+
+    background:
+        /* Тёплое свечение сверху справа */
+        radial-gradient(ellipse 60% 50% at 78% 12%, rgba(255, 140, 0, 0.18), transparent 60%),
+        /* Тёплое свечение снизу слева */
+        radial-gradient(ellipse 55% 55% at 18% 88%, rgba(255, 180, 0, 0.10), transparent 60%),
+        /* Холодный синий центр — для контраста с оранжевым */
+        radial-gradient(ellipse 70% 60% at 50% 50%, rgba(60, 85, 150, 0.18), transparent 65%),
+        /* Точечная сетка */
+        radial-gradient(circle, rgba(255, 165, 0, 0.10) 1px, transparent 1.4px) 0 0 / 30px 30px,
+        /* База */
+        linear-gradient(135deg, #0c0c13 0%, #141420 50%, #0f0f1c 100%);
+}
+
+/* Виньетка по краям — фокусирует взгляд на центре */
+main .wheel-game-area::before,
+main .roulette-game-area::before,
+main .slots-game-area::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(ellipse at center, transparent 30%, rgba(0, 0, 0, 0.55) 100%);
+    pointer-events: none;
+    z-index: 0;
+}
+
+/* Угловые акценты по бокам */
+main .wheel-game-area::after,
+main .roulette-game-area::after,
+main .slots-game-area::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+        linear-gradient(90deg, rgba(255, 140, 0, 0.07), transparent 10%),
+        linear-gradient(270deg, rgba(255, 140, 0, 0.07), transparent 10%);
+    pointer-events: none;
+    z-index: 0;
+}
+
+/* Контент поверх фона — но НЕ партиклы и не орбы */
+main .wheel-game-area > *:not(.game-particles):not(.game-orb),
+main .roulette-game-area > *:not(.game-particles):not(.game-orb),
+main .slots-game-area > *:not(.game-particles):not(.game-orb) {
+    position: relative;
+    z-index: 1;
+}
+
+/* ============ Плавающие частицы ============ */
+.game-particles {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+    overflow: hidden;
+    z-index: 0;
+}
+
+.game-particle {
+    position: absolute;
+    bottom: -20px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(255, 210, 120, 0.95), rgba(255, 140, 0, 0) 70%);
+    opacity: 0;
+    animation: particleFloat linear infinite;
+    will-change: transform, opacity;
+}
+
+@keyframes particleFloat {
+    0%   { transform: translate(0, 0) scale(0.4);        opacity: 0; }
+    12%  { opacity: 0.9; }
+    80%  { opacity: 0.6; }
+    100% { transform: translate(40px, -110vh) scale(1.15); opacity: 0; }
+}
+
+/* ============ Пульсирующие орбы ============ */
+.game-orb {
+    position: absolute;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(255, 165, 0, 0.20), transparent 70%);
+    filter: blur(24px);
+    pointer-events: none;
+    z-index: 0;
+    animation: orbPulse 10s ease-in-out infinite;
+}
+
+@keyframes orbPulse {
+    0%, 100% { transform: scale(1);    opacity: 0.45; }
+    50%      { transform: scale(1.22); opacity: 0.85; }
+}
+
+/* ============ Уважение к prefers-reduced-motion ============ */
+@media (prefers-reduced-motion: reduce) {
+    .game-particle,
+    .game-orb {
+        animation: none !important;
+        opacity: 0.35 !important;
+    }
+}
+
+/* ============ Адаптив ============ */
+@media (max-width: 768px) {
+    main .wheel-game-area,
+    main .roulette-game-area,
+    main .slots-game-area {
+        padding-top: 24px;
+        padding-bottom: 24px;
+        justify-content: flex-start; /* на мобиле сверху удобнее */
+    }
+}

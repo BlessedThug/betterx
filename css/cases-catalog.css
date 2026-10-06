@@ -1,0 +1,312 @@
+/* Стили каталога */
+
+#m-catalog {
+    width: 100%;
+    height: 100%;
+    padding: 40px 20px;
+    overflow-y: auto;
+    background: linear-gradient(135deg, rgba(20, 20, 20, 0.9) 0%, rgba(30, 30, 30, 0.95) 100%);
+    border-radius: 20px;
+    margin: 20px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+}
+
+#m-catalog h1 {
+    color: #fff;
+    font-size: 64px;
+    text-align: center;
+    margin-bottom: 50px;
+    padding-bottom: 20px;
+    position: relative;
+    background: linear-gradient(90deg, #ff8a00, #ffcc00);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-shadow: 0 5px 15px rgba(255, 140, 0, 0.2);
+    letter-spacing: 2px;
+}
+
+#m-catalog h1::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 200px;
+    height: 4px;
+    background: linear-gradient(90deg, #ff8a00, #ffcc00, #ff8a00);
+    border-radius: 2px;
+}
+
+/* Контейнер для кейсов */
+#case-choose {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 40px;
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+/* Стили для блоков кейсов */
+.block-choose {
+    display: block;
+    text-decoration: none;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    border-radius: 20px;
+    overflow: hidden;
+    position: relative;
+    background: linear-gradient(145deg, rgba(40, 40, 40, 0.9), rgba(25, 25, 25, 0.9));
+    border: 2px solid rgba(255, 165, 0, 0.3);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4);
+    backdrop-filter: blur(10px);
+}
+
+.block-choose:hover {
+    transform: translateY(-15px) scale(1.05);
+    border-color: #ff8a00;
+    box-shadow: 0 20px 40px rgba(255, 140, 0, 0.3);
+}
+
+.block-choose::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 140, 0, 0.1), transparent);
+    transition: left 0.6s;
+}
+
+.block-choose:hover::before {
+    left: 100%;
+}
+
+/* Общие стили для всех блоков кейсов */
+#block-money, #block-items, #block-games, #block-cs2 {
+    height: 350px;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 30px;
+    position: relative;
+}
+
+#block-money img, #block-items img, #block-games img, #block-cs2 img {
+    width: 180px;
+    height: 180px;
+    object-fit: contain;
+    margin-bottom: 25px;
+    filter: drop-shadow(0 5px 15px rgba(0, 0, 0, 0.3));
+    transition: all 0.4s ease;
+}
+
+.block-choose:hover img {
+    transform: scale(1.1) rotate(5deg);
+    filter: drop-shadow(0 10px 20px rgba(255, 200, 0, 0.5));
+}
+
+#block-money p, #block-items p, #block-games p, #block-cs2 p {
+    color: #fff;
+    font-size: 28px;
+    font-weight: 700;
+    text-align: center;
+    margin: 0;
+    padding: 15px 20px;
+    border-radius: 12px;
+    background: rgba(255, 165, 0, 0.15);
+    width: 100%;
+    max-width: 280px;
+    transition: all 0.3s ease;
+    position: relative;
+    z-index: 1;
+}
+
+.block-choose:hover p {
+    background: rgba(255, 165, 0, 0.25);
+    color: #ffcc00;
+    transform: scale(1.05);
+}
+
+/* Индивидуальные стили для каждого кейса */
+#block-money {
+    border-top: 4px solid #4CAF50;
+}
+
+#block-money p {
+    color: #4CAF50;
+    border: 2px solid rgba(76, 175, 80, 0.3);
+}
+
+.block-choose:hover #block-money p {
+    background: rgba(76, 175, 80, 0.2);
+    border-color: #4CAF50;
+}
+
+#block-items {
+    border-top: 4px solid #2196F3;
+}
+
+#block-items p {
+    color: #2196F3;
+    border: 2px solid rgba(33, 150, 243, 0.3);
+}
+
+.block-choose:hover #block-items p {
+    background: rgba(33, 150, 243, 0.2);
+    border-color: #2196F3;
+}
+
+#block-games {
+    border-top: 4px solid #9C27B0;
+}
+
+#block-games p {
+    color: #9C27B0;
+    border: 2px solid rgba(156, 39, 176, 0.3);
+}
+
+.block-choose:hover #block-games p {
+    background: rgba(156, 39, 176, 0.2);
+    border-color: #9C27B0;
+}
+
+#block-cs2 {
+    border-top: 4px solid #FF9800;
+}
+
+#block-cs2 p {
+    color: #FF9800;
+    border: 2px solid rgba(255, 152, 0, 0.3);
+}
+
+.block-choose:hover #block-cs2 p {
+    background: rgba(255, 152, 0, 0.2);
+    border-color: #FF9800;
+}
+
+/* Эффект свечения */
+.block-choose::after {
+    content: '';
+    position: absolute;
+    inset: -2px;
+    border-radius: 22px;
+    background: linear-gradient(90deg, #ff8a00, #ffcc00, #ff8a00);
+    opacity: 0;
+    z-index: -1;
+    transition: opacity 0.3s;
+}
+
+.block-choose:hover::after {
+    opacity: 0.5;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0% { opacity: 0.3; }
+    50% { opacity: 0.5; }
+    100% { opacity: 0.3; }
+}
+
+/* Индикатор цены (можно добавить позже) */
+.price-tag {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background: rgba(255, 140, 0, 0.9);
+    color: #fff;
+    padding: 8px 15px;
+    border-radius: 20px;
+    font-size: 18px;
+    font-weight: bold;
+    box-shadow: 0 4px 10px rgba(255, 140, 0, 0.3);
+}
+
+/* Адаптивность */
+@media (max-width: 1200px) {
+    #case-choose {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 30px;
+    }
+}
+
+@media (max-width: 768px) {
+    #m-catalog {
+        padding: 30px 15px;
+        margin: 10px;
+    }
+    
+    #m-catalog h1 {
+        font-size: 48px;
+        margin-bottom: 40px;
+    }
+    
+    #case-choose {
+        grid-template-columns: 1fr;
+        gap: 25px;
+        max-width: 500px;
+    }
+    
+    #block-money, #block-items, #block-games, #block-cs2 {
+        height: 320px;
+    }
+    
+    #block-money img, #block-items img, #block-games img, #block-cs2 img {
+        width: 160px;
+        height: 160px;
+    }
+    
+    #block-money p, #block-items p, #block-games p, #block-cs2 p {
+        font-size: 24px;
+    }
+}
+
+@media (max-width: 480px) {
+    #m-catalog h1 {
+        font-size: 36px;
+    }
+    
+    #block-money, #block-items, #block-games, #block-cs2 {
+        height: 280px;
+        padding: 20px;
+    }
+    
+    #block-money img, #block-items img, #block-games img, #block-cs2 img {
+        width: 140px;
+        height: 140px;
+    }
+    
+    #block-money p, #block-items p, #block-games p, #block-cs2 p {
+        font-size: 20px;
+        padding: 12px 15px;
+    }
+}
+
+/* Прокрутка для каталога */
+#m-catalog::-webkit-scrollbar {
+    width: 8px;
+}
+
+#m-catalog::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 10px;
+}
+
+#m-catalog::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, #ff8a00, #ffcc00);
+    border-radius: 10px;
+}
+
+#m-catalog::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(180deg, #ffcc00, #ff8a00);
+}
+
+/* Анимация для каталога */
+#m-catalog {
+    opacity: 0;
+    transform: translateY(10px);
+    transition: opacity 0.3s ease, transform 0.3s ease;
+}

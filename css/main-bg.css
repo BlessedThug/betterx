@@ -1,0 +1,148 @@
+/* ============ БАЗОВЫЙ ФОН BODY ============ */
+body {
+    position: relative;
+    min-height: 100vh;
+    background:
+        /* Тёплое свечение сверху справа */
+        radial-gradient(ellipse 65% 55% at 78% 8%, rgba(255, 140, 0, 0.16), transparent 60%),
+        /* Тёплое свечение снизу слева */
+        radial-gradient(ellipse 60% 60% at 15% 92%, rgba(255, 180, 0, 0.12), transparent 62%),
+        /* Холодный акцент в центре */
+        radial-gradient(ellipse 70% 60% at 50% 50%, rgba(60, 85, 150, 0.15), transparent 65%),
+        /* Точечная сетка */
+        radial-gradient(circle, rgba(255, 165, 0, 0.10) 1px, transparent 1.4px) 0 0 / 32px 32px,
+        /* База */
+        linear-gradient(135deg, #0c0c13 0%, #141420 50%, #0f0f1c 100%) !important;
+    background-attachment: fixed !important;
+}
+
+/* Виньетка по краям страницы */
+body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background: radial-gradient(ellipse at center, transparent 40%, rgba(0, 0, 0, 0.6) 100%);
+    pointer-events: none;
+    z-index: 0;
+}
+
+/* Боковые акценты */
+body::after {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background:
+        linear-gradient(90deg, rgba(255, 140, 0, 0.06), transparent 10%),
+        linear-gradient(270deg, rgba(255, 140, 0, 0.06), transparent 10%);
+    pointer-events: none;
+    z-index: 0;
+}
+
+/* Контент поверх фона */
+#general,
+main {
+    position: relative;
+    z-index: 1;
+}
+
+/* ============ ПЛАВАЮЩИЕ ЧАСТИЦЫ ============ */
+.main-particles {
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    overflow: hidden;
+    z-index: 0;
+}
+
+.main-particle {
+    position: absolute;
+    bottom: -20px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(255, 210, 120, 0.95), rgba(255, 140, 0, 0) 70%);
+    opacity: 0;
+    animation: mainParticleFloat linear infinite;
+    will-change: transform, opacity;
+}
+
+@keyframes mainParticleFloat {
+    0%   { transform: translate(0, 0) scale(0.4);           opacity: 0; }
+    12%  { opacity: 0.9; }
+    80%  { opacity: 0.6; }
+    100% { transform: translate(50px, -110vh) scale(1.15); opacity: 0; }
+}
+
+/* ============ ПУЛЬСИРУЮЩИЕ ОРБЫ ============ */
+.main-orb {
+    position: fixed;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(255, 165, 0, 0.22), transparent 70%);
+    filter: blur(28px);
+    pointer-events: none;
+    z-index: 0;
+    animation: mainOrbPulse 10s ease-in-out infinite;
+}
+
+@keyframes mainOrbPulse {
+    0%, 100% { transform: scale(1);    opacity: 0.45; }
+    50%      { transform: scale(1.22); opacity: 0.85; }
+}
+
+/* ============ ЗАГОЛОВОК "ВЫБЕРИТЕ РЕЖИМ ИГРЫ" ============ */
+#general h1 {
+    position: relative;
+    z-index: 2;
+    animation: titleGlow 3s ease-in-out infinite alternate;
+}
+
+@keyframes titleGlow {
+    from { filter: drop-shadow(0 0 15px rgba(255, 140, 0, 0.3)); }
+    to   { filter: drop-shadow(0 0 30px rgba(255, 180, 0, 0.55)); }
+}
+
+/* ============ КАРТОЧКИ РЕЖИМОВ — УСИЛЕННАЯ ПОДСВЕТКА ============ */
+.block-choose {
+    position: relative;
+    backdrop-filter: blur(8px);
+    background: linear-gradient(145deg, rgba(25, 25, 32, 0.85), rgba(15, 15, 22, 0.9)) !important;
+    border-color: rgba(255, 165, 0, 0.25) !important;
+}
+
+.block-choose:hover {
+    box-shadow:
+        0 20px 45px rgba(255, 140, 0, 0.35),
+        0 0 60px rgba(255, 140, 0, 0.2) !important;
+}
+
+/* Лёгкое «дыхание» карточек в покое */
+@keyframes cardIdle {
+    0%, 100% { transform: translateY(0); }
+    50%      { transform: translateY(-3px); }
+}
+
+.block-choose {
+    animation: cardIdle 6s ease-in-out infinite;
+}
+
+.block-choose:nth-child(2) { animation-delay: 0.5s; }
+.block-choose:nth-child(3) { animation-delay: 1.0s; }
+.block-choose:nth-child(4) { animation-delay: 1.5s; }
+.block-choose:nth-child(5) { animation-delay: 2.0s; }
+
+/* Отключаем idle-анимацию при hover, чтобы не конфликтовала */
+.block-choose:hover {
+    animation-play-state: paused;
+}
+
+/* ============ PREFERS-REDUCED-MOTION ============ */
+@media (prefers-reduced-motion: reduce) {
+    .main-particle,
+    .main-orb,
+    .block-choose {
+        animation: none !important;
+        opacity: 0.4 !important;
+    }
+
+    #general h1 {
+        animation: none !important;
+    }
+}
