@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <link rel="stylesheet" href="../css/wheel.css">
+    <link rel="stylesheet" href="../css/chassis.css">
+    <link rel="stylesheet" href="../css/game-bg.css">
+    <link rel="stylesheet" href="../css/memory.css">
+    <title>MEMORY | BETTER-X</title>
+    <link rel="icon" href="../img/logo.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:ital,wght@0,100..900;1,100..900&display=swap"
+        rel="stylesheet">
+</head>
+
+<body>
+    <header>
+        <ul>
+            <li id="web-name">
+                <a href="../index.html"><img src="../img/logo.png" alt="logo" id="web-logo">BETTER-X</a>
+            </li>
+            <li id="balance">Баланс: <span id="bal-header">0.00</span> ₽</li>
+            <li id="refill"><a href="#" id="depBtn">Пополнение</a></li>
+        </ul>
+    </header>
+
+    <div id="dep-overlay"
+        style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 999;">
+    </div>
+    <div id="dep-block"
+        style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgb(30, 30, 30); padding: 30px; border-radius: 12px; border: 3px solid orange; z-index: 1000; width: 400px; box-shadow: 0 0 40px rgba(255, 165, 0, 0.3);">
+        <h3 style="color: orange; text-align: center; margin-bottom: 20px; font-size: 24px;">Пополнение баланса</h3>
+        <input type="number" placeholder="Сумма, руб" id="depAmount" min="10" max="100000">
+        <input type="text" placeholder="Номер карты" id="cardNumber" maxlength="19">
+        <input type="text" placeholder="CVV-код" id="cardCvv" maxlength="3">
+        <input type="text" placeholder="Срок действия (MM/YY)" id="cardExpiry" maxlength="5">
+        <div style="display: flex; justify-content: space-between; gap: 10px; margin-top: 20px;">
+            <button id="confirmDepBtn"
+                style="background: linear-gradient(45deg, #ff7e33, #ffb400); color: black; padding: 10px; border: none; border-radius: 6px; width: 48%; cursor: pointer; font-weight: bold;">Пополнить</button>
+            <button id="closeDepBtn"
+                style="background: #555; color: white; padding: 10px; border: none; border-radius: 6px; width: 48%; cursor: pointer;">Отмена</button>
+        </div>
+    </div>
+
+    <main>
+        <div class="wheel-container">
+            <!-- ========== ЛЕВАЯ ПАНЕЛЬ ========== -->
+            <aside class="wheel-panel">
+                <div class="panel-section">
+                    <h3>💰 СТАВКА</h3>
+                    <div class="bet-input-wrapper">
+                        <input type="number" id="bet-amount" placeholder="Сумма ставки" min="10" step="10">
+                        <div class="quick-bets">
+                            <button class="quick-bet" data-amount="100">100₽</button>
+                            <button class="quick-bet" data-amount="500">500₽</button>
+                            <button class="quick-bet" data-amount="1000">1 000 ₽</button>
+                            <button class="quick-bet" data-amount="5000">5 000 ₽</button>
+                            <button class="quick-bet" data-amount="10000">10 000 ₽</button>
+                            <button class="quick-bet" data-amount="25000">25 000 ₽</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="panel-section">
+                    <h3>🎒 ИНВЕНТАРЬ</h3>
+                    <div id="inventory-list" class="inventory-list">
+                        <div class="inventory-empty">🎒 Нет предметов в инвентаре</div>
+                    </div>
+                </div>
+
+                <div class="panel-section">
+                    <h3>🎯 ТЕКУЩАЯ СТАВКА</h3>
+                    <div class="current-bet-display">
+                        <div class="label">СТАВКА</div>
+                        <div class="amount" id="current-bet-amount">0 ₽</div>
+                        <div class="item-name" id="current-bet-item"></div>
+                    </div>
+                </div>
+
+                <div class="panel-section">
+                    <h3>📊 ПРОГРЕСС</h3>
+                    <div class="memory-progress">
+                        <div class="mp-row"><span>Найдено пар:</span><span id="memory-pairs-count">0 / 8</span></div>
+                        <div class="mp-row"><span>Множитель:</span><span id="memory-current-mult" class="gold">—</span></div>
+                        <div class="mp-row"><span>К выплате:</span><span id="memory-current-win" class="green">0 ₽</span></div>
+                    </div>
+                    <div class="memory-ladder" id="memory-ladder"></div>
+                </div>
+
+                <button id="memory-start-btn" class="spin-button">🎴 НАЧАТЬ ИГРУ</button>
+            </aside>
+
+            <!-- ========== ИГРОВОЕ ПОЛЕ ========== -->
+            <section class="wheel-game-area memory-game-area">
+                <div class="memory-board-wrapper">
+                    <div class="memory-board" id="memory-board"></div>
+
+                    <div class="memory-decision" id="memory-decision">
+                        <div class="memory-decision-title" id="memory-decision-title">ПАРА НАЙДЕНА!</div>
+                        <div class="memory-decision-text" id="memory-decision-text">Выигрыш: x2</div>
+                        <div class="memory-decision-buttons">
+                            <button id="memory-cashout-btn" class="btn-cashout">💰 ЗАБРАТЬ</button>
+                            <button id="memory-continue-btn" class="btn-continue">➡ ПРОДОЛЖИТЬ</button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="memory-status" id="memory-status">Готовы? Сделайте ставку и начните игру.</div>
+
+                <div class="history-slots">
+                    <h4>📜 ИСТОРИЯ ИГР</h4>
+                    <div id="history-list" class="history-list"></div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <script src="../js/deposit.js"></script>
+    <script src="../js/inventory.js"></script>
+    <script src="../js/memory.js"></script>
+    <script src="../js/game-bg.js"></script>
+</body>
+
+</html>
