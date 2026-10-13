@@ -596,9 +596,7 @@
             const winFromOpp = oppValue * (1 - RAKE);
 
             if (currentGame.playerItem) {
-                if (window.InventoryManager) {
-                    try { window.InventoryManager.addItem(currentGame.playerItem); } catch (e) {}
-                }
+                returnItemToInventory(currentGame.playerItem);
                 window.globalBalance += winFromOpp;
             } else {
                 window.globalBalance += betValue + winFromOpp;
@@ -762,7 +760,7 @@
             waitingModal.style.display = 'none';
             if (window._waitingRefund) {
                 if (window._waitingRefund.item) {
-                    window.InventoryManager.addItem(window._waitingRefund.item);
+                    returnItemToInventory(window._waitingRefund.item);
                 } else {
                     window.globalBalance += window._waitingRefund.value;
                     saveBalance();
@@ -771,6 +769,25 @@
                 window._waitingRefund = null;
             }
         });
+    }
+
+    // ============ ВОЗВРАТ ПРЕДМЕТА В ИНВЕНТАРЬ ============
+    // ВАЖНО: InventoryManager.addItem принимает позиционные аргументы:
+    //   addItem(name, image, tier, price)
+    // Поэтому нельзя передавать объект item целиком — иначе получится
+    // предмет с именем "[object Object]" и дефолтной ценой 1000.
+    function returnItemToInventory(item) {
+        if (!item || !window.InventoryManager) return;
+        try {
+            window.InventoryManager.addItem(
+                item.name,
+                item.image,
+                item.tier,
+                item.price
+            );
+        } catch (e) {
+            console.error('Не удалось вернуть предмет в инвентарь:', e);
+        }
     }
 
     // ============ ОЖИДАНИЕ СОПЕРНИКА ============
