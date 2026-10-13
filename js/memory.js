@@ -1,7 +1,7 @@
 (function () {
     // ============ КОНСТАНТЫ ============
     const SYMBOLS = ['🍎', '🍊', '🍋', '🍌', '🍉', '🍇', '🍓', '🍒'];
-    const MULTIPLIERS = [4, 8, 12, 16, 20, 24, 28, 32];
+    const MULTIPLIERS = [2, 4, 8, 16, 20, 24, 28, 32];
     const CARD_FLIP_DELAY = 900;
     const TOTAL_PAIRS = 8;
     const TOTAL_ATTEMPTS = 3;   // всего попыток на всю игру
@@ -115,6 +115,30 @@
 
     function updateAllCardsVisual() {
         state.board.forEach((_, idx) => updateCardVisual(idx));
+    }
+
+    // ============ РАСКРЫТИЕ ВСЕХ КАРТ В КОНЦЕ ИГРЫ ============
+    function revealAllCards() {
+        if (!state.board || state.board.length === 0) return;
+
+        state.board.forEach(card => {
+            card.revealed = true;
+            card.wrong = false;
+        });
+
+        state.board.forEach((card, idx) => {
+            updateCardVisual(idx);
+
+            const el = boardEl.children[idx];
+            if (!el) return;
+
+            // Подсвечиваем карты, которые так и не собрали в пару
+            el.classList.toggle('missed', !card.matched);
+
+            // Каскадное раскрытие — карты переворачиваются друг за другом
+            const inner = el.querySelector('.memory-card-inner');
+            if (inner) inner.style.transitionDelay = (idx * 35) + 'ms';
+        });
     }
 
     // ============ ЛЕСТНИЦА ============
@@ -428,7 +452,7 @@
         window.globalBalance += winAmount;
         updateBalanceDisplay();
 
-        setStatus(`🎉 ВЫИГРЫШ! x${mult} · +${formatMoney(profit)} ₽`, 'success');
+        setStatus(`🎉 ВЫИГРЫШ! x${mult} · +${formatMoney(profit)} ₽ · Карты раскрыты`, 'success');
 
         addBalanceHistory(
             state.usedItem ? winAmount : profit,
@@ -442,7 +466,7 @@
         state.phase = 'gameover';
         state.locked = true;
         hideDecision();
-        updateAllCardsVisual();
+        revealAllCards();   // ← раскрываем все карты в конце игры
         resetButtons();
 
         if (window.forceSaveBalance) window.forceSaveBalance();
@@ -453,7 +477,10 @@
         state.phase = 'gameover';
         state.locked = true;
 
-        setStatus(`💀 ПРОИГРЫШ! Ставка ${state.bet.toLocaleString()} ₽ сгорела.`, 'error');
+        setStatus(`💀 ПРОИГРЫШ! Ставка ${state.bet.toLocaleString()} ₽ сгорела. Карты раскрыты — смотрите, где что было.`, 'error');
+
+        // Даём картам вернуться рубашкой вверх, а затем плавно раскрываем всё поле
+        setTimeout(revealAllCards, 300);
 
         addBalanceHistory(-state.bet, `Memory (промах на ${state.pairsFound + 1}-й паре)`);
         addToHistory(state.pairsFound, -state.bet, false, 0);
