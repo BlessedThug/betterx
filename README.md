@@ -17,7 +17,7 @@ Author: BlessedThug
 
 Версия: 0.4.1
 
-Доступные игры: Crash, Cases, Wheel, Slots, Roulette, Memory.
+Доступные игры: Crash, Cases, Wheel, Slots, Roulette, Memory, Duels.
 
 Changelogs:
 #### [v 0.4.1 (13.10.2026)]
