@@ -147,24 +147,95 @@
   let isItemBet = false;
 
   // ========== ГЕНЕРАЦИЯ КРАШ-МНОЖИТЕЛЯ ==========
-  // Классическая формула краш-игр: m = (1 - edge) / U,  U ~ uniform(0,1]
-  // Даёт RTP = 1 - edge и «правильную» кривую распределения.
-  const HOUSE_EDGE = 0.05;   // 5% → RTP 95%
-  const MAX_MULT = 1000;     // верхний предел множителя
+  // Дизайн: базовое распределение даёт RTP ~88–92% (без учёта адаптации),
+  // а поверх него работает «память» о последних раундах игрока —
+  // после крупных множителей резко повышается шанс мгновенного краша.
+  const MAX_MULT = 1000;
+
+  // Скользящее окно последних фактических результатов игрока
+  // (забор или точка краха — что игрок реально «получил»).
+  const recentResults = [];
+  const RECENT_LIMIT = 5;
+
+  function pushRecentResult(mult) {
+    if (typeof mult !== 'number' || !isFinite(mult) || mult <= 0) return;
+    recentResults.unshift(mult);
+    while (recentResults.length > RECENT_LIMIT) recentResults.pop();
+  }
 
   function chance() {
-    let u = Math.random();
-    if (u < 1e-6) u = 1e-6;                 // защита от деления на 0
-    const raw = (1 - HOUSE_EDGE) / u;
+    // ===== 1. БАЗОВОЕ РАСПРЕДЕЛЕНИЕ (зонная модель) =====
+    // 30% — мгновенный краш (1.00–1.15)
+    // 27% — низкий          (1.15–2.00)
+    // 20% — средний         (2.00–4.00)
+    // 12% — хороший         (4.00–10.00)
+    // 7%  — крупный         (10.00–25.00)
+    // 3%  — большой         (25.00–75.00)
+    // 1%  — джекпот         (75.00–300.00)
+    const u = Math.random();
+    let raw;
+
+    if (u < 0.30) {
+      raw = 1.00 + Math.random() * 0.15;
+    } else if (u < 0.57) {
+      raw = 1.15 + Math.random() * 0.85;
+    } else if (u < 0.77) {
+      raw = 2.00 + Math.random() * 2.00;
+    } else if (u < 0.89) {
+      raw = 4.00 + Math.random() * 6.00;
+    } else if (u < 0.96) {
+      raw = 10.00 + Math.random() * 15.00;
+    } else if (u < 0.99) {
+      raw = 25.00 + Math.random() * 50.00;
+    } else {
+      raw = 75.00 + Math.random() * 225.00;
+    }
+
+    // ===== 2. АДАПТАЦИЯ ПО СЕРИИ =====
+    if (recentResults.length > 0) {
+      const r0 = recentResults[0];
+      const r1 = recentResults[1];
+      const r2 = recentResults[2];
+
+      // (a) Джекпот (>= 50x) — почти гарантированно красный следующий раунд
+      if (r0 >= 50.00) {
+        if (Math.random() < 0.90) {
+          raw = Math.min(raw, 1.00 + Math.random() * 0.20);
+        }
+      }
+      // (b) Крупный (>= 5x) — вероятность краша растёт пропорционально размеру
+      else if (r0 >= 5.00) {
+        const crushChance = Math.min(0.80, 0.50 + r0 / 200);
+        if (Math.random() < crushChance) {
+          raw = Math.min(raw, 1.00 + Math.random() * 0.30);
+        }
+      }
+
+      // (c) Два подряд >= 2x — следующий скорее низкий
+      if (r1 !== undefined && r0 >= 2.00 && r1 >= 2.00) {
+        if (Math.random() < 0.55) {
+          raw = Math.min(raw, 1.00 + Math.random() * 0.40);
+        }
+      }
+
+      // (d) Три подряд >= 1.5x — почти наверняка следующий ниже 1.5x
+      if (r2 !== undefined && r0 >= 1.50 && r1 >= 1.50 && r2 >= 1.50) {
+        if (Math.random() < 0.80) {
+          raw = Math.min(raw, 1.00 + Math.random() * 0.30);
+        }
+      }
+    }
+
+    // ===== 3. ОГРАНИЧЕНИЕ И ОКРУГЛЕНИЕ =====
     const capped = Math.min(raw, MAX_MULT);
     return Math.max(1.00, Math.floor(capped * 100) / 100);
   }
 
   // ========== КРИВАЯ РОСТА МНОЖИТЕЛЯ ==========
   // m(t) = exp(RATE * t^EXP)
-  //   EXP > 1 → dm/dt = 0 при t = 0, то есть старт очень плавный.
-  //   Формула НЕ зависит от итогового краша: первые секунды любого раунда
-  //   проходят одинаково медленно, что критично для ручного забора.
+  //   EXP > 1 → dm/dt = 0 при t = 0, старт очень плавный.
+  //   Формула НЕ зависит от итогового краша — первые секунды любого
+  //   раунда проходят одинаково медленно, что критично для ручного забора.
   const GROWTH_RATE = 0.05;
   const GROWTH_EXP  = 1.4;
 
@@ -455,7 +526,6 @@
     if (!hasCashedOut && isBetConfirmed && confirmedBetMultiplier > 0 &&
         confirmedBetMultiplier < endMultiplier && rawMult >= confirmedBetMultiplier) {
       executeCashout(confirmedBetMultiplier);
-      // Продолжаем анимацию — множитель будет расти до краша
     }
 
     // ===== КРАШ =====
@@ -464,34 +534,33 @@
       isGrowing = false;
       multEl.textContent = endMultiplier.toFixed(2);
 
-      // Всегда показываем CRASH! — это итог раунда для всех
+      // Записываем результат игрока в «память» для адаптации сложности.
+      // Если ставки не было — серия не сбивается.
+      if (isBetConfirmed) {
+        pushRecentResult(hasCashedOut ? cashoutMultiplier : endMultiplier);
+      }
+
       showCrashText();
 
-      // Финализируем исход для игрока
       if (hasCashedOut) {
-        // Деньги уже начислены в executeCashout.
-        // Визуально — зелёный, т.к. игрок в плюсе.
         multEl.style.color = '#4CAF50';
         multEl.style.textShadow = '0 0 30px rgba(76, 175, 80, 0.9)';
       } else {
-        // Игрок не успел — теряет ставку (или предмет)
         processCrashLoss();
       }
 
-      // Публикуем итоговый множитель раунда в историю
       historyMuls.unshift(endMultiplier);
       if (historyMuls.length > 10) historyMuls.pop();
       updateHistoryDisplay();
 
-      // ВАЖНО: статус «Игра завершена» выставляем ровно один раз — здесь.
-      // Multiplayer именно в этот момент читает #x и получает точку краша.
+      // Multiplayer читает #x и точку краха именно в момент смены статуса
       updateStatus('Игра завершена');
 
       finalizeCrashVisual();
       return;
     }
 
-    // ===== ПРОСТО ОБНОВЛЕНИЕ ЭКРАНА =====
+    // ===== ОБНОВЛЕНИЕ ЭКРАНА =====
     currentMultiplier = rawMult;
     const displayStr = rawMult.toFixed(2);
     multEl.textContent = displayStr;
@@ -504,9 +573,6 @@
   }
 
   // ========== РУЧНОЙ / АВТО-КЭШАУТ ==========
-  // Начисляет деньги НЕМЕДЛЕННО, но анимацию НЕ останавливает —
-  // множитель продолжает расти до точки краша, чтобы игрок увидел,
-  // «до чего дожила» игра.
   function executeCashout(mult) {
     if (hasCashedOut) return;
     if (!isBetConfirmed || confirmedBetAmount <= 0) return;
@@ -515,17 +581,14 @@
     hasCashedOut = true;
     cashoutMultiplier = Math.floor(mult * 100) / 100;
 
-    // Фиксируем прибыль
     processCashoutWinnings(cashoutMultiplier);
 
-    // Визуал на кнопке
     btn.textContent = `✅ Забрано ${cashoutMultiplier.toFixed(2)}x`;
     btn.style.background = 'linear-gradient(45deg, #4CAF50, #2e7d32)';
     btn.disabled = true;
     btn.style.cursor = 'not-allowed';
 
-    // Заметьте: isGrowing НЕ трогаем — анимация продолжается.
-    // multEl продолжает обновляться в frame().
+    // isGrowing НЕ трогаем — анимация продолжается до точки краха
   }
 
   function processCashoutWinnings(mult) {
@@ -558,7 +621,7 @@
   // ========== ПРОИГРЫШ ПО КРАШУ ==========
   function processCrashLoss() {
     const betAmount = confirmedBetAmount;
-    if (!isBetConfirmed || betAmount <= 0) return; // без ставки — деньги не трогаем
+    if (!isBetConfirmed || betAmount <= 0) return;
 
     let displayAmount, sign;
     if (isItemBet) {
@@ -586,7 +649,6 @@
 
   function finalizeCrashVisual() {
     if (hasCashedOut) {
-      // Игрок в плюсе — показываем и его забор, и точку краха
       btn.textContent = `✅ Забрано ${cashoutMultiplier.toFixed(2)}x · Краш ${endMultiplier.toFixed(2)}x`;
       btn.style.background = 'linear-gradient(45deg, #4CAF50, #2e7d32)';
     } else {
@@ -659,7 +721,6 @@
     hideTimer();
     updateStatus('Идёт игра');
 
-    // Если ставка с предметом – удаляем его сейчас (до анимации)
     if (isBetConfirmed && isItemBet && selectedInventoryItem) {
       if (window.InventoryManager) {
         const removed = window.InventoryManager.removeItem(selectedInventoryItem.id);
@@ -696,17 +757,12 @@
     updateHistoryDisplay();
   }
 
-  // ========== ГЛАВНАЯ КНОПКА ==========
   function onMainButtonClick() {
     if (isGrowing && isBetConfirmed && !hasCashedOut) {
-      // Идёт раунд → ручной кэшаут по текущему множителю
       executeCashout(currentMultiplier);
     } else if (isWaitingForNextGame && !isBetConfirmed) {
-      // Ожидание → подтверждаем ставку
       confirmBet();
     }
-    // Если ставка подтверждена, но раунд ещё не начался — ничего
-    // Если уже забрано — кнопка disabled
   }
 
   // ========== ИНИЦИАЛИЗАЦИЯ ==========
