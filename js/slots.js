@@ -21,13 +21,13 @@
     // ============ КОНФИГУРАЦИЯ СИМВОЛОВ ============
     // weight — вес (шанс выпадения). Суммарный вес не обязательно 100 — алгоритм нормализует.
     const SYMBOLS = [
-        { emoji: '🍒', name: 'Вишня',    value: 2,  weight: 30, tier: 'common' },
-        { emoji: '🍋', name: 'Лимон',    value: 3,  weight: 25, tier: 'common' },
-        { emoji: '🍇', name: 'Виноград', value: 5,  weight: 20, tier: 'uncommon' },
-        { emoji: '🔔', name: 'Колокол',  value: 10, weight: 12, tier: 'rare' },
-        { emoji: '💎', name: 'Алмаз',    value: 20, weight: 8,  tier: 'epic' },
-        { emoji: '7️⃣', name: 'Семёрка',  value: 30, weight: 4,  tier: 'legendary' },
-        { emoji: '⭐', name: 'Звезда',   value: 50, weight: 1,  tier: 'mythic' },
+        { emoji: '🍒', name: 'Вишня',    value: 2,   weight: 32, tier: 'common'    },
+        { emoji: '🍋', name: 'Лимон',    value: 3,   weight: 28, tier: 'common'    },
+        { emoji: '🍇', name: 'Виноград', value: 5,   weight: 18, tier: 'uncommon'  },
+        { emoji: '🔔', name: 'Колокол',  value: 12,  weight: 10, tier: 'rare'      },
+        { emoji: '💎', name: 'Алмаз',    value: 25,  weight: 6,  tier: 'epic'      },
+        { emoji: '7️⃣', name: 'Семёрка',  value: 60,  weight: 4,  tier: 'legendary' },
+        { emoji: '⭐', name: 'Звезда',   value: 200, weight: 2,  tier: 'mythic'    },
     ];
 
     // Линии выплат: [row, col] для каждой из 3 ячеек
