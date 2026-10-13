@@ -144,31 +144,33 @@
   let confirmedBetAmount = 0;
   let confirmedBetMultiplier = 0;
   let isBetConfirmed = false;
-  let isItemBet = false; // true, если ставка сделана предметом
+  let isItemBet = false;
 
-  function ChanceNumber(min, max) {
-    min = Math.ceil(min);
-    max = Math.floor(max);
-    return Math.floor(Math.random() * (max - min + 1) + min);
-  }
+  // ========== ГЕНЕРАЦИЯ КРАШ-МНОЖИТЕЛЯ ==========
+  // Классическая формула краш-игр: m = (1 - edge) / U,  U ~ uniform(0,1]
+  // Даёт RTP = 1 - edge и «правильную» кривую распределения.
+  const HOUSE_EDGE = 0.05;   // 5% → RTP 95%
+  const MAX_MULT = 1000;     // верхний предел множителя
 
   function chance() {
-    let ch00 = 1.0
-    let ch01 = ChanceNumber(1, 2) + '.' + ChanceNumber(0, 9) + ChanceNumber(0, 9)
-    let ch02 = 1 + '.' + ChanceNumber(0, 9) + ChanceNumber(0, 9)
-    let ch03 = ChanceNumber(1, 3) + '.' + ChanceNumber(0, 9) + ChanceNumber(0, 9)
-    let ch04 = ChanceNumber(1, 4) + '.' + ChanceNumber(0, 9) + ChanceNumber(0, 9)
-    let ch05 = ChanceNumber(1, 5) + '.' + ChanceNumber(0, 9) + ChanceNumber(0, 9)
-    let ch06 = 1 + '.' + ChanceNumber(0, 3) + ChanceNumber(0, 9)
-    let ch07 = ChanceNumber(1, 2) + '.' + ChanceNumber(0, 9) + ChanceNumber(0, 9)
-    let ch08 = ChanceNumber(1, 50) + '.' + ChanceNumber(0, 9) + ChanceNumber(0, 9)
-    let ch09 = 1 + '.' + ChanceNumber(0, 5) + ChanceNumber(0, 9)
-    let ch10 = ChanceNumber(1, 250) + '.' + ChanceNumber(0, 9) + ChanceNumber(0, 9)
-    let ch11 = 1.01
-    let ch12 = 1.03
-    let ch = [ch01, ch02, ch03, ch04, ch05, ch06, ch07, ch08, ch09, ch10, ch11, ch12, ch00]
-    let chance = ch[Math.floor(Math.random() * 13)]
-    return parseFloat(chance)
+    let u = Math.random();
+    if (u < 1e-6) u = 1e-6;                 // защита от деления на 0
+    const raw = (1 - HOUSE_EDGE) / u;
+    const capped = Math.min(raw, MAX_MULT);
+    return Math.max(1.00, Math.floor(capped * 100) / 100);
+  }
+
+  // ========== КРИВАЯ РОСТА МНОЖИТЕЛЯ ==========
+  // m(t) = exp(RATE * t^EXP)
+  //   EXP > 1 → dm/dt = 0 при t = 0, то есть старт очень плавный.
+  //   Формула НЕ зависит от итогового краша: первые секунды любого раунда
+  //   проходят одинаково медленно, что критично для ручного забора.
+  const GROWTH_RATE = 0.05;
+  const GROWTH_EXP  = 1.4;
+
+  function multiplierAt(elapsedSec) {
+    const t = Math.max(elapsedSec, 0);
+    return Math.exp(GROWTH_RATE * Math.pow(t, GROWTH_EXP));
   }
 
   if (typeof window.globalBalance === 'undefined') {
@@ -181,7 +183,6 @@
   }
 
   function updateGlobalBalance(amount, operation = 'add') {
-    const oldBalance = window.globalBalance;
     if (operation === 'add') {
       window.globalBalance += amount;
     } else if (operation === 'subtract') {
@@ -256,14 +257,6 @@
     }
   }
 
-  function calculateDuration(start, end) {
-    const diff = Math.abs(end - start);
-    const minTime = 100;
-    const maxTime = 10000;
-    let duration = minTime + (maxTime - minTime) * Math.pow(diff / Math.max(end, 1), 0.5);
-    return Math.min(duration, 15000);
-  }
-
   function blockInputElements() {
     isGameBlocked = true;
     btn.disabled = true;
@@ -295,7 +288,11 @@
 
   function updateBetButtonText() {
     if (isBetConfirmed) {
-      btn.textContent = `✅ ${confirmedBetAmount}₽ x${confirmedBetMultiplier.toFixed(2)}`;
+      if (confirmedBetMultiplier > 0) {
+        btn.textContent = `✅ ${confirmedBetAmount}₽ → ${confirmedBetMultiplier.toFixed(2)}x`;
+      } else {
+        btn.textContent = `✅ ${confirmedBetAmount}₽ (ручной забор)`;
+      }
       btn.style.background = 'linear-gradient(45deg, #4CAF50, #45a049)';
     } else {
       btn.textContent = 'СТАВКА';
@@ -310,10 +307,10 @@
     }
 
     let betAmount = parseFloat(betAmountInput.value);
-    const betMultiplier = parseFloat(betMultiplierInput.value);
+    const targetRaw = betMultiplierInput.value.trim();
+    let targetMultiplier = targetRaw === '' ? 0 : parseFloat(targetRaw);
     const currentBalance = window.globalBalance;
 
-    // Проверяем, выбран ли предмет
     if (selectedInventoryItem) {
       betAmount = selectedInventoryItem.price;
       const inventory = window.InventoryManager ? window.InventoryManager.getInventory() : [];
@@ -341,13 +338,22 @@
       isItemBet = false;
     }
 
-    if (isNaN(betMultiplier) || betMultiplier < 1.00) {
-      updateStatus('Ожидание');
-      return;
+    // Автостоп ОПЦИОНАЛЕН: пустое поле = ручной забор
+    if (targetMultiplier !== 0) {
+      if (isNaN(targetMultiplier) || targetMultiplier < 1.01) {
+        updateStatus('Ожидание');
+        return;
+      }
+      if (targetMultiplier > MAX_MULT) {
+        targetMultiplier = MAX_MULT;
+        betMultiplierInput.value = MAX_MULT;
+      }
+    } else {
+      targetMultiplier = 0;
     }
 
     confirmedBetAmount = betAmount;
-    confirmedBetMultiplier = betMultiplier;
+    confirmedBetMultiplier = targetMultiplier;
     isBetConfirmed = true;
 
     updateStatus('Ожидание');
@@ -377,10 +383,10 @@
 
   let isGrowing = false;
   let startTime = 0;
-  let startMultiplier = 1.00;
   let currentMultiplier = 1.00;
   let endMultiplier = 1.00;
-  let duration = 0;
+  let hasCashedOut = false;
+  let cashoutMultiplier = 0;
 
   function showCrashText() {
     crashText.style.opacity = '1';
@@ -410,107 +416,204 @@
 
   function animateMul(start, end) {
     startTime = performance.now();
-    duration = calculateDuration(start, end);
-    startMultiplier = start;
+    currentMultiplier = start;
     endMultiplier = end;
     isGrowing = true;
+    hasCashedOut = false;
+    cashoutMultiplier = 0;
     blockInputElements();
     hideCrashText();
     multEl.style.animation = 'none';
+    multEl.style.color = 'orange';
+    multEl.style.textShadow = '0 0 30px rgba(255, 165, 0, 0.7)';
+    multEl.textContent = '1.00';
+
+    // Кнопка превращается в «ЗАБРАТЬ» на время раунда
+    if (isBetConfirmed) {
+      btn.disabled = false;
+      btn.style.opacity = '1';
+      btn.style.cursor = 'pointer';
+      btn.textContent = '💰 ЗАБРАТЬ 1.00x';
+      btn.style.background = 'linear-gradient(45deg, #4CAF50, #2e7d32)';
+    } else {
+      btn.disabled = true;
+      btn.style.opacity = '0.5';
+      btn.textContent = '— (ставка не сделана)';
+    }
+
     requestAnimationFrame(frame);
   }
 
   function frame(now) {
     if (!isGrowing) return;
 
-    const elapsed = now - startTime;
-    const t = Math.min(1, elapsed / duration);
-    const easedProgress = Math.pow(t, 3);
-    currentMultiplier = startMultiplier + (endMultiplier - startMultiplier) * easedProgress;
+    const elapsedSec = (now - startTime) / 1000;
+    const rawMult = multiplierAt(elapsedSec);
 
-    multEl.textContent = currentMultiplier.toFixed(2);
+    // ===== АВТОСТОП (опциональная страховка) =====
+    // Срабатывает ТОЛЬКО если цель меньше точки краша и ещё не забрано
+    if (!hasCashedOut && isBetConfirmed && confirmedBetMultiplier > 0 &&
+        confirmedBetMultiplier < endMultiplier && rawMult >= confirmedBetMultiplier) {
+      executeCashout(confirmedBetMultiplier);
+      // Продолжаем анимацию — множитель будет расти до краша
+    }
 
-    if (t >= 1) {
+    // ===== КРАШ =====
+    if (rawMult >= endMultiplier) {
+      currentMultiplier = endMultiplier;
+      isGrowing = false;
+      multEl.textContent = endMultiplier.toFixed(2);
+
+      // Всегда показываем CRASH! — это итог раунда для всех
       showCrashText();
 
-      const betAmount = confirmedBetAmount;
-      const betMultiplier = confirmedBetMultiplier;
-
-      let winAmount = 0;
-      let totalPayout = 0;
-      let isWin = false;
-      let timestamp = new Date().toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-
-      // Обработка результата
-      if (isBetConfirmed && betAmount > 0 && currentMultiplier >= betMultiplier) {
-        totalPayout = betAmount * betMultiplier;
-        if (isItemBet) {
-          // Ставка предметом – начисляем полную сумму выигрыша
-          winAmount = totalPayout;
-        } else {
-          // Денежная ставка – начисляем только прибыль
-          winAmount = totalPayout - betAmount;
-        }
-        updateGlobalBalance(winAmount, 'add');
-        isWin = true;
-      } else if (isBetConfirmed && betAmount > 0) {
-        if (isItemBet) {
-          // Предмет уже удалён – баланс не трогаем
-          winAmount = 0;
-        } else {
-          winAmount = -betAmount;
-          updateGlobalBalance(betAmount, 'subtract');
-        }
-        isWin = false;
+      // Финализируем исход для игрока
+      if (hasCashedOut) {
+        // Деньги уже начислены в executeCashout.
+        // Визуально — зелёный, т.к. игрок в плюсе.
+        multEl.style.color = '#4CAF50';
+        multEl.style.textShadow = '0 0 30px rgba(76, 175, 80, 0.9)';
+      } else {
+        // Игрок не успел — теряет ставку (или предмет)
+        processCrashLoss();
       }
 
+      // Публикуем итоговый множитель раунда в историю
+      historyMuls.unshift(endMultiplier);
+      if (historyMuls.length > 10) historyMuls.pop();
+      updateHistoryDisplay();
+
+      // ВАЖНО: статус «Игра завершена» выставляем ровно один раз — здесь.
+      // Multiplayer именно в этот момент читает #x и получает точку краша.
       updateStatus('Игра завершена');
 
-      if (!isNaN(currentMultiplier)) {
-        historyMuls.unshift(currentMultiplier);
-        if (historyMuls.length > 10) historyMuls.pop();
-        updateHistoryDisplay();
-      }
-
-      if (isBetConfirmed && betAmount > 0) {
-        let color = isWin ? '#4CAF50' : '#f44336';
-        let displayAmount;
-        let sign;
-        if (isWin) {
-          displayAmount = winAmount.toFixed(2);
-          sign = '+';
-        } else {
-          if (isItemBet) {
-            displayAmount = '0'; // предмет утерян, баланс не менялся
-            sign = '';
-          } else {
-            displayAmount = betAmount.toFixed(2);
-            sign = '-';
-          }
-        }
-        let html = `
-          <span style="color: ${color}; font-weight: bold;">${sign}${displayAmount} ₽</span> 
-          (${betMultiplier.toFixed(2)}x → ${currentMultiplier.toFixed(2)}x) 
-          <span style="color: orange;">→ ${window.globalBalance.toFixed(2)} ₽</span>
-          <span style="color: #888; font-size: 14px; margin-left: 10px;">${timestamp}</span>
-        `;
-        balanceHistory.unshift({ html: html, color: color });
-        updateBalanceHistoryDisplay();
-      }
-
-      resetBetConfirmation();
-
-      setTimeout(() => {
-        hideCrashText();
-        multEl.textContent = '1.00';
-        isGrowing = false;
-        startCountdown();
-      }, 5000);
-    } else {
-      requestAnimationFrame(frame);
+      finalizeCrashVisual();
+      return;
     }
+
+    // ===== ПРОСТО ОБНОВЛЕНИЕ ЭКРАНА =====
+    currentMultiplier = rawMult;
+    const displayStr = rawMult.toFixed(2);
+    multEl.textContent = displayStr;
+
+    if (!hasCashedOut && isBetConfirmed && !btn.disabled) {
+      btn.textContent = `💰 ЗАБРАТЬ ${displayStr}x`;
+    }
+
+    requestAnimationFrame(frame);
   }
 
+  // ========== РУЧНОЙ / АВТО-КЭШАУТ ==========
+  // Начисляет деньги НЕМЕДЛЕННО, но анимацию НЕ останавливает —
+  // множитель продолжает расти до точки краша, чтобы игрок увидел,
+  // «до чего дожила» игра.
+  function executeCashout(mult) {
+    if (hasCashedOut) return;
+    if (!isBetConfirmed || confirmedBetAmount <= 0) return;
+    if (!isGrowing) return;
+
+    hasCashedOut = true;
+    cashoutMultiplier = Math.floor(mult * 100) / 100;
+
+    // Фиксируем прибыль
+    processCashoutWinnings(cashoutMultiplier);
+
+    // Визуал на кнопке
+    btn.textContent = `✅ Забрано ${cashoutMultiplier.toFixed(2)}x`;
+    btn.style.background = 'linear-gradient(45deg, #4CAF50, #2e7d32)';
+    btn.disabled = true;
+    btn.style.cursor = 'not-allowed';
+
+    // Заметьте: isGrowing НЕ трогаем — анимация продолжается.
+    // multEl продолжает обновляться в frame().
+  }
+
+  function processCashoutWinnings(mult) {
+    const betAmount = confirmedBetAmount;
+    const totalPayout = betAmount * mult;
+    let winAmount;
+
+    if (isItemBet) {
+      winAmount = totalPayout;              // предмет уже изъят — платим полную сумму
+    } else {
+      winAmount = totalPayout - betAmount;  // чистая прибыль
+    }
+
+    updateGlobalBalance(winAmount, 'add');
+
+    const timestamp = new Date().toLocaleTimeString('ru-RU', {
+      hour: '2-digit', minute: '2-digit', second: '2-digit'
+    });
+    const color = '#4CAF50';
+    const html = `
+      <span style="color: ${color}; font-weight: bold;">+${winAmount.toFixed(2)} ₽</span> 
+      (Забрано на ${mult.toFixed(2)}x) 
+      <span style="color: orange;">→ ${window.globalBalance.toFixed(2)} ₽</span>
+      <span style="color: #888; font-size: 14px; margin-left: 10px;">${timestamp}</span>
+    `;
+    balanceHistory.unshift({ html, color });
+    updateBalanceHistoryDisplay();
+  }
+
+  // ========== ПРОИГРЫШ ПО КРАШУ ==========
+  function processCrashLoss() {
+    const betAmount = confirmedBetAmount;
+    if (!isBetConfirmed || betAmount <= 0) return; // без ставки — деньги не трогаем
+
+    let displayAmount, sign;
+    if (isItemBet) {
+      displayAmount = '0';
+      sign = '';
+    } else {
+      displayAmount = betAmount.toFixed(2);
+      sign = '-';
+      updateGlobalBalance(betAmount, 'subtract');
+    }
+
+    const timestamp = new Date().toLocaleTimeString('ru-RU', {
+      hour: '2-digit', minute: '2-digit', second: '2-digit'
+    });
+    const color = '#f44336';
+    const html = `
+      <span style="color: ${color}; font-weight: bold;">${sign}${displayAmount} ₽</span> 
+      (Краш на ${endMultiplier.toFixed(2)}x) 
+      <span style="color: orange;">→ ${window.globalBalance.toFixed(2)} ₽</span>
+      <span style="color: #888; font-size: 14px; margin-left: 10px;">${timestamp}</span>
+    `;
+    balanceHistory.unshift({ html, color });
+    updateBalanceHistoryDisplay();
+  }
+
+  function finalizeCrashVisual() {
+    if (hasCashedOut) {
+      // Игрок в плюсе — показываем и его забор, и точку краха
+      btn.textContent = `✅ Забрано ${cashoutMultiplier.toFixed(2)}x · Краш ${endMultiplier.toFixed(2)}x`;
+      btn.style.background = 'linear-gradient(45deg, #4CAF50, #2e7d32)';
+    } else {
+      btn.textContent = `💀 Краш ${endMultiplier.toFixed(2)}x`;
+      btn.style.background = 'linear-gradient(45deg, #cc2222, #8a1111)';
+    }
+    btn.disabled = true;
+
+    setTimeout(() => {
+      hideCrashText();
+      cleanupAfterRound();
+    }, 5000);
+  }
+
+  function cleanupAfterRound() {
+    hideCrashText();
+    multEl.textContent = '1.00';
+    multEl.style.color = 'orange';
+    multEl.style.textShadow = '0 0 30px rgba(255, 165, 0, 0.7)';
+    isGrowing = false;
+    hasCashedOut = false;
+    cashoutMultiplier = 0;
+    resetBetConfirmation();
+    startCountdown();
+  }
+
+  // ========== ТАЙМЕР ==========
   function showTimer() {
     timerContainer.style.display = 'block';
   }
@@ -593,9 +696,23 @@
     updateHistoryDisplay();
   }
 
+  // ========== ГЛАВНАЯ КНОПКА ==========
+  function onMainButtonClick() {
+    if (isGrowing && isBetConfirmed && !hasCashedOut) {
+      // Идёт раунд → ручной кэшаут по текущему множителю
+      executeCashout(currentMultiplier);
+    } else if (isWaitingForNextGame && !isBetConfirmed) {
+      // Ожидание → подтверждаем ставку
+      confirmBet();
+    }
+    // Если ставка подтверждена, но раунд ещё не начался — ничего
+    // Если уже забрано — кнопка disabled
+  }
+
+  // ========== ИНИЦИАЛИЗАЦИЯ ==========
   document.addEventListener('DOMContentLoaded', function () {
     generateInitialHistory();
-    btn.addEventListener('click', confirmBet);
+    btn.addEventListener('click', onMainButtonClick);
 
     const style = document.createElement('style');
     style.textContent = `
@@ -610,6 +727,10 @@
       #startBtn:hover { transform: scale(1.05); }
     `;
     document.head.appendChild(style);
+
+    if (betMultiplierInput) {
+      betMultiplierInput.placeholder = 'Автостоп (опц.)';
+    }
 
     setTimeout(() => {
       startCountdown();
