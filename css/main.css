@@ -64,11 +64,39 @@ a {
 
 /* Контейнер для блоков выбора */
 .mode-selection {
-    display: flex;
-    justify-content: center;
-    gap: 60px;
-    flex-wrap: wrap;
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    justify-items: center;
+    align-items: stretch;
+    gap: 40px;
     margin-top: 40px;
+    width: 100%;
+}
+
+/* Планшет — 2 колонки */
+@media (max-width: 1200px) {
+    .mode-selection {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 30px;
+    }
+}
+
+/* Мобильный — 1 колонка */
+@media (max-width: 768px) {
+    .mode-selection {
+        grid-template-columns: 1fr;
+        gap: 24px;
+    }
+}
+
+/* Очень широкий экран — 4 колонки */
+@media (min-width: 1800px) {
+    #general {
+        max-width: 1600px;
+    }
+    .mode-selection {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
 }
 
 .block-choose {
@@ -409,6 +437,55 @@ a {
 @media (max-width: 992px)  { #block-memory { width: 400px; height: 400px; } #block-memory p { font-size: 56px; } #block-memory .block-emoji { font-size: 180px; } }
 @media (max-width: 480px)  { #block-memory p { font-size: 48px; } #block-memory .block-emoji { font-size: 150px; } }
 
+#block-duels {
+    width: 500px;
+    height: 500px;
+    padding: 30px;
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+#block-duels p {
+    font-size: 64px;
+    font-weight: 800;
+    background: linear-gradient(90deg, #ff8a00, #ffcc00);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 30px;
+    letter-spacing: 2px;
+    text-shadow: 0 2px 10px rgba(255, 140, 0, 0.3);
+}
+
+#block-duels:hover p {
+    background: linear-gradient(90deg, #ffcc00, #ffffff);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+#block-duels img {
+    width: 400px;
+    height: 400px;
+    object-fit: contain;
+    filter: drop-shadow(0 5px 15px rgba(255, 140, 0, 0.4));
+    transition: all 0.4s ease;
+}
+
+#block-duels:hover img {
+    transform: scale(1.05) rotate(-8deg);
+    filter: drop-shadow(0 10px 25px rgba(255, 200, 0, 0.7));
+}
+
+@media (max-width: 1200px) { #block-duels { width: 450px; height: 450px; } #block-duels img { width: 360px; height: 360px; } }
+@media (max-width: 992px)  { #block-duels { width: 400px; height: 400px; } #block-duels p { font-size: 56px; } #block-duels img { width: 320px; height: 320px; } }
+@media (max-width: 480px)  { #block-duels p { font-size: 48px; } #block-duels img { width: 260px; height: 260px; } }
+
+@media (max-width: 1200px) { #block-dices { width: 450px; height: 450px; } #block-dices img { width: 340px; height: 340px; } }
+@media (max-width: 992px)  { #block-dices { width: 400px; height: 400px; } #block-dices p { font-size: 56px; } #block-dices img { width: 300px; height: 300px; } }
+@media (max-width: 480px)  { #block-dices p { font-size: 48px; } #block-dices img { width: 250px; height: 250px; } }
+
 /* Плавающая кнопка информации в правом нижнем углу */
 #info-fab {
     position: fixed;
@@ -634,5 +711,64 @@ a {
     #block-sapper img {
         width: 260px;
         height: 185px;
+    }
+}
+
+/* ============ АДАПТИВНАЯ ПЛИТКА В СЕТКЕ 3×N ============ */
+
+.mode-selection .block-choose {
+    width: 100%;
+    max-width: 100%;
+    display: block;
+}
+
+.mode-selection .block-choose > div {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 1 / 1;
+    padding: 24px;
+    box-sizing: border-box;
+}
+
+/* Картинки — пропорционально уменьшаются вместе с плиткой */
+.mode-selection .block-choose img {
+    max-width: 78%;
+    max-height: 62%;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+}
+
+/* Текстовый заголовок режима — тоже адаптивный */
+.mode-selection .block-choose p {
+    font-size: clamp(32px, 3.4vw, 56px);
+    margin-bottom: clamp(12px, 1.8vw, 26px);
+}
+
+/* Memory — эмодзи */
+.mode-selection #block-memory .block-emoji {
+    font-size: clamp(96px, 14vw, 220px);
+}
+
+/* Убираем фиксированные размеры у всех плиток */
+#block-crash,
+#block-cases,
+#block-wheel,
+#block-slots,
+#block-roulette,
+#block-memory,
+#block-duels {
+    width: 100% !important;
+    height: auto !important;
+}
+
+.mode-selection .block-choose > div {
+    max-width: 480px;
+    margin: 0 auto;
+}
+
+@media (min-width: 1800px) {
+    .mode-selection .block-choose > div {
+        max-width: 420px;
     }
 }

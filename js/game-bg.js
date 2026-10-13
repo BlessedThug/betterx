@@ -5,7 +5,7 @@
 (function () {
     function initGameBackground() {
         const targets = document.querySelectorAll(
-            'main .wheel-game-area, main .roulette-game-area, main .slots-game-area'
+            'main.wheel-game-area, main.roulette-game-area, main.slots-game-area, main.memory-game-area, main.duels-game-area'
         );
 
         if (!targets.length) return;
