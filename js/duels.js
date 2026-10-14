@@ -32,7 +32,12 @@
 
     const leaveBtn        = document.getElementById('leave-btn');
     const rollBtn         = document.getElementById('roll-btn');
+    const duelTitleEl     = document.getElementById('duel-title');
+    const diceArenaEl     = document.getElementById('dice-arena');
+    const raceArenaEl     = document.getElementById('race-arena');
+    const bjArenaEl       = document.getElementById('blackjack-arena');
 
+    // Dice UI
     const youDiceEl       = document.getElementById('you-dice');
     const oppDiceEl       = document.getElementById('opp-dice');
     const youNameEl       = document.getElementById('you-name');
@@ -41,6 +46,32 @@
     const oppBetDisplay   = document.getElementById('opp-bet-display');
     const youChanceEl     = document.getElementById('you-chance');
     const oppChanceEl     = document.getElementById('opp-chance');
+
+    // Race UI
+    const raceYouName     = document.getElementById('race-you-name');
+    const raceOppName     = document.getElementById('race-opp-name');
+    const raceYouBet      = document.getElementById('race-you-bet');
+    const raceOppBet      = document.getElementById('race-opp-bet');
+    const raceYouChance   = document.getElementById('race-you-chance');
+    const raceOppChance   = document.getElementById('race-opp-chance');
+    const raceYouRunner   = document.getElementById('race-you-runner');
+    const raceOppRunner   = document.getElementById('race-opp-runner');
+    const raceLaneYou     = document.querySelector('.race-lane-you');
+    const raceLaneOpp     = document.querySelector('.race-lane-opp');
+
+    // Blackjack UI
+    const bjYouNameEl     = document.getElementById('bj-you-name');
+    const bjOppNameEl     = document.getElementById('bj-opp-name');
+    const bjYouBetEl      = document.getElementById('bj-you-bet');
+    const bjOppBetEl      = document.getElementById('bj-opp-bet');
+    const bjYouCardsEl    = document.getElementById('bj-you-cards');
+    const bjOppCardsEl    = document.getElementById('bj-opp-cards');
+    const bjYouScoreEl    = document.getElementById('bj-you-score');
+    const bjOppScoreEl    = document.getElementById('bj-opp-score');
+    const bjActionsEl     = document.getElementById('bj-actions');
+    const bjHitBtn        = document.getElementById('bj-hit-btn');
+    const bjStandBtn      = document.getElementById('bj-stand-btn');
+
     const bankValueEl     = document.getElementById('bank-value');
     const duelMessage     = document.getElementById('duel-message');
     const duelStatus      = document.getElementById('duel-status');
@@ -49,15 +80,14 @@
 
     // ============ РЕЕСТР ИГР ============
     const GAME_TYPES = {
-        dice: { icon: '🎲', name: 'Кости' }
-        // coin:  { icon: '🪙', name: 'Монетка' },
-        // rps:   { icon: '✊', name: 'КНБ' }
+        dice:      { icon: '🎲', name: 'Кости' },
+        race:      { icon: '🏁', name: 'Гонки' },
+        blackjack: { icon: '🃏', name: 'Блэкджек' }
     };
 
     function gameIcon(gameId) {
         return (GAME_TYPES[gameId] && GAME_TYPES[gameId].icon) || '🎮';
     }
-
     function gameName(gameId) {
         return (GAME_TYPES[gameId] && GAME_TYPES[gameId].name) || 'Игра';
     }
@@ -71,20 +101,50 @@
     let activeFilter = 'all';
 
     let selectedCreateItem = null;
+    let selectedCreateGame = 'dice';
     let selectedJoinItem = null;
     let joiningLobby = null;
     let currentGame = null;
     let isRolling = false;
+    let raceTimer = null;
+    let botStartTimeout = null;
+
+    // Blackjack state
+    let bjDeck = [];
+    let bjYouHand = [];
+    let bjOppHand = [];
+    let bjBotRevealed = false;
+    let bjPhase = 'idle'; // 'idle' | 'player' | 'bot' | 'done'
+    let bjActionTimer = null;
 
     const RAKE = 0.05;
+    const BOT_ITEM_CHANCE = 0.10;
+
+    // ============ ЛИЧНОСТИ БОТОВ В БЛЭКДЖЕКЕ ============
+    // threshold — при какой сумме бот останавливается.
+    //   16 — «консервативный»: стоит раньше, реже перебирает, но и реже набирает 20-21
+    //   17 — «стандарт»: как настоящий дилер
+    //   18 — «агрессивный»: рискует, чаще перебирает, но и чаще выбивает 19-21
+    const BJ_BOT_PERSONALITIES = [
+        { key: 'conservative', icon: '🛡️', name: 'Осторожный', threshold: 16, weight: 35 },
+        { key: 'standard',     icon: '⚖️', name: 'Стандарт',    threshold: 17, weight: 45 },
+        { key: 'aggressive',   icon: '⚡', name: 'Агрессивный', threshold: 18, weight: 20 }
+    ];
+
+    function pickBotPersonality() {
+        const total = BJ_BOT_PERSONALITIES.reduce((s, p) => s + p.weight, 0);
+        let r = Math.random() * total;
+        for (const p of BJ_BOT_PERSONALITIES) {
+            r -= p.weight;
+            if (r <= 0) return p;
+        }
+        return BJ_BOT_PERSONALITIES[1];
+    }
 
     const DICE_FACE_MAP = {
-        1: ['p5'],
-        2: ['p1', 'p9'],
-        3: ['p1', 'p5', 'p9'],
-        4: ['p1', 'p3', 'p7', 'p9'],
-        5: ['p1', 'p3', 'p5', 'p7', 'p9'],
-        6: ['p1', 'p3', 'p4', 'p6', 'p7', 'p9']
+        1: ['p5'], 2: ['p1','p9'], 3: ['p1','p5','p9'],
+        4: ['p1','p3','p7','p9'], 5: ['p1','p3','p5','p7','p9'],
+        6: ['p1','p3','p4','p6','p7','p9']
     };
 
     // ============ УТИЛИТЫ ============
@@ -118,100 +178,73 @@
         return arr[Math.floor(Math.random() * arr.length)];
     }
 
-    // ============ ДИЗАЙН КУБИКА ============
+    // ============ ВОЗВРАТ ПРЕДМЕТА ============
+    function returnItemToInventory(item) {
+        if (!item || !window.InventoryManager) return;
+        try {
+            window.InventoryManager.addItem(item.name, item.image, item.tier, item.price);
+        } catch (e) {
+            console.error('Не удалось вернуть предмет:', e);
+        }
+    }
+
+    // ============ ПУЛ ПРЕДМЕТОВ БОТА ============
+    function getBotItemPool() {
+        const pool = [];
+        if (Array.isArray(window.ITEMS_CASE_DATA)) pool.push(...window.ITEMS_CASE_DATA);
+        if (Array.isArray(window.GAMES_CASE_DATA)) pool.push(...window.GAMES_CASE_DATA);
+        return pool;
+    }
+
+    function pickBotItem() {
+        const pool = getBotItemPool();
+        if (pool.length === 0) return null;
+        const it = pickRandom(pool);
+        return { name: it.name, image: it.image, tier: it.tier, price: it.price };
+    }
+
+    // ============ КУБИК ============
     function renderDiceFace(diceEl, value) {
         let html = '';
         for (let i = 1; i <= 9; i++) html += `<div class="dot p${i}"></div>`;
         diceEl.innerHTML = html;
-
-        const active = DICE_FACE_MAP[value] || [];
-        active.forEach(pos => {
+        (DICE_FACE_MAP[value] || []).forEach(pos => {
             const dot = diceEl.querySelector('.' + pos);
             if (dot) dot.classList.add('on');
         });
     }
-
     function renderRandomDiceFace(diceEl) {
         renderDiceFace(diceEl, randomInt(1, 6));
     }
 
     // ============ НИКИ ============
     const NICKNAMES = [
-        'Azure_Blade', 'Black_Storm', 'Crimson_Fury', 'Cyber_Wraith', 'Dark_Ember',
-        'Dawn_Breaker', 'Death_Note_09', 'Deep_Blue', 'Demon_Slayer', 'Desert_Eagle',
-        'Diamond_Edge', 'Doom_Bringer', 'Double_Tap', 'Dragon_Fire', 'Dread_Naught',
-        'Dust_Devil', 'Elite_Sniper', 'Eternal_Flame', 'Fallen_Angel', 'First_Blood',
-        'Flame_Thrower', 'Frost_Giant', 'Ghost_Recon', 'Golden_Hawk', 'Gravity_Shift',
-        'Hell_Fire_42', 'High_Voltage', 'Holy_Knight', 'Horizon_Zero', 'Inferno_Blaze',
-        'Iron_Will', 'Jade_Emperor', 'Jungle_King', 'Krypton_Force', 'Light_Bringer',
-        'Lone_Wolf_13', 'Midnight_Raven', 'Mystic_Storm', 'Necro_Mancer', 'Night_Shadow',
-        'Ocean_Wave', 'Phantom_Reaper', 'Platinum_Edge', 'Power_Player', 'Pure_Energy',
-        'Quick_Silver', 'Red_Devil_07', 'Rocket_Man', 'Royal_Guard', 'Rusty_Nail',
-        'FrostBite', 'ShadowMorph', 'SteelEagle', 'PhantomStrike', 'MysticEcho',
-        'BlazeRunner', 'CrystalShard', 'DuskReaper', 'EmberWolf', 'FangBlade',
-        'GlacialTide', 'HawkEye_99', 'IronSoul', 'JadeDragon', 'KrakenRise',
-        'LunarFox', 'Maelstrom_7', 'Nebula_42', 'OnyxFang', 'PrismLight',
-        'QuantumFox', 'RavenFrost', 'SableWind', 'Tempest_88', 'Umbra_13',
-        'vlad_k26', 'shadow_reaper', 'katya.smirnova', 'alex_gaming99',
-        'dark_knight_x', 'cyber_ghost', 'masha_fox', 'pixel_art', 'dima.volkov',
-        'neon_pulse', 'anastasia_r', 'toxic_vibe', 'sergey.k', 'alpha_wolf',
-        'lisa_sweet', 'night_walker', 'max_force_8', 'julia_dream', 'frost_bite',
-        'pavel_pro', 'silent_assassin', 'olga_travel', 'iron_man_91', 'kristina_m',
-        'storm_bringer', 'denis_d', 'moon_light', 'artem_k', 'wild_cat', 'speed_demon',
-        'elena_s', 'matrix_cod', 'ivan_best', 'angel_eyes', 'black_pearl', 'igor_v', 'cosmic_ray',
-        'natalia_p', 'fire_starter', 'roma_g', 'golden_boy', 'starlight', 'andrey_b',
-        'ice_queen', 'phantom_lord', 'anna_k', 'vortex_x', 'dmitry_l', 'silver_surfer', 'ksenia_v',
-        'Valkyrie_6', 'Wraith_77', 'Xenon_5', 'Yeti_27', 'Zenith_3',
-        'ApexHunter', 'Blitz_44', 'Cipher_9', 'Delta_One', 'Echo_Zero',
-        'GammaRay', 'Helix_22', 'Inertia_4', 'Joker_66', 'Karma_11',
-        'Lynx_88', 'Matrix_99', 'Nova_Star', 'Orion_Belt', 'Phoenix_Ash',
-        'Quasar_77', 'Raptor_33', 'Sirius_12', 'Titan_55', 'Vector_6',
-        'North_Wind', 'ShadowStalker', 'Iron_Falcon', 'Last_Resort', 'Dark_Phoenix',
-        'Silent_Titan', 'Storm_Bringer', 'Grey_Wolf_77', 'Night_Reaper', 'Omega_Force',
-        'RageQuit_No', 'Bloody_Mary', 'Xx_Killer_xX', 'OneTap_King', 'Berserker_Rage',
-        'NoMercy_01', 'Headshot_Harry', 'Mad_Max_88', 'Savage_Beast', 'Terminator_2K',
-        'Fluffy_Kitten', 'Sleepy_Panda', 'Lazy_Dragon', 'Choco_Cookie', 'Bunny_Hop',
-        'Fat_Cat_42', 'Tiny_Tank', 'Happy_Cloud', 'Pink_Unicorn', 'Dancing_Fox',
-        'Ctrl_Z', 'Lag_Wizard', '0_Intelligence', 'Just_Luck', 'RNG_God',
-        'AFK_Player', 'No_Aim_No_Problem', 'Potato_PC', 'Alt_F4_King', 'Theory_Crafter',
-        'Alex_007', 'Max_Power', 'Jimmy_Knox', 'Tony_Snake', 'Leo_Thunder',
-        'Sam_Fisher', 'Nick_Flash', 'Tom_Hawk', 'Dan_Wild', 'Zack_Zero',
-        'Ghost_Rider', 'Venom_Strike', 'Crimson_Tide', 'Silver_Surfer', 'Golden_Eye',
-        'Emerald_Dream', 'Sapphire_Sky', 'Onyx_Shadow', 'Ruby_Heart', 'Pearl_Whisper',
-        'Neon_Ninja', 'Cyber_Samurai', 'Stealth_Reaper', 'Blitz_Krieg', 'Fury_Storm',
-        'Ice_Cold', 'Fire_Storm', 'Thunder_Clap', 'Earth_Shaker', 'Wind_Walker',
-        'Mega_Byte', 'Giga_Chad', 'Tera_Flop', 'Peta_Bit', 'Exa_Byte',
-        'Pixel_Pusher', 'Frame_Drop', 'Low_FPS', 'High_Ping', 'Packet_Loss',
-        'Solo_Queue', 'Duo_King', 'Squad_Leader', 'Clutch_God', 'Ace_Pilot',
-        'Tank_You', 'Heal_Bot', 'DPS_Monster', 'Support_Hero', 'Flex_Player',
-        'Noob_Slayer', 'Pro_Noob', 'Veteran_Noob', 'Grind_Master', 'Lore_Nerd',
-        'RNGesus', 'Blessed_By_RNG', 'Cursed_By_RNG', 'Lucky_Seven', 'Unlucky_13',
-        'Coffee_Addict', 'Tea_Sipper', 'Energy_Drink', 'Water_Bottle', 'Soda_Pop',
-        'Midnight_Oil', 'Early_Riser', 'Night_Hawk', 'Day_Dreamer', 'Dusk_Till_Dawn',
-        'CoffeeLover', 'NightOwl', 'EarlyBird', 'GymRat', 'YogaMaster',
-        'FoodieExplorer', 'TravelAddict', 'BookWorm', 'MovieBuff', 'MusicFanatic',
-        'ArtEnthusiast', 'NatureWalker', 'BeachLover', 'MountainHiker', 'CityExplorer',
-        'FitnessFreak', 'MeditationGuru', 'PetLover', 'CatMom', 'DogDad',
-        'HomeChef', 'BBQMaster', 'TeaConnoisseur', 'WineTaster', 'CraftBeerFan',
-        'SunriseSeeker', 'SunsetChaser', 'StarGazer', 'MoonWalker', 'CloudWatcher',
-        'RainDancer', 'SnowQueen', 'StormRider', 'ThunderBolt', 'LightningStrike',
-        'PixelWarrior', 'RetroGamer', 'SpeedRunner', 'AchievementHunter', 'PlatinumTrophy',
-        'RaidLeader', 'ClutchPlayer', 'HeadshotKing', 'StealthMaster', 'TankMain',
-        'HealerMain', 'DamageDealer', 'SupportMain', 'ProPlayer', 'EsportsLegend',
-        'NoobMaster', 'VeteranGamer', 'TheGrinder', 'TheoryCrafter', 'LoreMaster',
-        'LuckyCharm', 'FortuneCookie', 'DiamondHands', 'GoldenEagle', 'SilverFox',
-        'RainbowDash', 'ShadowHunter', 'PhoenixRising', 'DragonSoul', 'WolfPack',
-        'NightRaven', 'StormBringer', 'FireFox', 'IceQueen', 'ThunderStrike',
-        'CyberPunk', 'NeonRider', 'QuantumLeap', 'StarLord', 'IronFist',
-        'DataDrifter', 'CodeCrusader', 'ByteMe', 'NullPointer', 'StackOverflow',
-        'AngryCat', 'LazyDog', 'SlyFox', 'BraveLion', 'SwiftEagle',
-        'CleverMonkey', 'ProudPeacock', 'GentleGiant', 'FierceTiger', 'WiseOwl',
-        'ChaosTheory', 'ButterflyEffect', 'DarkMatter', 'BlackHole', 'WhiteDwarf',
-        'SpicyNoodle', 'SweetTooth', 'SourPatch', 'BitterCoffee', 'SaltyPretzel',
-        'RichDaddy', 'MoneyBags', 'GoldFinger', 'PlatinumCard', 'DiamondEyes',
-        'CtrlAltDel', 'AltF4', 'BlueScreen', 'Error404', 'LoadingDot',
-        'Crystal_Clear', 'Midnight_Star', 'Velvet_Rose', 'Silent_Echo', 'Broken_Dream',
-        'Lost_Soul', 'Dark_Knight', 'White_Wizard', 'Red_Queen', 'Blue_King'
+        'Azure_Blade','Black_Storm','Crimson_Fury','Cyber_Wraith','Dark_Ember',
+        'Dawn_Breaker','Diamond_Edge','Doom_Bringer','Dragon_Fire','Dread_Naught',
+        'Elite_Sniper','Eternal_Flame','Fallen_Angel','Flame_Thrower','Frost_Giant',
+        'Ghost_Recon','Golden_Hawk','Hell_Fire_42','High_Voltage','Holy_Knight',
+        'Inferno_Blaze','Iron_Will','Jade_Emperor','Jungle_King','Krypton_Force',
+        'Lone_Wolf_13','Midnight_Raven','Mystic_Storm','Necro_Mancer','Night_Shadow',
+        'Phantom_Reaper','Power_Player','Quick_Silver','Red_Devil_07','Rocket_Man',
+        'FrostBite','ShadowMorph','SteelEagle','BlazeRunner','CrystalShard',
+        'DuskReaper','EmberWolf','GlacialTide','HawkEye_99','IronSoul',
+        'KrakenRise','LunarFox','Nebula_42','OnyxFang','QuantumFox',
+        'vlad_k26','shadow_reaper','katya.smirnova','alex_gaming99','cyber_ghost',
+        'masha_fox','pixel_art','dima.volkov','neon_pulse','anastasia_r',
+        'toxic_vibe','sergey.k','alpha_wolf','lisa_sweet','night_walker',
+        'Valkyrie_6','Wraith_77','Xenon_5','Zenith_3','ApexHunter',
+        'Blitz_44','Cipher_9','Delta_One','GammaRay','Joker_66',
+        'Matrix_99','Nova_Star','Phoenix_Ash','Quasar_77','Sirius_12',
+        'Titan_55','North_Wind','Iron_Falcon','Dark_Phoenix','Storm_Bringer',
+        'Omega_Force','Berserker_Rage','Headshot_Harry','Savage_Beast','Fluffy_Kitten',
+        'Sleepy_Panda','Panda_King','Choco_Cookie','RNG_God','Just_Luck',
+        'Lucky_Seven','Unlucky_13','NightOwl','EarlyBird','GymRat',
+        'TravelAddict','BookWorm','MovieBuff','StarGazer','MoonWalker',
+        'PixelWarrior','RetroGamer','SpeedRunner','EsportsLegend','LuckyCharm',
+        'DiamondHands','GoldenEagle','SilverFox','PhoenixRising','DragonSoul',
+        'NightRaven','IceQueen','CyberPunk','NeonRider','StarLord',
+        'CodeCrusader','ByteMe','Error404','Crystal_Clear','Midnight_Star',
+        'Silent_Echo','Broken_Dream','Lost_Soul','Dark_Knight','White_Wizard'
     ];
 
     function randomNickname() {
@@ -228,13 +261,24 @@
     }
 
     function makeLobby() {
-        return {
-            id: lobbyIdCounter++,
-            name: randomNickname(),
-            bet: randomBetAmount(),
-            item: null,
-            game: 'dice'
-        };
+        const r = Math.random();
+        let game;
+        if (r < 0.4) game = 'dice';
+        else if (r < 0.7) game = 'race';
+        else game = 'blackjack';
+
+        let bet = randomBetAmount();
+        let item = null;
+
+        if (Math.random() < BOT_ITEM_CHANCE) {
+            const botItem = pickBotItem();
+            if (botItem) {
+                item = botItem;
+                bet = botItem.price;
+            }
+        }
+
+        return { id: lobbyIdCounter++, name: randomNickname(), bet, item, game };
     }
 
     // ============ ШАНС ============
@@ -266,6 +310,11 @@
             const icon = gameIcon(lobby.game);
             const gname = gameName(lobby.game);
 
+            let itemBadge = '';
+            if (lobby.item) {
+                itemBadge = `<div class="lobby-item-badge"><img src="${lobby.item.image}" onerror="this.src='../img/logo.png'">${lobby.item.name}</div>`;
+            }
+
             card.innerHTML = `
                 <div class="lobby-card-header">
                     <div class="lobby-avatar">${initial}</div>
@@ -279,7 +328,7 @@
                     <div>
                         <div class="lobby-bet-label">СТАВКА</div>
                         <div class="lobby-bet-value">${lobby.bet.toLocaleString('ru-RU')} ₽</div>
-                        ${lobby.item ? `<div class="lobby-item-badge">🎒 ${lobby.item.name}</div>` : ''}
+                        ${itemBadge}
                     </div>
                     <button class="lobby-join-btn">ИГРАТЬ</button>
                 </div>
@@ -293,13 +342,13 @@
     }
 
     function addRandomLobby() {
-        if (lobbies.length >= 21) return;   // было 12
+        if (lobbies.length >= 21) return;
         lobbies.push(makeLobby());
         renderLobbies();
     }
 
     function removeRandomLobby() {
-        if (lobbies.length <= 4) return;    // было 2
+        if (lobbies.length <= 4) return;
         const idx = Math.floor(Math.random() * lobbies.length);
         lobbies.splice(idx, 1);
         renderLobbies();
@@ -307,11 +356,7 @@
 
     function startLobbySimulation() {
         if (lobbies.length === 0) {
-            // Стартовое наполнение — 8–12 лобби
-            const initial = randomInt(8, 12);
-            for (let i = 0; i < initial; i++) {
-                lobbies.push(makeLobby());
-            }
+            for (let i = 0; i < randomInt(8, 12); i++) lobbies.push(makeLobby());
             renderLobbies();
         }
 
@@ -320,12 +365,12 @@
 
         if (lobbyAddInterval) clearInterval(lobbyAddInterval);
         lobbyAddInterval = setInterval(() => {
-            if (Math.random() < 0.7) addRandomLobby();   // чаще добавляем
-        }, 3500);                                        // было 4500
+            if (Math.random() < 0.7) addRandomLobby();
+        }, 3500);
 
         if (lobbyRemoveInterval) clearInterval(lobbyRemoveInterval);
         lobbyRemoveInterval = setInterval(() => {
-            if (Math.random() < 0.35) removeRandomLobby();  // реже удаляем
+            if (Math.random() < 0.35) removeRandomLobby();
         }, 7000);
 
         setInterval(() => {
@@ -351,7 +396,6 @@
             container.innerHTML = '<div class="inventory-empty">🎒 Нет предметов в инвентаре</div>';
             return;
         }
-
         container.innerHTML = '';
         inventory.forEach(item => {
             const row = document.createElement('div');
@@ -386,12 +430,18 @@
         });
     }
 
-    // ============ МОДАЛКА: СОЗДАНИЕ ============
+    // ============ МОДАЛКИ ============
     function openCreateModal() {
         selectedCreateItem = null;
+        selectedCreateGame = 'dice';
         createBetInput.value = '';
         createBetInput.disabled = false;
         createBetInput.style.opacity = '1';
+
+        document.querySelectorAll('#create-game-pick .modal-game-pick-item').forEach(el => {
+            el.classList.toggle('active', el.dataset.game === 'dice');
+        });
+
         renderInventoryList(createInvList, (item) => {
             if (selectedCreateItem && selectedCreateItem.id === item.id) {
                 selectedCreateItem = null;
@@ -413,7 +463,6 @@
         selectedCreateItem = null;
     }
 
-    // ============ МОДАЛКА: JOIN ============
     function openJoinModal(lobby) {
         joiningLobby = lobby;
         selectedJoinItem = null;
@@ -421,7 +470,11 @@
         joinOppGameIcon.textContent = gameIcon(lobby.game);
         joinOppGameName.textContent = gameName(lobby.game);
         joinOppNameEl.textContent = lobby.name;
-        joinOppBetEl.textContent = lobby.bet.toLocaleString('ru-RU') + ' ₽';
+
+        let oppBetText = lobby.bet.toLocaleString('ru-RU') + ' ₽';
+        if (lobby.item) oppBetText += ` · 🎒 ${lobby.item.name}`;
+        joinOppBetEl.textContent = oppBetText;
+
         joinBetInput.value = lobby.bet;
         joinBetInput.disabled = false;
         joinBetInput.style.opacity = '1';
@@ -453,21 +506,15 @@
 
     function updateJoinChancePreview() {
         if (!joiningLobby) return;
-
         let playerBetValue;
         if (selectedJoinItem) playerBetValue = selectedJoinItem.price;
         else playerBetValue = parseFloat(joinBetInput.value) || 0;
-
-        if (playerBetValue <= 0) {
-            joinChanceEl.textContent = '—';
-            return;
-        }
-
+        if (playerBetValue <= 0) { joinChanceEl.textContent = '—'; return; }
         const p = calcPlayerWinChance(playerBetValue, joiningLobby.bet);
         joinChanceEl.textContent = (p * 100).toFixed(1) + '%';
     }
 
-    // ============ ЗНАЧЕНИЯ КУБИКОВ ============
+    // ============ КОСТИ ============
     function determineDiceValues(playerWins) {
         let winnerValue, loserValue;
         if (Math.random() < 0.65) {
@@ -482,6 +529,128 @@
             : { player: loserValue, opponent: winnerValue };
     }
 
+    // ============ ГОНКИ: НЕПРЕДСКАЗУЕМОСТЬ ============
+    function generateRaceProgress(totalTicks) {
+        const deltas = [];
+        for (let i = 0; i < totalTicks; i++) {
+            let s = 0.6 + Math.random() * 0.9;
+            const r = Math.random();
+            if (r < 0.06) s *= 0.3;
+            else if (r < 0.12) s *= 1.8;
+            deltas.push(s);
+        }
+        return deltas;
+    }
+    function cumsum(arr) {
+        const out = []; let s = 0;
+        for (const v of arr) { s += v; out.push(s); }
+        return out;
+    }
+    function normalizeSeq(seq, finalValue) {
+        const max = seq[seq.length - 1];
+        if (max <= 0) return seq.map(() => 0);
+        return seq.map(v => (v / max) * finalValue);
+    }
+    function computeRaceSequences(totalTicks, playerWins) {
+        const youCum = cumsum(generateRaceProgress(totalTicks));
+        const oppCum = cumsum(generateRaceProgress(totalTicks));
+        const youTotal = youCum[youCum.length - 1];
+        const oppTotal = oppCum[oppCum.length - 1];
+        const naturalYouWins = youTotal > oppTotal;
+
+        let winnerCum, loserCum;
+        if (naturalYouWins === playerWins) {
+            winnerCum = playerWins ? youCum : oppCum;
+            loserCum  = playerWins ? oppCum : youCum;
+        } else {
+            winnerCum = playerWins ? oppCum : youCum;
+            loserCum  = playerWins ? youCum : oppCum;
+        }
+        const loserFinal = 92 + Math.random() * 6;
+        const winnerPos = normalizeSeq(winnerCum, 100);
+        const loserPos  = normalizeSeq(loserCum, loserFinal);
+
+        return playerWins
+            ? { youPos: winnerPos, oppPos: loserPos }
+            : { youPos: loserPos, oppPos: winnerPos };
+    }
+
+    // ============ БЛЭКДЖЕК: ЛОГИКА КАРТ ============
+    function createDeck() {
+        const suits = ['♠', '♥', '♦', '♣'];
+        const ranks = ['A','2','3','4','5','6','7','8','9','10','J','Q','K'];
+        const deck = [];
+        for (const s of suits) for (const r of ranks) deck.push({ rank: r, suit: s });
+        for (let i = deck.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [deck[i], deck[j]] = [deck[j], deck[i]];
+        }
+        return deck;
+    }
+
+    function cardValue(card) {
+        if (card.rank === 'A') return 11;
+        if (['J','Q','K'].includes(card.rank)) return 10;
+        return parseInt(card.rank, 10);
+    }
+
+    function handScore(hand) {
+        let score = 0, aces = 0;
+        for (const c of hand) {
+            score += cardValue(c);
+            if (c.rank === 'A') aces++;
+        }
+        while (score > 21 && aces > 0) {
+            score -= 10;
+            aces--;
+        }
+        return score;
+    }
+
+    function renderCard(card, hidden = false) {
+        const el = document.createElement('div');
+        el.className = 'bj-card';
+        if (hidden) {
+            el.classList.add('back');
+            return el;
+        }
+        const isRed = card.suit === '♥' || card.suit === '♦';
+        if (isRed) el.classList.add('red');
+        el.innerHTML = `
+            <div class="bj-rank">${card.rank}</div>
+            <div class="bj-suit">${card.suit}</div>
+        `;
+        return el;
+    }
+
+    function renderBlackjackHands() {
+        bjYouCardsEl.innerHTML = '';
+        bjOppCardsEl.innerHTML = '';
+
+        bjYouHand.forEach(c => bjYouCardsEl.appendChild(renderCard(c)));
+
+        bjOppHand.forEach((c, i) => {
+            // 2-я карта бота скрыта, пока не начнётся его ход
+            const hidden = !bjBotRevealed && i === 1;
+            bjOppCardsEl.appendChild(renderCard(c, hidden));
+        });
+
+        const youScore = handScore(bjYouHand);
+        bjYouScoreEl.textContent = youScore;
+        bjYouScoreEl.classList.toggle('bust', youScore > 21);
+
+        if (bjBotRevealed) {
+            const oppScore = handScore(bjOppHand);
+            bjOppScoreEl.textContent = oppScore;
+            bjOppScoreEl.classList.toggle('bust', oppScore > 21);
+        } else {
+            // Показываем только первую карту
+            const first = bjOppHand[0];
+            bjOppScoreEl.textContent = first ? cardValue(first) : 0;
+            bjOppScoreEl.classList.remove('bust');
+        }
+    }
+
     // ============ СТАРТ ДУЭЛИ ============
     function startDuel(config) {
         currentGame = {
@@ -491,6 +660,8 @@
             opponentName: config.opponentName,
             opponentBetValue: config.opponentBet,
             opponentItem: config.opponentItem || null,
+            playerStarts: Math.random() < 0.5,
+            botPersonality: pickBotPersonality(),
             phase: 'ready'
         };
 
@@ -498,49 +669,127 @@
         gameView.style.display = 'block';
         stopLobbySimulation();
 
-        youNameEl.textContent = 'Вы';
-        oppNameEl.textContent = currentGame.opponentName;
-        youBetDisplay.textContent = config.playerBet.value.toLocaleString('ru-RU') + ' ₽' +
-            (config.playerBet.item ? ` · 🎒 ${config.playerBet.item.name}` : '');
-        oppBetDisplay.textContent = config.opponentBet.toLocaleString('ru-RU') + ' ₽';
+        duelTitleEl.textContent = 'ДУЭЛЬ · ' + gameName(currentGame.game).toUpperCase();
+
+        // Скрыть все арены, показать нужную
+        diceArenaEl.style.display = 'none';
+        raceArenaEl.style.display = 'none';
+        bjArenaEl.style.display = 'none';
+
+        if (currentGame.game === 'race') raceArenaEl.style.display = 'block';
+        else if (currentGame.game === 'blackjack') bjArenaEl.style.display = 'block';
+        else diceArenaEl.style.display = 'grid';
 
         const p = calcPlayerWinChance(currentGame.playerBetValue, currentGame.opponentBetValue);
-        youChanceEl.innerHTML = `Победа: <b>${(p * 100).toFixed(1)}%</b>`;
-        oppChanceEl.innerHTML = `Победа: <b>${((1 - p) * 100).toFixed(1)}%</b>`;
+        const youItemSuffix = currentGame.playerItem ? ` · 🎒 ${currentGame.playerItem.name}` : '';
+        const oppItemSuffix = currentGame.opponentItem ? ` · 🎒 ${currentGame.opponentItem.name}` : '';
 
+        // Общие поля
         bankValueEl.textContent = (currentGame.playerBetValue + currentGame.opponentBetValue).toLocaleString('ru-RU') + ' ₽';
-
-        renderDiceFace(youDiceEl, 1);
-        renderDiceFace(oppDiceEl, 1);
-        youDiceEl.querySelectorAll('.dot').forEach(d => d.classList.remove('on'));
-        oppDiceEl.querySelectorAll('.dot').forEach(d => d.classList.remove('on'));
-
         duelMessage.textContent = '';
         duelMessage.className = 'duel-message';
-        duelStatus.textContent = 'Готовы? Нажмите кнопку';
-        duelStatus.style.color = '';
 
-        document.querySelectorAll('.dice-side').forEach(el => el.classList.remove('winner', 'loser'));
+        if (currentGame.game === 'race') {
+            raceYouName.textContent = 'Вы';
+            raceOppName.textContent = currentGame.opponentName;
+            raceYouBet.textContent = config.playerBet.value.toLocaleString('ru-RU') + ' ₽' + youItemSuffix;
+            raceOppBet.textContent = config.opponentBet.toLocaleString('ru-RU') + ' ₽' + oppItemSuffix;
+            raceYouChance.innerHTML = `Победа: <b>${(p * 100).toFixed(1)}%</b>`;
+            raceOppChance.innerHTML = `Победа: <b>${((1 - p) * 100).toFixed(1)}%</b>`;
 
-        rollBtn.onclick = onRollClick;
-        rollBtn.disabled = false;
-        rollBtn.textContent = '🎲 БРОСИТЬ КУБИКИ';
-        isRolling = false;
+            raceYouRunner.style.left = '2%';
+            raceOppRunner.style.left = '2%';
+            raceYouRunner.className = 'race-runner race-runner-you';
+            raceOppRunner.className = 'race-runner race-runner-opp';
+            raceLaneYou.classList.remove('race-active');
+            raceLaneOpp.classList.remove('race-active');
+        } else if (currentGame.game === 'blackjack') {
+            bjYouNameEl.textContent = 'Вы';
+            bjOppNameEl.textContent = currentGame.opponentName;
+            bjYouBetEl.textContent = config.playerBet.value.toLocaleString('ru-RU') + ' ₽' + youItemSuffix;
+            bjOppBetEl.textContent = config.opponentBet.toLocaleString('ru-RU') + ' ₽' + oppItemSuffix;
+
+            bjYouCardsEl.innerHTML = '';
+            bjOppCardsEl.innerHTML = '';
+            bjYouScoreEl.textContent = '0';
+            bjOppScoreEl.textContent = '0';
+            bjYouScoreEl.classList.remove('bust');
+            bjOppScoreEl.classList.remove('bust');
+            bjActionsEl.style.display = 'none';
+        } else {
+            youNameEl.textContent = 'Вы';
+            oppNameEl.textContent = currentGame.opponentName;
+            youBetDisplay.textContent = config.playerBet.value.toLocaleString('ru-RU') + ' ₽' + youItemSuffix;
+            oppBetDisplay.textContent = config.opponentBet.toLocaleString('ru-RU') + ' ₽' + oppItemSuffix;
+            youChanceEl.innerHTML = `Победа: <b>${(p * 100).toFixed(1)}%</b>`;
+            oppChanceEl.innerHTML = `Победа: <b>${((1 - p) * 100).toFixed(1)}%</b>`;
+
+            renderDiceFace(youDiceEl, 1);
+            renderDiceFace(oppDiceEl, 1);
+            youDiceEl.querySelectorAll('.dot').forEach(d => d.classList.remove('on'));
+            oppDiceEl.querySelectorAll('.dot').forEach(d => d.classList.remove('on'));
+            document.querySelectorAll('.dice-side').forEach(el => el.classList.remove('winner', 'loser'));
+        }
+
+        // Кто начинает (для блэкджека не показываем «кто первый» — там всегда первым игрок)
+        const btnLabel = currentGame.game === 'race' ? '🏁 НАЧАТЬ ГОНКУ'
+                       : currentGame.game === 'blackjack' ? '🃏 РАЗДАТЬ КАРТЫ'
+                       : '🎲 БРОСИТЬ КУБИКИ';
+
+        if (currentGame.game === 'blackjack') {
+            duelStatus.textContent = '🎯 Раздача карт';
+            duelStatus.style.color = '#4CAF50';
+            rollBtn.textContent = btnLabel;
+            rollBtn.disabled = false;
+            rollBtn.classList.remove('bot-turn');
+            rollBtn.onclick = onRollClick;
+            isRolling = false;
+            return;
+        }
+
+        if (currentGame.playerStarts) {
+            duelStatus.textContent = '🎯 Первым бросаете ВЫ';
+            duelStatus.style.color = '#4CAF50';
+            rollBtn.textContent = btnLabel;
+            rollBtn.disabled = false;
+            rollBtn.classList.remove('bot-turn');
+            rollBtn.onclick = onRollClick;
+            isRolling = false;
+        } else {
+            duelStatus.textContent = `⚡ Начинает ${currentGame.opponentName}...`;
+            duelStatus.style.color = '#ff8a73';
+            rollBtn.textContent = currentGame.game === 'race' ? '🏁 СОПЕРНИК СТАРТУЕТ...' : '🎲 СОПЕРНИК БРОСАЕТ...';
+            rollBtn.disabled = true;
+            rollBtn.classList.add('bot-turn');
+            isRolling = true;
+
+            if (botStartTimeout) clearTimeout(botStartTimeout);
+            botStartTimeout = setTimeout(() => {
+                botStartTimeout = null;
+                if (!currentGame || currentGame.playerStarts) return;
+                isRolling = false;
+                rollBtn.classList.remove('bot-turn');
+                if (currentGame.game === 'race') startRace();
+                else rollDice();
+            }, 1500);
+        }
     }
 
     function onRollClick() {
         if (isRolling || !currentGame) return;
-        rollDice();
+        if (currentGame.game === 'blackjack') startBlackjack();
+        else if (currentGame.game === 'race') startRace();
+        else rollDice();
     }
 
-    // ============ БРОСОК ============
+    // ============ КОСТИ: РАУНД ============
     function rollDice() {
         isRolling = true;
         rollBtn.disabled = true;
         rollBtn.textContent = '🎲 БРОСАЕМ...';
         duelStatus.textContent = 'Кубики в полёте...';
+        duelStatus.style.color = '';
         duelMessage.textContent = '';
-        duelMessage.className = 'duel-message';
 
         youDiceEl.classList.add('rolling');
         oppDiceEl.classList.add('rolling');
@@ -561,7 +810,6 @@
     function finishRoll() {
         const p = calcPlayerWinChance(currentGame.playerBetValue, currentGame.opponentBetValue);
         const playerWins = Math.random() < p;
-
         const dice = determineDiceValues(playerWins);
         renderDiceFace(youDiceEl, dice.player);
         renderDiceFace(oppDiceEl, dice.opponent);
@@ -583,55 +831,389 @@
                 oppSide.classList.add('winner');
                 youSide.classList.add('loser');
             }
-            resolveDuel(playerWins);
+            resolveDuel(playerWins, 'dice');
         }, 450);
     }
 
-    // ============ РАСЧЁТ ============
-    function resolveDuel(playerWins) {
-        const betValue = currentGame.playerBetValue;
-        const oppValue = currentGame.opponentBetValue;
+    // ============ ГОНКИ: РАУНД ============
+    function startRace() {
+        isRolling = true;
+        rollBtn.disabled = true;
+        rollBtn.textContent = '🏁 ГОНКА ИДЁТ...';
+        duelStatus.textContent = 'И кони понеслись!';
+        duelStatus.style.color = '';
+        duelMessage.textContent = '';
+
+        raceLaneYou.classList.add('race-active');
+        raceLaneOpp.classList.add('race-active');
+
+        const p = calcPlayerWinChance(currentGame.playerBetValue, currentGame.opponentBetValue);
+        const playerWins = Math.random() < p;
+
+        const totalTicks = 34;
+        const tickMs = 90;
+        const { youPos, oppPos } = computeRaceSequences(totalTicks, playerWins);
+
+        raceYouRunner.style.left = '2%';
+        raceOppRunner.style.left = '2%';
+
+        let tick = 0;
+        if (raceTimer) clearInterval(raceTimer);
+        raceTimer = setInterval(() => {
+            if (tick >= totalTicks) {
+                clearInterval(raceTimer);
+                raceTimer = null;
+                finishRace(playerWins);
+                return;
+            }
+            raceYouRunner.style.left = (2 + youPos[tick] * 0.86) + '%';
+            raceOppRunner.style.left = (2 + oppPos[tick] * 0.86) + '%';
+            tick++;
+        }, tickMs);
+    }
+
+    function finishRace(playerWins) {
+        raceLaneYou.classList.remove('race-active');
+        raceLaneOpp.classList.remove('race-active');
 
         if (playerWins) {
-            const winFromOpp = oppValue * (1 - RAKE);
+            raceYouRunner.style.left = '88%';
+            raceOppRunner.style.left = '82%';
+            raceYouRunner.classList.add('race-winner');
+            raceOppRunner.classList.add('race-loser');
+        } else {
+            raceOppRunner.style.left = '88%';
+            raceYouRunner.style.left = '82%';
+            raceOppRunner.classList.add('race-winner');
+            raceYouRunner.classList.add('race-loser');
+        }
 
+        setTimeout(() => resolveDuel(playerWins, 'race'), 800);
+    }
+
+    // ============ БЛЭКДЖЕК: РАУНД ============
+    function startBlackjack() {
+        isRolling = true;
+        rollBtn.disabled = true;
+        rollBtn.textContent = '🃏 РАЗДАЁМ...';
+        duelStatus.textContent = 'Раздача карт';
+        duelStatus.style.color = '';
+        duelMessage.textContent = '';
+
+        // Новый раунд
+        bjDeck = createDeck();
+        bjYouHand = [];
+        bjOppHand = [];
+        bjBotRevealed = false;
+        bjPhase = 'idle';
+
+        // Раздача по одной карте: вы → бот → вы → бот
+        const dealSequence = [
+            { target: 'you' }, { target: 'opp' },
+            { target: 'you' }, { target: 'opp' }
+        ];
+
+        let idx = 0;
+        const dealNext = () => {
+            if (idx >= dealSequence.length) {
+                // Все карты сданы — играем
+                bjPhase = 'player';
+                isRolling = false;
+                duelStatus.textContent = 'Ваш ход';
+                duelStatus.style.color = '#4CAF50';
+                rollBtn.style.display = 'none';
+                bjActionsEl.style.display = 'flex';
+                bjHitBtn.disabled = false;
+                bjStandBtn.disabled = false;
+                checkPlayerBlackjack();
+                return;
+            }
+
+            const step = dealSequence[idx];
+            const card = bjDeck.pop();
+
+            if (step.target === 'you') bjYouHand.push(card);
+            else bjOppHand.push(card);
+
+            renderBlackjackHands();
+            idx++;
+            bjActionTimer = setTimeout(dealNext, 260);
+        };
+
+        dealNext();
+    }
+
+    function checkPlayerBlackjack() {
+        // Автоматический stand при 21
+        if (handScore(bjYouHand) === 21) {
+            duelStatus.textContent = '🎉 21! Автоматически';
+            setTimeout(playerStand, 700);
+        }
+    }
+
+    function playerHit() {
+        if (bjPhase !== 'player') return;
+        bjHitBtn.disabled = true;
+        bjStandBtn.disabled = true;
+
+        if (bjDeck.length === 0) bjDeck = createDeck();
+        bjYouHand.push(bjDeck.pop());
+        renderBlackjackHands();
+
+        const score = handScore(bjYouHand);
+
+        if (score > 21) {
+            // Перебор — мгновенное поражение
+            bjPhase = 'done';
+            duelMessage.textContent = '💥 ПЕРЕБОР!';
+            duelMessage.className = 'duel-message lose';
+            duelStatus.textContent = 'Вы перебрали...';
+
+            setTimeout(() => {
+                bjActionsEl.style.display = 'none';
+                bjBotRevealed = true;
+                renderBlackjackHands();
+                resolveDuel(false, 'blackjack');
+            }, 900);
+        } else if (score === 21) {
+            duelStatus.textContent = '🎉 21! Автоматически';
+            setTimeout(playerStand, 500);
+        } else {
+            bjHitBtn.disabled = false;
+            bjStandBtn.disabled = false;
+            duelStatus.textContent = `Ваш ход (${score})`;
+        }
+    }
+
+    function playerStand() {
+        if (bjPhase !== 'player') return;
+        bjPhase = 'bot';
+        bjHitBtn.disabled = true;
+        bjStandBtn.disabled = true;
+        bjActionsEl.style.display = 'none';
+        duelStatus.textContent = `${currentGame.opponentName} думает...`;
+
+        // Раскрываем карты бота
+        bjBotRevealed = true;
+        renderBlackjackHands();
+
+        setTimeout(botBlackjackTurn, 700);
+    }
+
+        // ============ ХАРАКТЕР БОТА (внутренний, не показывается) ============
+    //   cautious — стоит чаще, реже перебирает, но и реже добирает 20-21
+    //   normal   — баланс
+    //   risky    — чаще добирает, чаще перебирает, но и чаще выбивает 20-21
+    function pickBotCharacter() {
+        const r = Math.random();
+        if (r < 0.35) return 'cautious';
+        if (r < 0.80) return 'normal';
+        return 'risky';
+    }
+
+    function botBlackjackTurn() {
+        if (!currentGame) return;
+
+        const character = currentGame.botCharacter || 'normal';
+
+        const playNext = () => {
+            if (!currentGame) return;
+
+            const oppScore = handScore(bjOppHand);
+            const playerScore = handScore(bjYouHand);
+
+            // --- Мгновенные решения: прекращаем думать ---
+
+            // Бот уже перебрал — не может продолжать
+            if (oppScore > 21) {
+                finishBlackjack();
+                return;
+            }
+
+            // Игрок перебрал — бот уже победил, не рискуем
+            if (playerScore > 21) {
+                finishBlackjack();
+                return;
+            }
+
+            // --- Думаем, стоит ли бить ---
+            let shouldHit = false;
+
+            if (oppScore < 17) {
+                // Базовое правило дилера — всегда добирает
+                shouldHit = true;
+            } else if (oppScore > playerScore) {
+                // Уже впереди — стоим
+                shouldHit = false;
+            } else if (oppScore === playerScore) {
+                // Счёт равный — берём пуш, если уже ≥ 17
+                shouldHit = false;
+            } else {
+                // Отстаём. Смотрим насколько:
+                const gap = playerScore - oppScore;
+
+                if (gap >= 3) {
+                    // Отстали сильно. Догнать почти нереально — стоим,
+                    // не будем губить шанс на чужой перебор (не наш случай, но всё же)
+                    shouldHit = false;
+                } else {
+                    // Отстаём на 1-2. Здесь решает характер:
+                    let hitChance;
+                    if (character === 'cautious') hitChance = 0.30;
+                    else if (character === 'risky') hitChance = 0.80;
+                    else hitChance = 0.55;
+
+                    shouldHit = Math.random() < hitChance;
+                }
+            }
+
+            // --- Действие ---
+            if (!shouldHit) {
+                finishBlackjack();
+                return;
+            }
+
+            if (bjDeck.length === 0) bjDeck = createDeck();
+            bjOppHand.push(bjDeck.pop());
+            renderBlackjackHands();
+
+            if (handScore(bjOppHand) > 21) {
+                bjActionTimer = setTimeout(finishBlackjack, 700);
+            } else {
+                bjActionTimer = setTimeout(playNext, 700);
+            }
+        };
+
+        bjActionTimer = setTimeout(playNext, 700);
+    }
+
+    function finishBlackjack() {
+        const youScore = handScore(bjYouHand);
+        const oppScore = handScore(bjOppHand);
+
+        let playerWins;
+        let isPush = false;
+
+        if (youScore > 21) {
+            playerWins = false;
+        } else if (oppScore > 21) {
+            playerWins = true;
+        } else if (youScore > oppScore) {
+            playerWins = true;
+        } else if (youScore < oppScore) {
+            playerWins = false;
+        } else {
+            // Пуш
+            isPush = true;
+            playerWins = false;
+        }
+
+        bjPhase = 'done';
+
+        if (isPush) {
+            // Возвращаем ставку игроку и предмет, если был
             if (currentGame.playerItem) {
                 returnItemToInventory(currentGame.playerItem);
-                window.globalBalance += winFromOpp;
+                currentGame.playerItem = null;
             } else {
-                window.globalBalance += betValue + winFromOpp;
+                window.globalBalance += currentGame.playerBetValue;
+            }
+            saveBalance();
+            updateBalanceDisplay();
+
+            duelMessage.textContent = `🤝 ПУШ! ${youScore} против ${oppScore}. Ставка возвращена.`;
+            duelMessage.className = 'duel-message';
+            duelStatus.textContent = 'Ничья';
+            duelStatus.style.color = '#ffb400';
+
+            setTimeout(() => {
+                rollBtn.textContent = '↩ ВЕРНУТЬСЯ В ЛОББИ';
+                rollBtn.disabled = false;
+                rollBtn.classList.remove('bot-turn');
+                rollBtn.onclick = () => returnToLobby();
+                isRolling = false;
+            }, 400);
+
+            return;
+        }
+
+        // Иначе — обычная победа/поражение
+        setTimeout(() => resolveDuel(playerWins, 'blackjack'), 200);
+    }
+
+    // ============ РАСЧЁТ ИСХОДА ============
+    function resolveDuel(playerWins, gameType) {
+        const betValue = currentGame.playerBetValue;
+        const oppValue = currentGame.opponentBetValue;
+        const playerItem = currentGame.playerItem;
+        const opponentItem = currentGame.opponentItem;
+        const label = gameType === 'race' ? '🏁'
+                    : gameType === 'blackjack' ? '🃏'
+                    : '🎲';
+
+        if (playerWins) {
+            // 1. Возвращаем собственную ставку
+            if (playerItem) {
+                returnItemToInventory(playerItem);
+            } else {
+                window.globalBalance += betValue;
+            }
+
+            // 2. Забираем то, что поставил соперник
+            let prizeText = '';
+            if (opponentItem) {
+                // Забираем предмет как трофей
+                returnItemToInventory(opponentItem);
+                prizeText = `предмет: ${opponentItem.name} (${formatMoney(opponentItem.price)} ₽)`;
+            } else {
+                // Забираем деньги минус рейк
+                const rakeAmount = oppValue * RAKE;
+                const netWin = oppValue - rakeAmount;
+                window.globalBalance += netWin;
+                prizeText = `${formatMoney(netWin)} ₽ (комиссия ${formatMoney(rakeAmount)} ₽)`;
             }
 
             saveBalance();
             updateBalanceDisplay();
 
-            duelMessage.textContent = `🏆 ПОБЕДА! Вы забираете ${formatMoney(winFromOpp)} ₽ (своя ставка возвращена${currentGame.playerItem ? ', предмет возвращён' : ''})`;
+            duelMessage.innerHTML = `${label} ПОБЕДА! Приз: ${prizeText}. Своя ставка возвращена${playerItem ? ', предмет в инвентаре' : ''}.`;
             duelMessage.className = 'duel-message win';
             duelStatus.textContent = 'Раунд завершён';
             duelStatus.style.color = '#4CAF50';
         } else {
-            duelMessage.textContent = `💀 ПРОИГРЫШ. Вы теряете ${betValue.toLocaleString('ru-RU')} ₽`;
+            const lostText = playerItem
+                ? `предмет "${playerItem.name}" (${formatMoney(betValue)} ₽)`
+                : `${betValue.toLocaleString('ru-RU')} ₽`;
+            duelMessage.textContent = `${label} ПРОИГРЫШ. Вы теряете ${lostText}`;
             duelMessage.className = 'duel-message lose';
             duelStatus.textContent = 'Раунд завершён';
             duelStatus.style.color = '#ff5555';
         }
 
+        rollBtn.style.display = '';
         rollBtn.textContent = '↩ ВЕРНУТЬСЯ В ЛОББИ';
         rollBtn.disabled = false;
+        rollBtn.classList.remove('bot-turn');
         rollBtn.onclick = () => returnToLobby();
         isRolling = false;
     }
 
     function returnToLobby() {
+        if (raceTimer) { clearInterval(raceTimer); raceTimer = null; }
+        if (botStartTimeout) { clearTimeout(botStartTimeout); botStartTimeout = null; }
+        if (bjActionTimer) { clearTimeout(bjActionTimer); bjActionTimer = null; }
         currentGame = null;
         isRolling = false;
+        bjPhase = 'idle';
 
         gameView.style.display = 'none';
         lobbyView.style.display = 'block';
 
+        rollBtn.style.display = '';
+        rollBtn.classList.remove('bot-turn');
         rollBtn.onclick = onRollClick;
-        rollBtn.textContent = '🎲 БРОСИТЬ КУБИКИ';
-        rollBtn.disabled = false;
+
+        bjActionsEl.style.display = 'none';
 
         startLobbySimulation();
         renderLobbies();
@@ -651,18 +1233,25 @@
         createLobbyBtn.addEventListener('click', openCreateModal);
         cancelCreateBtn.addEventListener('click', closeCreateModal);
 
+        document.querySelectorAll('#create-game-pick .modal-game-pick-item').forEach(el => {
+            el.addEventListener('click', () => {
+                document.querySelectorAll('#create-game-pick .modal-game-pick-item').forEach(x => x.classList.remove('active'));
+                el.classList.add('active');
+                selectedCreateGame = el.dataset.game;
+            });
+        });
+
         confirmCreateBtn.addEventListener('click', () => {
             let betValue;
             if (selectedCreateItem) betValue = selectedCreateItem.price;
             else betValue = parseFloat(createBetInput.value) || 0;
-
             if (betValue <= 0) return;
 
             if (selectedCreateItem) {
                 const inv = getInventory();
                 if (!inv.some(i => i.id === selectedCreateItem.id)) return;
                 window.InventoryManager.removeItem(selectedCreateItem.id);
-                startWaitingForOpponent({ value: betValue, item: selectedCreateItem, game: 'dice' });
+                startWaitingForOpponent({ value: betValue, item: selectedCreateItem, game: selectedCreateGame });
             } else {
                 if (betValue > (window.globalBalance || 0)) {
                     alert('Недостаточно средств!');
@@ -671,9 +1260,8 @@
                 window.globalBalance -= betValue;
                 saveBalance();
                 updateBalanceDisplay();
-                startWaitingForOpponent({ value: betValue, item: null, game: 'dice' });
+                startWaitingForOpponent({ value: betValue, item: null, game: selectedCreateGame });
             }
-
             closeCreateModal();
         });
 
@@ -698,17 +1286,13 @@
 
         confirmJoinBtn.addEventListener('click', () => {
             if (!joiningLobby) return;
-
-            let playerBetValue;
-            let playerItem = null;
-
+            let playerBetValue, playerItem = null;
             if (selectedJoinItem) {
                 playerBetValue = selectedJoinItem.price;
                 playerItem = selectedJoinItem;
             } else {
                 playerBetValue = parseFloat(joinBetInput.value) || 0;
             }
-
             if (playerBetValue <= 0) return;
 
             if (selectedJoinItem) {
@@ -727,18 +1311,19 @@
 
             const opponentName = joiningLobby.name;
             const opponentBet = joiningLobby.bet;
+            const opponentItem = joiningLobby.item;
             const gameId = joiningLobby.game;
 
             lobbies = lobbies.filter(l => l.id !== joiningLobby.id);
             renderLobbies();
-
             closeJoinModal();
 
             startDuel({
                 game: gameId,
                 playerBet: { value: playerBetValue, item: playerItem },
                 opponentName,
-                opponentBet
+                opponentBet,
+                opponentItem
             });
         });
 
@@ -751,6 +1336,8 @@
         });
 
         rollBtn.onclick = onRollClick;
+        bjHitBtn.addEventListener('click', playerHit);
+        bjStandBtn.addEventListener('click', playerStand);
 
         cancelWaitingBtn.addEventListener('click', () => {
             if (window._waitingTimeout) {
@@ -771,25 +1358,6 @@
         });
     }
 
-    // ============ ВОЗВРАТ ПРЕДМЕТА В ИНВЕНТАРЬ ============
-    // ВАЖНО: InventoryManager.addItem принимает позиционные аргументы:
-    //   addItem(name, image, tier, price)
-    // Поэтому нельзя передавать объект item целиком — иначе получится
-    // предмет с именем "[object Object]" и дефолтной ценой 1000.
-    function returnItemToInventory(item) {
-        if (!item || !window.InventoryManager) return;
-        try {
-            window.InventoryManager.addItem(
-                item.name,
-                item.image,
-                item.tier,
-                item.price
-            );
-        } catch (e) {
-            console.error('Не удалось вернуть предмет в инвентарь:', e);
-        }
-    }
-
     // ============ ОЖИДАНИЕ СОПЕРНИКА ============
     function startWaitingForOpponent(playerBet) {
         waitingGameEl.textContent = `${gameIcon(playerBet.game)} ${gameName(playerBet.game)}`;
@@ -806,15 +1374,25 @@
             window._waitingRefund = null;
 
             let oppBet = playerBet.value;
+            let oppItem = null;
             const r = Math.random();
             if (r < 0.15) oppBet = Math.round(playerBet.value * 1.2);
             else if (r < 0.30) oppBet = Math.round(playerBet.value / 1.2);
+
+            if (Math.random() < BOT_ITEM_CHANCE) {
+                const botItem = pickBotItem();
+                if (botItem) {
+                    oppItem = botItem;
+                    oppBet = botItem.price;
+                }
+            }
 
             startDuel({
                 game: playerBet.game,
                 playerBet,
                 opponentName: randomNickname(),
-                opponentBet: oppBet
+                opponentBet: oppBet,
+                opponentItem: oppItem
             });
         }, delay);
     }
@@ -849,7 +1427,8 @@
             }
         });
 
-        console.log('DUELS: инициализирован. Игр в реестре:', Object.keys(GAME_TYPES).length);
+        console.log('DUELS: инициализирован. Игр:', Object.keys(GAME_TYPES).length,
+                    '| Пул предметов ботов:', getBotItemPool().length);
     }
 
     if (document.readyState === 'loading') {
