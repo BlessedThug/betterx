@@ -235,11 +235,12 @@
 
                 <label class="modal-label">Ваша ставка (₽):</label>
                 <input type="number" id="join-bet-input" min="10" step="10">
+                <div class="join-range-hint" id="join-range-hint">Допустимый диапазон: — ₽</div>
 
                 <div class="bet-adjust-row">
-                    <button class="bet-adjust-btn" data-factor="0.8333">−20%</button>
+                    <button class="bet-adjust-btn" data-factor="0.8">−20%</button>
                     <button class="bet-adjust-btn" data-factor="1">= Равно</button>
-                    <button class="bet-adjust-btn" data-factor="1.2">+20%</button>
+                    <button class="bet-adjust-btn" data-factor="1.25">+20%</button>
                 </div>
 
                 <div class="join-chance-preview">
@@ -253,7 +254,7 @@
                 </div>
 
                 <div class="modal-buttons">
-                    <button id="confirm-join-btn" class="btn-confirm">ПРИНЯТЬ</button>
+                    <button id="confirm-join-btn" class="btn-confirm" disabled>ПРИНЯТЬ</button>
                     <button id="cancel-join-btn" class="btn-cancel">ОТМЕНА</button>
                 </div>
             </div>
@@ -275,8 +276,8 @@
 
     <script src="../js/deposit.js"></script>
     <script src="../js/inventory.js"></script>
-    <script src="../js/cases/case-items-data.js"></script>
-    <script src="../js/cases/case-games-data.js"></script>
+    <script src="../js/case-items-data.js"></script>
+    <script src="../js/case-games-data.js"></script>
     <script src="../js/duels-bg.js"></script>
     <script src="../js/duels.js"></script>
 </body>

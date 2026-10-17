@@ -2,16 +2,15 @@
 
 .duels-main {
     min-height: calc(100vh - 65px);
-    /* padding убран — он теперь у .duels-view */
 }
 
 .duels-view {
-    max-width: 1280px;   /* было 1100 — теперь шире под 3 колонки */
+    max-width: 1280px;
     margin: 0 auto;
     padding: 30px 24px 60px;
-    animation: fadeInDuels 0.4s ease;
     position: relative;
     z-index: 1;
+    animation: fadeInDuels 0.4s ease;
 }
 
 @keyframes fadeInDuels {
@@ -64,7 +63,6 @@
     box-shadow: 0 12px 32px rgba(255, 140, 0, 0.6);
 }
 
-/* Status bar */
 .lobby-status {
     display: flex;
     align-items: center;
@@ -93,12 +91,23 @@
     50%      { transform: scale(1.35); opacity: 0.55; }
 }
 
-/* Сетка лобби */
+/* Lobby list */
 .lobbies-list {
     display: grid;
     grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 18px;
     padding: 10px 0 40px;
+}
+
+@media (max-width: 1100px) {
+    .lobbies-list { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 700px) {
+    .lobbies-list { grid-template-columns: 1fr; }
+}
+@media (min-width: 1600px) {
+    .duels-view { max-width: 1400px; }
+    .lobbies-list { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 }
 
 .lobbies-empty {
@@ -222,6 +231,14 @@
     margin-top: 4px;
 }
 
+.lobby-item-badge img {
+    width: 16px;
+    height: 16px;
+    object-fit: contain;
+    vertical-align: middle;
+    margin-right: 4px;
+}
+
 /* ============ ИГРОВОЙ ФИЛЬТР ============ */
 
 .game-filter {
@@ -264,8 +281,6 @@
 .game-filter-icon {
     font-size: 18px;
 }
-
-/* ============ ИКОНКА ИГРЫ В КАРТОЧКЕ ЛОББИ ============ */
 
 .lobby-game-row {
     display: inline-flex;
@@ -334,6 +349,7 @@
     margin-top: 8px;
 }
 
+/* Dice */
 .dice-arena {
     display: grid;
     grid-template-columns: 1fr auto 1fr;
@@ -403,7 +419,6 @@
     margin: 10px 0;
 }
 
-/* ============ КУБИК ============ */
 .dice {
     width: 120px;
     height: 120px;
@@ -466,7 +481,6 @@
 .dot.p8 { grid-column: 2; grid-row: 3; }
 .dot.p9 { grid-column: 3; grid-row: 3; }
 
-/* VS */
 .vs-block {
     display: flex;
     align-items: center;
@@ -485,7 +499,6 @@
     letter-spacing: 1px;
 }
 
-/* Bet tags under dice */
 .bet-tag {
     padding: 8px 18px;
     border-radius: 10px;
@@ -507,503 +520,7 @@
     color: #4CAF50;
 }
 
-/* Bank */
-.bank-info {
-    text-align: center;
-    padding: 18px;
-    background: rgba(0, 0, 0, 0.5);
-    border-radius: 14px;
-    border: 1px solid rgba(255, 165, 0, 0.25);
-    max-width: 400px;
-    margin: 0 auto 20px;
-}
-
-.bank-label {
-    font-size: 12px;
-    color: #888;
-    letter-spacing: 2px;
-    margin-bottom: 4px;
-}
-
-.bank-value {
-    font-size: 28px;
-    font-weight: 800;
-    color: #ffb400;
-    text-shadow: 0 0 20px rgba(255, 180, 0, 0.5);
-}
-
-/* Message */
-.duel-message {
-    text-align: center;
-    font-size: 18px;
-    font-weight: 700;
-    padding: 14px;
-    min-height: 30px;
-    transition: color 0.3s;
-}
-
-.duel-message.win  { color: #4CAF50; text-shadow: 0 0 20px rgba(76, 175, 80, 0.6); }
-.duel-message.lose { color: #ff5555; text-shadow: 0 0 20px rgba(255, 85, 85, 0.6); }
-.duel-message.info { color: #ffb400; }
-
-/* Roll button */
-.duel-actions {
-    text-align: center;
-    margin-top: 20px;
-}
-
-.roll-btn {
-    padding: 18px 60px;
-    border: none;
-    border-radius: 14px;
-    background: linear-gradient(45deg, #ff7e33, #ffb400);
-    color: #1a1a1a;
-    font-family: 'Noto Sans', sans-serif;
-    font-weight: 800;
-    font-size: 18px;
-    letter-spacing: 1.5px;
-    cursor: pointer;
-    transition: all 0.25s ease;
-    box-shadow: 0 10px 28px rgba(255, 140, 0, 0.4);
-}
-
-.roll-btn:hover:not(:disabled) {
-    transform: translateY(-3px) scale(1.02);
-    box-shadow: 0 14px 40px rgba(255, 140, 0, 0.65);
-}
-
-.roll-btn:disabled {
-    opacity: 0.55;
-    cursor: not-allowed;
-    transform: none;
-}
-
-/* ============ MODALS ============ */
-
-.modal-overlay {
-    position: fixed;
-    inset: 0;
-    background: rgba(0, 0, 0, 0.82);
-    backdrop-filter: blur(6px);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 1000;
-    animation: modalFade 0.25s ease;
-    padding: 20px;
-}
-
-@keyframes modalFade {
-    from { opacity: 0; }
-    to   { opacity: 1; }
-}
-
-.modal-content {
-    background: linear-gradient(145deg, rgb(30, 30, 38), rgb(20, 20, 26));
-    border: 2px solid rgba(255, 165, 0, 0.5);
-    border-radius: 18px;
-    padding: 28px;
-    width: 100%;
-    max-width: 480px;
-    max-height: 90vh;
-    overflow-y: auto;
-    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.7), 0 0 60px rgba(255, 165, 0, 0.15);
-    animation: modalSlide 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-}
-
-@keyframes modalSlide {
-    from { transform: translateY(30px) scale(0.95); opacity: 0; }
-    to   { transform: translateY(0) scale(1); opacity: 1; }
-}
-
-.modal-content h2 {
-    color: #ffb400;
-    font-size: 24px;
-    font-weight: 800;
-    text-align: center;
-    margin-bottom: 8px;
-    letter-spacing: 1px;
-}
-
-.modal-hint {
-    text-align: center;
-    color: #888;
-    font-size: 13px;
-    margin-bottom: 22px;
-}
-
-.modal-label {
-    display: block;
-    color: #ccc;
-    font-size: 13px;
-    font-weight: 600;
-    margin: 18px 0 8px;
-    letter-spacing: 0.5px;
-}
-
-.modal-content input[type="number"],
-.modal-content input[type="text"] {
-    width: 100%;
-    padding: 14px 16px;
-    background: rgba(0, 0, 0, 0.55);
-    border: 2px solid rgba(255, 165, 0, 0.25);
-    border-radius: 10px;
-    color: #fff;
-    font-family: 'Noto Sans', sans-serif;
-    font-size: 16px;
-    font-weight: 700;
-    outline: none;
-    transition: all 0.2s;
-}
-
-.modal-content input:focus {
-    border-color: #ffb400;
-    box-shadow: 0 0 0 3px rgba(255, 165, 0, 0.15);
-}
-
-/* Modal game pick */
-.modal-game-pick {
-    display: flex;
-    gap: 10px;
-    flex-wrap: wrap;
-}
-
-.modal-game-pick-item {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    padding: 10px 16px;
-    background: rgba(0, 0, 0, 0.4);
-    border: 2px solid rgba(255, 165, 0, 0.2);
-    border-radius: 10px;
-    color: #ccc;
-    font-weight: 700;
-    font-size: 13px;
-    cursor: pointer;
-    transition: all 0.2s;
-}
-
-.modal-game-pick-item.active {
-    background: rgba(255, 165, 0, 0.15);
-    border-color: #ffb400;
-    color: #ffb400;
-}
-
-.modal-game-icon {
-    font-size: 20px;
-}
-
-/* Inventory inside modal */
-.modal-inventory-list {
-    max-height: 180px;
-    overflow-y: auto;
-    background: rgba(0, 0, 0, 0.35);
-    border-radius: 10px;
-    padding: 8px;
-    border: 1px solid rgba(255, 255, 255, 0.05);
-}
-
-.modal-inventory-list::-webkit-scrollbar { width: 6px; }
-.modal-inventory-list::-webkit-scrollbar-track { background: transparent; }
-.modal-inventory-list::-webkit-scrollbar-thumb { background: #ffb400; border-radius: 3px; }
-
-.inventory-empty {
-    text-align: center;
-    color: #666;
-    font-size: 13px;
-    padding: 16px;
-}
-
-.inv-item {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 8px 10px;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: background 0.2s;
-    border: 2px solid transparent;
-}
-
-.inv-item:hover {
-    background: rgba(255, 165, 0, 0.08);
-}
-
-.inv-item.selected {
-    background: rgba(255, 165, 0, 0.15);
-    border-color: #ffb400;
-}
-
-.inv-item-img {
-    width: 36px;
-    height: 36px;
-    object-fit: contain;
-    border-radius: 6px;
-    background: rgba(0, 0, 0, 0.4);
-}
-
-.inv-item-info {
-    flex: 1;
-    min-width: 0;
-}
-
-.inv-item-name {
-    font-size: 13px;
-    font-weight: 700;
-    color: #fff;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-}
-
-.inv-item-price {
-    font-size: 11px;
-    color: #ffb400;
-    margin-top: 2px;
-}
-
-.inv-item-check {
-    font-size: 18px;
-    color: #ffb400;
-}
-
-/* Modal buttons */
-.modal-buttons {
-    display: flex;
-    gap: 10px;
-    margin-top: 24px;
-}
-
-.btn-confirm,
-.btn-cancel {
-    flex: 1;
-    padding: 14px;
-    border: none;
-    border-radius: 10px;
-    font-family: 'Noto Sans', sans-serif;
-    font-weight: 800;
-    font-size: 14px;
-    letter-spacing: 1px;
-    cursor: pointer;
-    transition: all 0.2s;
-}
-
-.btn-confirm {
-    background: linear-gradient(45deg, #4CAF50, #2e7d32);
-    color: #fff;
-    box-shadow: 0 5px 16px rgba(76, 175, 80, 0.4);
-}
-
-.btn-confirm:hover:not(:disabled) {
-    transform: translateY(-2px);
-    box-shadow: 0 8px 22px rgba(76, 175, 80, 0.6);
-}
-
-.btn-confirm:disabled {
-    opacity: 0.4;
-    cursor: not-allowed;
-}
-
-.btn-cancel {
-    background: #444;
-    color: #ddd;
-}
-
-.btn-cancel:hover {
-    background: #555;
-}
-
-/* Join modal */
-.join-opp-info {
-    background: rgba(0, 0, 0, 0.4);
-    padding: 14px;
-    border-radius: 10px;
-    margin-bottom: 12px;
-    border-left: 3px solid #ffb400;
-}
-
-.join-opp-game {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    padding: 6px 14px;
-    margin-bottom: 10px;
-    border-radius: 10px;
-    background: linear-gradient(135deg, rgba(255, 126, 51, 0.2), rgba(255, 180, 0, 0.15));
-    border: 1px solid rgba(255, 165, 0, 0.35);
-}
-
-.join-opp-game-icon {
-    font-size: 20px;
-}
-
-.join-opp-game-name {
-    font-size: 13px;
-    font-weight: 800;
-    letter-spacing: 1px;
-    color: #ffb400;
-    text-transform: uppercase;
-}
-
-.join-opp-name,
-.join-opp-bet {
-    font-size: 14px;
-    color: #aaa;
-    margin: 3px 0;
-}
-
-.join-opp-name b,
-.join-opp-bet b {
-    color: #fff;
-}
-
-.bet-adjust-row {
-    display: flex;
-    gap: 6px;
-    margin-top: 8px;
-}
-
-.bet-adjust-btn {
-    flex: 1;
-    padding: 8px;
-    background: rgba(0, 0, 0, 0.5);
-    border: 1px solid rgba(255, 165, 0, 0.3);
-    border-radius: 8px;
-    color: #ffb400;
-    font-family: 'Noto Sans', sans-serif;
-    font-weight: 700;
-    font-size: 12px;
-    cursor: pointer;
-    transition: all 0.2s;
-}
-
-.bet-adjust-btn:hover {
-    background: rgba(255, 165, 0, 0.15);
-    border-color: #ffb400;
-}
-
-.join-chance-preview {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-top: 14px;
-    padding: 12px 14px;
-    background: rgba(76, 175, 80, 0.08);
-    border-radius: 10px;
-    border: 1px solid rgba(76, 175, 80, 0.25);
-    font-size: 13px;
-    color: #aaa;
-}
-
-.join-chance-preview b {
-    color: #4CAF50;
-    font-size: 20px;
-}
-
-/* Waiting modal */
-.modal-waiting {
-    text-align: center;
-}
-
-.spinner {
-    width: 50px;
-    height: 50px;
-    margin: 0 auto 18px;
-    border: 4px solid rgba(255, 165, 0, 0.15);
-    border-top-color: #ffb400;
-    border-radius: 50%;
-    animation: spin 0.9s linear infinite;
-}
-
-@keyframes spin {
-    to { transform: rotate(360deg); }
-}
-
-.waiting-info {
-    font-size: 16px;
-    color: #ccc;
-    margin: 12px 0 8px;
-}
-
-.waiting-info b {
-    color: #ffb400;
-}
-
-.waiting-hint {
-    font-size: 13px;
-    color: #777;
-    margin-bottom: 22px;
-}
-
-/* ============ АДАПТИВ ============ */
-
-@media (max-width: 720px) {
-    .dice-arena {
-        grid-template-columns: 1fr;
-        gap: 12px;
-    }
-
-    .vs-block {
-        padding: 6px 0;
-    }
-
-    .vs-text {
-        font-size: 30px;
-    }
-
-    .dice {
-        width: 96px;
-        height: 96px;
-        padding: 11px;
-        gap: 5px;
-    }
-
-    .lobby-top h1 {
-        font-size: 38px;
-    }
-
-    .roll-btn {
-        padding: 16px 40px;
-        font-size: 16px;
-    }
-
-    .modal-content {
-        padding: 22px;
-    }
-
-    .lobbies-list {
-        grid-template-columns: 1fr;
-    }
-}
-
-/* Планшет — 2 колонки */
-@media (max-width: 1100px) {
-    .lobbies-list {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-    }
-}
-
-/* Мобильный — 1 колонка */
-@media (max-width: 700px) {
-    .lobbies-list {
-        grid-template-columns: 1fr;
-    }
-}
-
-/* Широкий экран — можно и 4, если места много */
-@media (min-width: 1600px) {
-    .duels-view {
-        max-width: 1400px;
-    }
-    .lobbies-list {
-        grid-template-columns: repeat(4, minmax(0, 1fr));
-    }
-}
-
-/* ============================================================
-   АРЕНА ГОНОК
-   ============================================================ */
-
+/* Race */
 .race-arena {
     max-width: 900px;
     margin: 0 auto 30px;
@@ -1104,7 +621,6 @@
     overflow: hidden;
 }
 
-/* Бегущая разметка на дорожке — иллюзия движения */
 .race-lane::before {
     content: '';
     position: absolute;
@@ -1166,7 +682,6 @@
     filter: grayscale(0.6) opacity(0.65) drop-shadow(0 4px 10px rgba(0, 0, 0, 0.6));
 }
 
-/* Пыль из-под копыт — простая эмуляция */
 .race-runner::after {
     content: '';
     position: absolute;
@@ -1190,101 +705,7 @@
     100% { transform: translate(-30px, -50%) scale(0.3); opacity: 0; }
 }
 
-/* Адаптив */
-@media (max-width: 640px) {
-    .race-lane {
-        height: 60px;
-    }
-
-    .race-runner {
-        font-size: 40px;
-    }
-
-    .race-player-avatar {
-        width: 46px;
-        height: 46px;
-        font-size: 12px;
-    }
-
-    .race-vs {
-        font-size: 22px;
-    }
-}
-
-/* ============ БЕЙДЖ ПРЕДМЕТА У БОТА ============ */
-
-.bot-item-tag {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    padding: 4px 10px;
-    margin-top: 5px;
-    border-radius: 8px;
-    background: linear-gradient(135deg, rgba(126, 26, 126, 0.35), rgba(184, 61, 186, 0.25));
-    border: 1px solid rgba(184, 61, 186, 0.55);
-    font-size: 11px;
-    font-weight: 700;
-    color: #f0a8f0;
-    max-width: 220px;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    white-space: nowrap;
-    box-shadow: 0 0 12px rgba(184, 61, 186, 0.25);
-}
-
-.bot-item-tag img {
-    width: 18px;
-    height: 18px;
-    object-fit: contain;
-}
-
-/* Строка «кто начинает» */
-.duel-initiator {
-    display: inline-block;
-    padding: 6px 16px;
-    margin-bottom: 12px;
-    border-radius: 10px;
-    background: rgba(0, 0, 0, 0.45);
-    border: 1px solid rgba(255, 165, 0, 0.3);
-    color: #ffb400;
-    font-size: 13px;
-    font-weight: 700;
-    letter-spacing: 0.5px;
-}
-
-.duel-initiator.bot-initiates {
-    color: #ff8a73;
-    border-color: rgba(255, 138, 115, 0.5);
-    background: rgba(60, 20, 20, 0.5);
-}
-
-/* Кнопка в состоянии «соперник начинает» */
-.roll-btn.bot-turn {
-    background: linear-gradient(45deg, #555, #333) !important;
-    color: #aaa !important;
-    cursor: wait !important;
-    box-shadow: none !important;
-    animation: botTurnPulse 1.2s ease-in-out infinite;
-}
-
-@keyframes botTurnPulse {
-    0%, 100% { opacity: 0.7; }
-    50%      { opacity: 1; }
-}
-
-/* Бейдж предмета в карточке лобби — использует существующий .lobby-item-badge */
-.lobby-item-badge img {
-    width: 16px;
-    height: 16px;
-    object-fit: contain;
-    vertical-align: middle;
-    margin-right: 4px;
-}
-
-/* ============================================================
-   БЛЭКДЖЕК
-   ============================================================ */
-
+/* Blackjack */
 .blackjack-arena {
     max-width: 900px;
     margin: 0 auto 30px;
@@ -1352,7 +773,6 @@
     padding: 4px 0;
 }
 
-/* КАРТА */
 .bj-card {
     width: 78px;
     height: 112px;
@@ -1395,7 +815,6 @@
 .bj-card.red .bj-suit { color: #d3232f; }
 .bj-card .bj-suit { color: #1a1a1a; }
 
-/* Рубашка карты */
 .bj-card.back {
     background: repeating-linear-gradient(45deg,
         #2a2a4a 0 9px,
@@ -1466,7 +885,6 @@
     text-shadow: 0 0 20px rgba(76, 175, 80, 0.4);
 }
 
-/* Кнопки действий */
 .bj-actions {
     display: flex;
     gap: 12px;
@@ -1510,7 +928,520 @@
     transform: none;
 }
 
+/* Bank & Message */
+.bank-info {
+    text-align: center;
+    padding: 18px;
+    background: rgba(0, 0, 0, 0.5);
+    border-radius: 14px;
+    border: 1px solid rgba(255, 165, 0, 0.25);
+    max-width: 400px;
+    margin: 0 auto 20px;
+}
+
+.bank-label {
+    font-size: 12px;
+    color: #888;
+    letter-spacing: 2px;
+    margin-bottom: 4px;
+}
+
+.bank-value {
+    font-size: 28px;
+    font-weight: 800;
+    color: #ffb400;
+    text-shadow: 0 0 20px rgba(255, 180, 0, 0.5);
+}
+
+.duel-message {
+    text-align: center;
+    font-size: 18px;
+    font-weight: 700;
+    padding: 14px;
+    min-height: 30px;
+    transition: color 0.3s;
+}
+
+.duel-message.win  { color: #4CAF50; text-shadow: 0 0 20px rgba(76, 175, 80, 0.6); }
+.duel-message.lose { color: #ff5555; text-shadow: 0 0 20px rgba(255, 85, 85, 0.6); }
+.duel-message.info { color: #ffb400; }
+
+.duel-actions {
+    text-align: center;
+    margin-top: 20px;
+}
+
+.roll-btn {
+    padding: 18px 60px;
+    border: none;
+    border-radius: 14px;
+    background: linear-gradient(45deg, #ff7e33, #ffb400);
+    color: #1a1a1a;
+    font-family: 'Noto Sans', sans-serif;
+    font-weight: 800;
+    font-size: 18px;
+    letter-spacing: 1.5px;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    box-shadow: 0 10px 28px rgba(255, 140, 0, 0.4);
+}
+
+.roll-btn:hover:not(:disabled) {
+    transform: translateY(-3px) scale(1.02);
+    box-shadow: 0 14px 40px rgba(255, 140, 0, 0.65);
+}
+
+.roll-btn:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.roll-btn.bot-turn {
+    background: linear-gradient(45deg, #555, #333) !important;
+    color: #aaa !important;
+    cursor: wait !important;
+    box-shadow: none !important;
+    animation: botTurnPulse 1.2s ease-in-out infinite;
+}
+
+@keyframes botTurnPulse {
+    0%, 100% { opacity: 0.7; }
+    50%      { opacity: 1; }
+}
+
+/* ============ MODALS ============ */
+
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.82);
+    backdrop-filter: blur(6px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+    animation: modalFade 0.25s ease;
+    padding: 20px;
+}
+
+@keyframes modalFade {
+    from { opacity: 0; }
+    to   { opacity: 1; }
+}
+
+.modal-content {
+    background: linear-gradient(145deg, rgb(30, 30, 38), rgb(20, 20, 26));
+    border: 2px solid rgba(255, 165, 0, 0.5);
+    border-radius: 18px;
+    padding: 28px;
+    width: 100%;
+    max-width: 480px;
+    max-height: 90vh;
+    overflow-y: auto;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.7), 0 0 60px rgba(255, 165, 0, 0.15);
+    animation: modalSlide 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes modalSlide {
+    from { transform: translateY(30px) scale(0.95); opacity: 0; }
+    to   { transform: translateY(0) scale(1); opacity: 1; }
+}
+
+.modal-content h2 {
+    color: #ffb400;
+    font-size: 24px;
+    font-weight: 800;
+    text-align: center;
+    margin-bottom: 8px;
+    letter-spacing: 1px;
+}
+
+.modal-hint {
+    text-align: center;
+    color: #888;
+    font-size: 13px;
+    margin-bottom: 22px;
+}
+
+.modal-label {
+    display: block;
+    color: #ccc;
+    font-size: 13px;
+    font-weight: 600;
+    margin: 18px 0 8px;
+    letter-spacing: 0.5px;
+}
+
+.modal-content input[type="number"],
+.modal-content input[type="text"] {
+    width: 100%;
+    padding: 14px 16px;
+    background: rgba(0, 0, 0, 0.55);
+    border: 2px solid rgba(255, 165, 0, 0.25);
+    border-radius: 10px;
+    color: #fff;
+    font-family: 'Noto Sans', sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    outline: none;
+    transition: all 0.2s;
+}
+
+.modal-content input:focus {
+    border-color: #ffb400;
+    box-shadow: 0 0 0 3px rgba(255, 165, 0, 0.15);
+}
+
+.join-range-hint {
+    margin-top: 8px;
+    padding: 8px 12px;
+    background: rgba(255, 165, 0, 0.08);
+    border: 1px dashed rgba(255, 165, 0, 0.4);
+    border-radius: 8px;
+    color: #ffb400;
+    font-size: 12px;
+    font-weight: 600;
+    text-align: center;
+    letter-spacing: 0.3px;
+    transition: all 0.2s ease;
+}
+
+.join-range-hint.danger {
+    background: rgba(255, 85, 85, 0.1);
+    border-color: rgba(255, 85, 85, 0.5);
+    color: #ff5555;
+}
+
+.modal-game-pick {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.modal-game-pick-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 16px;
+    background: rgba(0, 0, 0, 0.4);
+    border: 2px solid rgba(255, 165, 0, 0.2);
+    border-radius: 10px;
+    color: #ccc;
+    font-weight: 700;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.modal-game-pick-item.active {
+    background: rgba(255, 165, 0, 0.15);
+    border-color: #ffb400;
+    color: #ffb400;
+}
+
+.modal-game-icon {
+    font-size: 20px;
+}
+
+.modal-inventory-list {
+    max-height: 180px;
+    overflow-y: auto;
+    background: rgba(0, 0, 0, 0.35);
+    border-radius: 10px;
+    padding: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.modal-inventory-list::-webkit-scrollbar { width: 6px; }
+.modal-inventory-list::-webkit-scrollbar-track { background: transparent; }
+.modal-inventory-list::-webkit-scrollbar-thumb { background: #ffb400; border-radius: 3px; }
+
+.inventory-empty {
+    text-align: center;
+    color: #666;
+    font-size: 13px;
+    padding: 16px;
+}
+
+.inv-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 10px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.2s;
+    border: 2px solid transparent;
+}
+
+.inv-item:hover {
+    background: rgba(255, 165, 0, 0.08);
+}
+
+.inv-item.selected {
+    background: rgba(255, 165, 0, 0.15);
+    border-color: #ffb400;
+}
+
+.inv-item-img {
+    width: 36px;
+    height: 36px;
+    object-fit: contain;
+    border-radius: 6px;
+    background: rgba(0, 0, 0, 0.4);
+}
+
+.inv-item-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.inv-item-name {
+    font-size: 13px;
+    font-weight: 700;
+    color: #fff;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.inv-item-price {
+    font-size: 11px;
+    color: #ffb400;
+    margin-top: 2px;
+}
+
+.inv-item-check {
+    font-size: 18px;
+    color: #ffb400;
+}
+
+.modal-buttons {
+    display: flex;
+    gap: 10px;
+    margin-top: 24px;
+}
+
+.btn-confirm,
+.btn-cancel {
+    flex: 1;
+    padding: 14px;
+    border: none;
+    border-radius: 10px;
+    font-family: 'Noto Sans', sans-serif;
+    font-weight: 800;
+    font-size: 14px;
+    letter-spacing: 1px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-confirm {
+    background: linear-gradient(45deg, #4CAF50, #2e7d32);
+    color: #fff;
+    box-shadow: 0 5px 16px rgba(76, 175, 80, 0.4);
+}
+
+.btn-confirm:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 22px rgba(76, 175, 80, 0.6);
+}
+
+.btn-confirm:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+.btn-cancel {
+    background: #444;
+    color: #ddd;
+}
+
+.btn-cancel:hover {
+    background: #555;
+}
+
+.join-opp-info {
+    background: rgba(0, 0, 0, 0.4);
+    padding: 14px;
+    border-radius: 10px;
+    margin-bottom: 12px;
+    border-left: 3px solid #ffb400;
+}
+
+.join-opp-game {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 14px;
+    margin-bottom: 10px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, rgba(255, 126, 51, 0.2), rgba(255, 180, 0, 0.15));
+    border: 1px solid rgba(255, 165, 0, 0.35);
+}
+
+.join-opp-game-icon {
+    font-size: 20px;
+}
+
+.join-opp-game-name {
+    font-size: 13px;
+    font-weight: 800;
+    letter-spacing: 1px;
+    color: #ffb400;
+    text-transform: uppercase;
+}
+
+.join-opp-name,
+.join-opp-bet {
+    font-size: 14px;
+    color: #aaa;
+    margin: 3px 0;
+}
+
+.join-opp-name b,
+.join-opp-bet b {
+    color: #fff;
+}
+
+.bet-adjust-row {
+    display: flex;
+    gap: 6px;
+    margin-top: 8px;
+}
+
+.bet-adjust-btn {
+    flex: 1;
+    padding: 8px;
+    background: rgba(0, 0, 0, 0.5);
+    border: 1px solid rgba(255, 165, 0, 0.3);
+    border-radius: 8px;
+    color: #ffb400;
+    font-family: 'Noto Sans', sans-serif;
+    font-weight: 700;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.bet-adjust-btn:hover {
+    background: rgba(255, 165, 0, 0.15);
+    border-color: #ffb400;
+}
+
+.join-chance-preview {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 14px;
+    padding: 12px 14px;
+    background: rgba(76, 175, 80, 0.08);
+    border-radius: 10px;
+    border: 1px solid rgba(76, 175, 80, 0.25);
+    font-size: 13px;
+    color: #aaa;
+}
+
+.join-chance-preview b {
+    color: #4CAF50;
+    font-size: 20px;
+}
+
+.modal-waiting {
+    text-align: center;
+}
+
+.spinner {
+    width: 50px;
+    height: 50px;
+    margin: 0 auto 18px;
+    border: 4px solid rgba(255, 165, 0, 0.15);
+    border-top-color: #ffb400;
+    border-radius: 50%;
+    animation: spin 0.9s linear infinite;
+}
+
+@keyframes spin {
+    to { transform: rotate(360deg); }
+}
+
+.waiting-info {
+    font-size: 16px;
+    color: #ccc;
+    margin: 12px 0 8px;
+}
+
+.waiting-info b {
+    color: #ffb400;
+}
+
+.waiting-hint {
+    font-size: 13px;
+    color: #777;
+    margin-bottom: 22px;
+}
+
+/* ============ АДАПТИВ ============ */
+
+@media (max-width: 720px) {
+    .dice-arena {
+        grid-template-columns: 1fr;
+        gap: 12px;
+    }
+
+    .vs-block {
+        padding: 6px 0;
+    }
+
+    .vs-text {
+        font-size: 30px;
+    }
+
+    .dice {
+        width: 96px;
+        height: 96px;
+        padding: 11px;
+        gap: 5px;
+    }
+
+    .lobby-top h1 {
+        font-size: 38px;
+    }
+
+    .roll-btn {
+        padding: 16px 40px;
+        font-size: 16px;
+    }
+
+    .modal-content {
+        padding: 22px;
+    }
+
+    .lobbies-list {
+        grid-template-columns: 1fr;
+    }
+}
+
 @media (max-width: 640px) {
+    .race-lane {
+        height: 60px;
+    }
+
+    .race-runner {
+        font-size: 40px;
+    }
+
+    .race-player-avatar {
+        width: 46px;
+        height: 46px;
+        font-size: 12px;
+    }
+
+    .race-vs {
+        font-size: 22px;
+    }
+
     .bj-card {
         width: 62px;
         height: 90px;

@@ -22,6 +22,7 @@
     const joinBetInput    = document.getElementById('join-bet-input');
     const joinInvList     = document.getElementById('join-inventory-list');
     const joinChanceEl    = document.getElementById('join-chance-preview');
+    const joinRangeHintEl = document.getElementById('join-range-hint');
     const confirmJoinBtn  = document.getElementById('confirm-join-btn');
     const cancelJoinBtn   = document.getElementById('cancel-join-btn');
 
@@ -114,31 +115,27 @@
     let bjYouHand = [];
     let bjOppHand = [];
     let bjBotRevealed = false;
-    let bjPhase = 'idle'; // 'idle' | 'player' | 'bot' | 'done'
+    let bjPhase = 'idle';
     let bjActionTimer = null;
 
     const RAKE = 0.05;
     const BOT_ITEM_CHANCE = 0.10;
 
-    // ============ ЛИЧНОСТИ БОТОВ В БЛЭКДЖЕКЕ ============
-    // threshold — при какой сумме бот останавливается.
-    //   16 — «консервативный»: стоит раньше, реже перебирает, но и реже набирает 20-21
-    //   17 — «стандарт»: как настоящий дилер
-    //   18 — «агрессивный»: рискует, чаще перебирает, но и чаще выбивает 19-21
-    const BJ_BOT_PERSONALITIES = [
-        { key: 'conservative', icon: '🛡️', name: 'Осторожный', threshold: 16, weight: 35 },
-        { key: 'standard',     icon: '⚖️', name: 'Стандарт',    threshold: 17, weight: 45 },
-        { key: 'aggressive',   icon: '⚡', name: 'Агрессивный', threshold: 18, weight: 20 }
-    ];
+    // ============ ДОПУСК ПО СТАВКАМ (±20%) ============
+    const BET_TOLERANCE = 0.20;
+    const BET_RATIO_MAX = 1 / (1 - BET_TOLERANCE); // 1.25
 
-    function pickBotPersonality() {
-        const total = BJ_BOT_PERSONALITIES.reduce((s, p) => s + p.weight, 0);
-        let r = Math.random() * total;
-        for (const p of BJ_BOT_PERSONALITIES) {
-            r -= p.weight;
-            if (r <= 0) return p;
-        }
-        return BJ_BOT_PERSONALITIES[1];
+    function isBetWithinTolerance(a, b) {
+        if (!isFinite(a) || !isFinite(b)) return false;
+        if (a <= 0 || b <= 0) return false;
+        return Math.max(a, b) <= Math.min(a, b) * BET_RATIO_MAX;
+    }
+
+    function getBetBounds(oppBet) {
+        return {
+            min: Math.ceil(oppBet / BET_RATIO_MAX),
+            max: Math.floor(oppBet * BET_RATIO_MAX)
+        };
     }
 
     const DICE_FACE_MAP = {
@@ -196,10 +193,12 @@
         return pool;
     }
 
-    function pickBotItem() {
+    function pickBotItemNearBet(betValue) {
         const pool = getBotItemPool();
         if (pool.length === 0) return null;
-        const it = pickRandom(pool);
+        const filtered = pool.filter(it => isBetWithinTolerance(it.price, betValue));
+        if (filtered.length === 0) return null;
+        const it = pickRandom(filtered);
         return { name: it.name, image: it.image, tier: it.tier, price: it.price };
     }
 
@@ -271,7 +270,7 @@
         let item = null;
 
         if (Math.random() < BOT_ITEM_CHANCE) {
-            const botItem = pickBotItem();
+            const botItem = pickBotItemNearBet(bet); // случайный предмет в радиусе от ставки
             if (botItem) {
                 item = botItem;
                 bet = botItem.price;
@@ -467,6 +466,8 @@
         joiningLobby = lobby;
         selectedJoinItem = null;
 
+        const bounds = getBetBounds(lobby.bet);
+
         joinOppGameIcon.textContent = gameIcon(lobby.game);
         joinOppGameName.textContent = gameName(lobby.game);
         joinOppNameEl.textContent = lobby.name;
@@ -476,6 +477,8 @@
         joinOppBetEl.textContent = oppBetText;
 
         joinBetInput.value = lobby.bet;
+        joinBetInput.min = Math.max(10, bounds.min);
+        joinBetInput.max = bounds.max;
         joinBetInput.disabled = false;
         joinBetInput.style.opacity = '1';
 
@@ -506,11 +509,38 @@
 
     function updateJoinChancePreview() {
         if (!joiningLobby) return;
+
         let playerBetValue;
         if (selectedJoinItem) playerBetValue = selectedJoinItem.price;
         else playerBetValue = parseFloat(joinBetInput.value) || 0;
-        if (playerBetValue <= 0) { joinChanceEl.textContent = '—'; return; }
-        const p = calcPlayerWinChance(playerBetValue, joiningLobby.bet);
+
+        const oppBet = joiningLobby.bet;
+        const bounds = getBetBounds(oppBet);
+
+        if (joinRangeHintEl) {
+            joinRangeHintEl.textContent =
+                `Допустимый диапазон: ${bounds.min.toLocaleString('ru-RU')} – ${bounds.max.toLocaleString('ru-RU')} ₽`;
+            joinRangeHintEl.classList.remove('danger');
+        }
+
+        if (playerBetValue <= 0) {
+            joinChanceEl.textContent = '—';
+            joinChanceEl.style.color = '';
+            confirmJoinBtn.disabled = true;
+            return;
+        }
+
+        if (!isBetWithinTolerance(playerBetValue, oppBet)) {
+            joinChanceEl.textContent = '❌ Вне диапазона';
+            joinChanceEl.style.color = '#ff5555';
+            confirmJoinBtn.disabled = true;
+            if (joinRangeHintEl) joinRangeHintEl.classList.add('danger');
+            return;
+        }
+
+        joinChanceEl.style.color = '';
+        confirmJoinBtn.disabled = false;
+        const p = calcPlayerWinChance(playerBetValue, oppBet);
         joinChanceEl.textContent = (p * 100).toFixed(1) + '%';
     }
 
@@ -529,7 +559,7 @@
             : { player: loserValue, opponent: winnerValue };
     }
 
-    // ============ ГОНКИ: НЕПРЕДСКАЗУЕМОСТЬ ============
+    // ============ ГОНКИ ============
     function generateRaceProgress(totalTicks) {
         const deltas = [];
         for (let i = 0; i < totalTicks; i++) {
@@ -575,7 +605,7 @@
             : { youPos: loserPos, oppPos: winnerPos };
     }
 
-    // ============ БЛЭКДЖЕК: ЛОГИКА КАРТ ============
+    // ============ БЛЭКДЖЕК ============
     function createDeck() {
         const suits = ['♠', '♥', '♦', '♣'];
         const ranks = ['A','2','3','4','5','6','7','8','9','10','J','Q','K'];
@@ -630,7 +660,6 @@
         bjYouHand.forEach(c => bjYouCardsEl.appendChild(renderCard(c)));
 
         bjOppHand.forEach((c, i) => {
-            // 2-я карта бота скрыта, пока не начнётся его ход
             const hidden = !bjBotRevealed && i === 1;
             bjOppCardsEl.appendChild(renderCard(c, hidden));
         });
@@ -644,11 +673,18 @@
             bjOppScoreEl.textContent = oppScore;
             bjOppScoreEl.classList.toggle('bust', oppScore > 21);
         } else {
-            // Показываем только первую карту
             const first = bjOppHand[0];
             bjOppScoreEl.textContent = first ? cardValue(first) : 0;
             bjOppScoreEl.classList.remove('bust');
         }
+    }
+
+    // Характер бота (не показывается в UI)
+    function pickBotCharacter() {
+        const r = Math.random();
+        if (r < 0.35) return 'cautious';
+        if (r < 0.80) return 'normal';
+        return 'risky';
     }
 
     // ============ СТАРТ ДУЭЛИ ============
@@ -661,7 +697,7 @@
             opponentBetValue: config.opponentBet,
             opponentItem: config.opponentItem || null,
             playerStarts: Math.random() < 0.5,
-            botPersonality: pickBotPersonality(),
+            botCharacter: pickBotCharacter(),
             phase: 'ready'
         };
 
@@ -671,7 +707,6 @@
 
         duelTitleEl.textContent = 'ДУЭЛЬ · ' + gameName(currentGame.game).toUpperCase();
 
-        // Скрыть все арены, показать нужную
         diceArenaEl.style.display = 'none';
         raceArenaEl.style.display = 'none';
         bjArenaEl.style.display = 'none';
@@ -684,7 +719,6 @@
         const youItemSuffix = currentGame.playerItem ? ` · 🎒 ${currentGame.playerItem.name}` : '';
         const oppItemSuffix = currentGame.opponentItem ? ` · 🎒 ${currentGame.opponentItem.name}` : '';
 
-        // Общие поля
         bankValueEl.textContent = (currentGame.playerBetValue + currentGame.opponentBetValue).toLocaleString('ru-RU') + ' ₽';
         duelMessage.textContent = '';
         duelMessage.className = 'duel-message';
@@ -731,7 +765,6 @@
             document.querySelectorAll('.dice-side').forEach(el => el.classList.remove('winner', 'loser'));
         }
 
-        // Кто начинает (для блэкджека не показываем «кто первый» — там всегда первым игрок)
         const btnLabel = currentGame.game === 'race' ? '🏁 НАЧАТЬ ГОНКУ'
                        : currentGame.game === 'blackjack' ? '🃏 РАЗДАТЬ КАРТЫ'
                        : '🎲 БРОСИТЬ КУБИКИ';
@@ -900,14 +933,12 @@
         duelStatus.style.color = '';
         duelMessage.textContent = '';
 
-        // Новый раунд
         bjDeck = createDeck();
         bjYouHand = [];
         bjOppHand = [];
         bjBotRevealed = false;
         bjPhase = 'idle';
 
-        // Раздача по одной карте: вы → бот → вы → бот
         const dealSequence = [
             { target: 'you' }, { target: 'opp' },
             { target: 'you' }, { target: 'opp' }
@@ -916,7 +947,6 @@
         let idx = 0;
         const dealNext = () => {
             if (idx >= dealSequence.length) {
-                // Все карты сданы — играем
                 bjPhase = 'player';
                 isRolling = false;
                 duelStatus.textContent = 'Ваш ход';
@@ -944,7 +974,6 @@
     }
 
     function checkPlayerBlackjack() {
-        // Автоматический stand при 21
         if (handScore(bjYouHand) === 21) {
             duelStatus.textContent = '🎉 21! Автоматически';
             setTimeout(playerStand, 700);
@@ -963,7 +992,6 @@
         const score = handScore(bjYouHand);
 
         if (score > 21) {
-            // Перебор — мгновенное поражение
             bjPhase = 'done';
             duelMessage.textContent = '💥 ПЕРЕБОР!';
             duelMessage.className = 'duel-message lose';
@@ -993,22 +1021,10 @@
         bjActionsEl.style.display = 'none';
         duelStatus.textContent = `${currentGame.opponentName} думает...`;
 
-        // Раскрываем карты бота
         bjBotRevealed = true;
         renderBlackjackHands();
 
         setTimeout(botBlackjackTurn, 700);
-    }
-
-        // ============ ХАРАКТЕР БОТА (внутренний, не показывается) ============
-    //   cautious — стоит чаще, реже перебирает, но и реже добирает 20-21
-    //   normal   — баланс
-    //   risky    — чаще добирает, чаще перебирает, но и чаще выбивает 20-21
-    function pickBotCharacter() {
-        const r = Math.random();
-        if (r < 0.35) return 'cautious';
-        if (r < 0.80) return 'normal';
-        return 'risky';
     }
 
     function botBlackjackTurn() {
@@ -1022,52 +1038,31 @@
             const oppScore = handScore(bjOppHand);
             const playerScore = handScore(bjYouHand);
 
-            // --- Мгновенные решения: прекращаем думать ---
+            if (oppScore > 21) { finishBlackjack(); return; }
+            if (playerScore > 21) { finishBlackjack(); return; }
 
-            // Бот уже перебрал — не может продолжать
-            if (oppScore > 21) {
-                finishBlackjack();
-                return;
-            }
-
-            // Игрок перебрал — бот уже победил, не рискуем
-            if (playerScore > 21) {
-                finishBlackjack();
-                return;
-            }
-
-            // --- Думаем, стоит ли бить ---
             let shouldHit = false;
 
             if (oppScore < 17) {
-                // Базовое правило дилера — всегда добирает
                 shouldHit = true;
             } else if (oppScore > playerScore) {
-                // Уже впереди — стоим
                 shouldHit = false;
             } else if (oppScore === playerScore) {
-                // Счёт равный — берём пуш, если уже ≥ 17
                 shouldHit = false;
             } else {
-                // Отстаём. Смотрим насколько:
                 const gap = playerScore - oppScore;
 
                 if (gap >= 3) {
-                    // Отстали сильно. Догнать почти нереально — стоим,
-                    // не будем губить шанс на чужой перебор (не наш случай, но всё же)
                     shouldHit = false;
                 } else {
-                    // Отстаём на 1-2. Здесь решает характер:
                     let hitChance;
                     if (character === 'cautious') hitChance = 0.30;
                     else if (character === 'risky') hitChance = 0.80;
                     else hitChance = 0.55;
-
                     shouldHit = Math.random() < hitChance;
                 }
             }
 
-            // --- Действие ---
             if (!shouldHit) {
                 finishBlackjack();
                 return;
@@ -1091,7 +1086,7 @@
         const youScore = handScore(bjYouHand);
         const oppScore = handScore(bjOppHand);
 
-        let playerWins;
+        let playerWins = false;
         let isPush = false;
 
         if (youScore > 21) {
@@ -1103,7 +1098,6 @@
         } else if (youScore < oppScore) {
             playerWins = false;
         } else {
-            // Пуш
             isPush = true;
             playerWins = false;
         }
@@ -1111,7 +1105,6 @@
         bjPhase = 'done';
 
         if (isPush) {
-            // Возвращаем ставку игроку и предмет, если был
             if (currentGame.playerItem) {
                 returnItemToInventory(currentGame.playerItem);
                 currentGame.playerItem = null;
@@ -1127,6 +1120,7 @@
             duelStatus.style.color = '#ffb400';
 
             setTimeout(() => {
+                rollBtn.style.display = '';
                 rollBtn.textContent = '↩ ВЕРНУТЬСЯ В ЛОББИ';
                 rollBtn.disabled = false;
                 rollBtn.classList.remove('bot-turn');
@@ -1137,7 +1131,6 @@
             return;
         }
 
-        // Иначе — обычная победа/поражение
         setTimeout(() => resolveDuel(playerWins, 'blackjack'), 200);
     }
 
@@ -1152,21 +1145,17 @@
                     : '🎲';
 
         if (playerWins) {
-            // 1. Возвращаем собственную ставку
             if (playerItem) {
                 returnItemToInventory(playerItem);
             } else {
                 window.globalBalance += betValue;
             }
 
-            // 2. Забираем то, что поставил соперник
             let prizeText = '';
             if (opponentItem) {
-                // Забираем предмет как трофей
                 returnItemToInventory(opponentItem);
                 prizeText = `предмет: ${opponentItem.name} (${formatMoney(opponentItem.price)} ₽)`;
             } else {
-                // Забираем деньги минус рейк
                 const rakeAmount = oppValue * RAKE;
                 const netWin = oppValue - rakeAmount;
                 window.globalBalance += netWin;
@@ -1272,7 +1261,12 @@
             btn.addEventListener('click', () => {
                 if (!joiningLobby) return;
                 const factor = parseFloat(btn.dataset.factor);
-                const target = Math.max(10, Math.round(joiningLobby.bet * factor));
+                const bounds = getBetBounds(joiningLobby.bet);
+
+                let target = Math.round(joiningLobby.bet * factor);
+                target = Math.max(bounds.min, Math.min(bounds.max, target));
+                target = Math.max(10, target);
+
                 joinBetInput.value = target;
                 if (selectedJoinItem) {
                     selectedJoinItem = null;
@@ -1294,6 +1288,12 @@
                 playerBetValue = parseFloat(joinBetInput.value) || 0;
             }
             if (playerBetValue <= 0) return;
+
+            if (!isBetWithinTolerance(playerBetValue, joiningLobby.bet)) {
+                const b = getBetBounds(joiningLobby.bet);
+                alert(`Ставка должна быть в диапазоне ${b.min.toLocaleString('ru-RU')} – ${b.max.toLocaleString('ru-RU')} ₽`);
+                return;
+            }
 
             if (selectedJoinItem) {
                 const inv = getInventory();
@@ -1376,15 +1376,24 @@
             let oppBet = playerBet.value;
             let oppItem = null;
             const r = Math.random();
-            if (r < 0.15) oppBet = Math.round(playerBet.value * 1.2);
-            else if (r < 0.30) oppBet = Math.round(playerBet.value / 1.2);
+
+            if (r < 0.15) {
+                oppBet = Math.floor(playerBet.value * BET_RATIO_MAX);
+            } else if (r < 0.30) {
+                oppBet = Math.ceil(playerBet.value / BET_RATIO_MAX);
+            }
+            oppBet = Math.max(10, oppBet);
 
             if (Math.random() < BOT_ITEM_CHANCE) {
-                const botItem = pickBotItem();
+                const botItem = pickBotItemNearBet(playerBet.value);
                 if (botItem) {
                     oppItem = botItem;
                     oppBet = botItem.price;
                 }
+            }
+
+            if (!isBetWithinTolerance(playerBet.value, oppBet) && !oppItem) {
+                oppBet = Math.round(playerBet.value);
             }
 
             startDuel({
