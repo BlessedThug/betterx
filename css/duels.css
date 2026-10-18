@@ -1451,3 +1451,134 @@
     .bj-card .bj-suit { font-size: 26px; }
     .bj-action-btn { padding: 12px 20px; font-size: 13px; }
 }
+
+/* ============ КАРТОЧНЫЕ БОИ ============ */
+.cardbattle-arena {
+    max-width: 1000px;
+    margin: 0 auto 30px;
+    padding: 24px;
+    background: linear-gradient(145deg, rgba(20, 25, 35, 0.9), rgba(10, 15, 25, 0.95));
+    border: 2px solid rgba(100, 150, 255, 0.35);
+    border-radius: 20px;
+    box-shadow: 0 0 50px rgba(50, 100, 255, 0.15), inset 0 0 30px rgba(0, 0, 0, 0.7);
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    position: relative;
+    overflow: hidden;
+}
+.cardbattle-arena::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at 50% 50%, rgba(100, 150, 255, 0.05), transparent 70%);
+    pointer-events: none;
+}
+.cb-side { display: flex; flex-direction: column; gap: 10px; align-items: center; position: relative; z-index: 1; }
+.cb-avatar-row { display: flex; justify-content: space-between; width: 100%; max-width: 600px; font-weight: 700; font-size: 14px; color: #fff; }
+.cb-hp-bar { width: 100%; max-width: 600px; height: 20px; background: rgba(0,0,0,0.6); border-radius: 10px; overflow: hidden; border: 1px solid rgba(255,255,255,0.1); }
+.cb-hp-fill { height: 100%; width: 100%; transition: width 0.3s ease, background 0.3s; }
+.cb-you .cb-hp-fill { background: linear-gradient(90deg, #2e7d32, #4CAF50); }
+.cb-opp .cb-hp-fill { background: linear-gradient(90deg, #b71c1c, #f44336); }
+.cb-hand { display: flex; gap: 12px; justify-content: center; }
+.cb-card {
+    width: 90px; height: 140px; background: linear-gradient(145deg, #2a2a35, #1a1a22);
+    border: 2px solid rgba(255,255,255,0.1); border-radius: 12px;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    cursor: pointer; transition: all 0.2s; position: relative; padding: 8px; text-align: center;
+}
+.cb-card:hover:not(.disabled) { transform: translateY(-10px); border-color: #ffb400; box-shadow: 0 10px 20px rgba(0,0,0,0.5); }
+.cb-card.disabled { opacity: 0.5; cursor: not-allowed; }
+.cb-card .cb-card-icon { font-size: 28px; margin-bottom: 6px; }
+.cb-card .cb-card-name { font-size: 11px; font-weight: bold; color: #fff; }
+.cb-card .cb-card-desc { font-size: 9px; color: #aaa; margin-top: 4px; line-height: 1.2; }
+.cb-card.card-back { background: repeating-linear-gradient(45deg, #111 0 10px, #222 10px 20px); border-color: rgba(255,180,0,0.3); }
+.cb-center { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; position: relative; z-index: 1; padding: 10px 0; }
+.cb-turn-indicator { font-size: 18px; font-weight: bold; color: #ffb400; text-shadow: 0 0 10px rgba(255,180,0,0.5); }
+.cb-log { font-size: 13px; color: #aaa; text-align: center; min-height: 40px; max-width: 600px; display: flex; flex-direction: column; gap: 4px; }
+.cb-log div { animation: fadeInLog 0.3s ease; }
+@keyframes fadeInLog { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: translateY(0); } }
+
+/* ============ КАРТОЧНЫЕ БОИ ============ */
+.cardbattle-arena {
+    max-width: 1000px;
+    margin: 0 auto 30px;
+    padding: 24px;
+    background: linear-gradient(145deg, rgba(20, 25, 35, 0.9), rgba(10, 15, 25, 0.95));
+    border: 2px solid rgba(100, 150, 255, 0.35);
+    border-radius: 20px;
+    box-shadow: 0 0 50px rgba(50, 100, 255, 0.15), inset 0 0 30px rgba(0, 0, 0, 0.7);
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    position: relative;
+    overflow: hidden;
+}
+.cardbattle-arena::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at 50% 50%, rgba(100, 150, 255, 0.05), transparent 70%);
+    pointer-events: none;
+}
+.cb-side { display: flex; flex-direction: column; gap: 10px; align-items: center; position: relative; z-index: 1; }
+.cb-avatar-row { display: flex; justify-content: space-between; width: 100%; max-width: 600px; font-weight: 700; font-size: 14px; color: #fff; }
+.cb-hp-bar { width: 100%; max-width: 600px; height: 20px; background: rgba(0,0,0,0.6); border-radius: 10px; overflow: hidden; border: 1px solid rgba(255,255,255,0.1); }
+.cb-hp-fill { height: 100%; width: 100%; transition: width 0.3s ease, background 0.3s; }
+.cb-you .cb-hp-fill { background: linear-gradient(90deg, #2e7d32, #4CAF50); }
+.cb-opp .cb-hp-fill { background: linear-gradient(90deg, #b71c1c, #f44336); }
+.cb-hand { display: flex; gap: 8px; justify-content: center; flex-wrap: wrap; min-height: 140px; }
+
+/* Карты */
+.cb-card {
+    width: 85px; height: 130px; background: linear-gradient(145deg, #2a2a35, #1a1a22);
+    border: 2px solid rgba(255,255,255,0.1); border-radius: 12px;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    cursor: pointer; transition: all 0.2s; position: relative; padding: 6px; text-align: center;
+}
+.cb-card:hover:not(.disabled) { transform: translateY(-10px); border-color: #fff; box-shadow: 0 10px 20px rgba(0,0,0,0.5); }
+.cb-card.disabled { opacity: 0.5; cursor: not-allowed; }
+.cb-card .cb-card-icon { font-size: 26px; margin-bottom: 4px; }
+.cb-card .cb-card-name { font-size: 10px; font-weight: bold; color: #fff; line-height: 1.1; }
+.cb-card .cb-card-desc { font-size: 9px; color: #aaa; margin-top: 4px; line-height: 1.2; }
+
+/* Типы карт */
+.cb-card.type-action { border-bottom: 4px solid #ff3333; }
+.cb-card.type-buff { border-bottom: 4px solid #4CAF50; }
+
+/* Редкости */
+.cb-card.rarity-3 { box-shadow: 0 0 10px rgba(156, 39, 176, 0.4); border-color: rgba(156, 39, 176, 0.5); }
+.cb-card.rarity-4 { box-shadow: 0 0 15px rgba(255, 193, 7, 0.6); border-color: rgba(255, 193, 7, 0.8); }
+.cb-card.card-back { background: repeating-linear-gradient(45deg, #111 0 10px, #222 10px 20px); border-color: rgba(255,180,0,0.3); }
+
+.cb-center { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; position: relative; z-index: 1; padding: 10px 0; }
+.cb-turn-indicator { font-size: 18px; font-weight: bold; color: #ffb400; text-shadow: 0 0 10px rgba(255,180,0,0.5); }
+.cb-log { font-size: 13px; color: #aaa; text-align: center; min-height: 40px; max-width: 600px; display: flex; flex-direction: column; gap: 4px; }
+.cb-log div { animation: fadeInLog 0.3s ease; }
+@keyframes fadeInLog { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: translateY(0); } }
+
+/* Кнопки действий */
+.cb-actions-row { display: flex; gap: 10px; margin-top: 10px; }
+.cb-action-btn {
+    padding: 10px 16px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 8px; color: #fff; font-size: 13px; font-weight: bold; cursor: pointer; transition: all 0.2s;
+}
+.cb-action-btn:hover { background: rgba(255,255,255,0.2); transform: scale(1.05); }
+
+/* Индикатор статусов (яд, кровотечение, уязвимость) */
+.cb-statuses {
+    display: inline-flex;
+    gap: 4px;
+    margin-left: 6px;
+    font-size: 13px;
+    font-weight: 700;
+}
+
+.cb-statuses span { color: #fff; }
+
+/* Заблокированные кнопки */
+.cb-action-btn:disabled {
+    opacity: 0.35;
+    cursor: not-allowed;
+    transform: none !important;
+}

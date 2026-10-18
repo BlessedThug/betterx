@@ -45,8 +45,6 @@
     </div>
 
     <main class="duels-main duels-game-area">
-
-        <!-- ============ LOBBY VIEW ============ -->
         <section id="lobby-view" class="duels-view">
             <div class="lobby-top">
                 <h1>⚔️ DUELS — ДУЭЛИ</h1>
@@ -61,20 +59,19 @@
 
             <div class="game-filter" id="game-filter">
                 <button class="game-filter-btn active" data-game="all">
-                    <span class="game-filter-icon">🎮</span>
-                    <span>Все игры</span>
+                    <span class="game-filter-icon">🎮</span><span>Все игры</span>
                 </button>
                 <button class="game-filter-btn" data-game="dice">
-                    <span class="game-filter-icon">🎲</span>
-                    <span>Кости</span>
+                    <span class="game-filter-icon">🎲</span><span>Кости</span>
                 </button>
                 <button class="game-filter-btn" data-game="race">
-                    <span class="game-filter-icon">🏁</span>
-                    <span>Гонки</span>
+                    <span class="game-filter-icon">🏁</span><span>Гонки</span>
                 </button>
                 <button class="game-filter-btn" data-game="blackjack">
-                    <span class="game-filter-icon">🃏</span>
-                    <span>Блэкджек</span>
+                    <span class="game-filter-icon">🃏</span><span>Блэкджек</span>
+                </button>
+                <button class="game-filter-btn" data-game="cardbattle">
+                    <span class="game-filter-icon">⚔️</span><span>Карты</span>
                 </button>
             </div>
 
@@ -83,7 +80,6 @@
             </div>
         </section>
 
-        <!-- ============ GAME VIEW ============ -->
         <section id="game-view" class="duels-view" style="display: none;">
             <button id="leave-btn" class="leave-btn">← Выйти из дуэли</button>
 
@@ -97,9 +93,7 @@
                 <div class="dice-side dice-side-you">
                     <div class="player-tag you-tag">ВЫ</div>
                     <div class="player-name-big" id="you-name">Вы</div>
-                    <div class="dice-wrap">
-                        <div class="dice" id="you-dice"></div>
-                    </div>
+                    <div class="dice-wrap"><div class="dice" id="you-dice"></div></div>
                     <div class="bet-tag" id="you-bet-display">0 ₽</div>
                     <div class="chance-tag" id="you-chance">50.0%</div>
                 </div>
@@ -107,9 +101,7 @@
                 <div class="dice-side dice-side-opp">
                     <div class="player-tag opp-tag">СОПЕРНИК</div>
                     <div class="player-name-big" id="opp-name">—</div>
-                    <div class="dice-wrap">
-                        <div class="dice" id="opp-dice"></div>
-                    </div>
+                    <div class="dice-wrap"><div class="dice" id="opp-dice"></div></div>
                     <div class="bet-tag" id="opp-bet-display">0 ₽</div>
                     <div class="chance-tag" id="opp-chance">50.0%</div>
                 </div>
@@ -171,6 +163,34 @@
                 </div>
             </div>
 
+            <!-- АРЕНА КАРТОЧНЫХ БОЁВ -->
+            <div class="cardbattle-arena" id="cardbattle-arena" style="display: none;">
+                <div class="cb-side cb-opp">
+                    <div class="cb-avatar-row">
+                        <span class="cb-name" id="cb-opp-name">—</span>
+                        <span class="cb-hp-text" id="cb-opp-hp-text">100 / 100</span>
+                    </div>
+                    <div class="cb-hp-bar"><div class="cb-hp-fill" id="cb-opp-hp-fill"></div></div>
+                    <div class="cb-hand cb-hand-opp" id="cb-opp-hand"></div>
+                </div>
+                <div class="cb-center">
+                    <div class="cb-turn-indicator" id="cb-turn-indicator">Ожидание...</div>
+                    <div class="cb-log" id="cb-log"></div>
+                    <div class="cb-actions-row" id="cb-player-actions" style="display:none;">
+                        <button id="cb-draw-btn" class="cb-action-btn">🃏 Взять 2 карты</button>
+                        <button id="cb-pass-btn" class="cb-action-btn">⏭️ Завершить ход</button>
+                    </div>
+                </div>
+                <div class="cb-side cb-you">
+                    <div class="cb-hand cb-hand-you" id="cb-you-hand"></div>
+                    <div class="cb-hp-bar"><div class="cb-hp-fill" id="cb-you-hp-fill"></div></div>
+                    <div class="cb-avatar-row">
+                        <span class="cb-name">Вы</span>
+                        <span class="cb-hp-text" id="cb-you-hp-text">100 / 100</span>
+                    </div>
+                </div>
+            </div>
+
             <div class="bank-info">
                 <div class="bank-label">БАНК ДУЭЛИ</div>
                 <div class="bank-value" id="bank-value">0 ₽</div>
@@ -183,36 +203,32 @@
             </div>
         </section>
 
-        <!-- ============ CREATE LOBBY MODAL ============ -->
+        <!-- CREATE LOBBY MODAL -->
         <div id="create-modal" class="modal-overlay" style="display: none;">
             <div class="modal-content">
                 <h2>Создать лобби</h2>
                 <p class="modal-hint">Соперник найдётся автоматически в течение нескольких секунд.</p>
-
                 <label class="modal-label">Игра:</label>
                 <div class="modal-game-pick" id="create-game-pick">
                     <div class="modal-game-pick-item active" data-game="dice">
-                        <span class="modal-game-icon">🎲</span>
-                        <span>Кости</span>
+                        <span class="modal-game-icon">🎲</span><span>Кости</span>
                     </div>
                     <div class="modal-game-pick-item" data-game="race">
-                        <span class="modal-game-icon">🏁</span>
-                        <span>Гонки</span>
+                        <span class="modal-game-icon">🏁</span><span>Гонки</span>
                     </div>
                     <div class="modal-game-pick-item" data-game="blackjack">
-                        <span class="modal-game-icon">🃏</span>
-                        <span>Блэкджек</span>
+                        <span class="modal-game-icon">🃏</span><span>Блэкджек</span>
+                    </div>
+                    <div class="modal-game-pick-item" data-game="cardbattle">
+                        <span class="modal-game-icon">⚔️</span><span>Карты</span>
                     </div>
                 </div>
-
                 <label class="modal-label">Ставка (₽):</label>
                 <input type="number" id="create-bet-input" placeholder="Например, 1000" min="10" step="10">
-
                 <label class="modal-label">…или выберите предмет из инвентаря:</label>
                 <div id="create-inventory-list" class="modal-inventory-list">
                     <div class="inventory-empty">🎒 Нет предметов в инвентаре</div>
                 </div>
-
                 <div class="modal-buttons">
                     <button id="confirm-create-btn" class="btn-confirm">СОЗДАТЬ</button>
                     <button id="cancel-create-btn" class="btn-cancel">ОТМЕНА</button>
@@ -220,7 +236,7 @@
             </div>
         </div>
 
-        <!-- ============ JOIN LOBBY MODAL ============ -->
+        <!-- JOIN LOBBY MODAL -->
         <div id="join-modal" class="modal-overlay" style="display: none;">
             <div class="modal-content">
                 <h2>Принять дуэль</h2>
@@ -232,27 +248,22 @@
                     <div class="join-opp-name">Соперник: <b id="join-opp-name">—</b></div>
                     <div class="join-opp-bet">Ставка соперника: <b id="join-opp-bet">0 ₽</b></div>
                 </div>
-
                 <label class="modal-label">Ваша ставка (₽):</label>
                 <input type="number" id="join-bet-input" min="10" step="10">
                 <div class="join-range-hint" id="join-range-hint">Допустимый диапазон: — ₽</div>
-
                 <div class="bet-adjust-row">
                     <button class="bet-adjust-btn" data-factor="0.8">−20%</button>
                     <button class="bet-adjust-btn" data-factor="1">= Равно</button>
                     <button class="bet-adjust-btn" data-factor="1.25">+20%</button>
                 </div>
-
                 <div class="join-chance-preview">
                     <span>Ваш шанс победы:</span>
                     <b id="join-chance-preview">50.0%</b>
                 </div>
-
                 <label class="modal-label">…или выберите предмет:</label>
                 <div id="join-inventory-list" class="modal-inventory-list">
                     <div class="inventory-empty">🎒 Нет предметов в инвентаре</div>
                 </div>
-
                 <div class="modal-buttons">
                     <button id="confirm-join-btn" class="btn-confirm" disabled>ПРИНЯТЬ</button>
                     <button id="cancel-join-btn" class="btn-cancel">ОТМЕНА</button>
@@ -260,7 +271,7 @@
             </div>
         </div>
 
-        <!-- ============ WAITING MODAL ============ -->
+        <!-- WAITING MODAL -->
         <div id="waiting-modal" class="modal-overlay" style="display: none;">
             <div class="modal-content modal-waiting">
                 <div class="spinner"></div>
@@ -271,15 +282,17 @@
                 <button id="cancel-waiting-btn" class="btn-cancel">ОТМЕНИТЬ</button>
             </div>
         </div>
-
     </main>
 
     <script src="../js/deposit.js"></script>
     <script src="../js/inventory.js"></script>
-    <script src="../js/case-items-data.js"></script>
-    <script src="../js/case-games-data.js"></script>
+    <script src="../js/cases/case-items-data.js"></script>
+    <script src="../js/cases/case-games-data.js"></script>
     <script src="../js/duels-bg.js"></script>
-    <script src="../js/duels.js"></script>
+    <script src="../js/duels/duels.js"></script>
+    <script src="../js/duels/dice.js"></script>
+    <script src="../js/duels/race.js"></script>
+    <script src="../js/duels/blackjack.js"></script>
+    <script src="../js/duels/cardbattle.js"></script>
 </body>
-
 </html>
