@@ -5,15 +5,15 @@
     const gameContainer = document.getElementById('game');
 
     // Сохраняем оригинальные стили
-    if (betContainer) {
-        betContainer.style.width = '400px';
-        betContainer.style.flexShrink = '0';
-    }
+    // if (betContainer) {
+    //     betContainer.style.width = '400px';
+    //     betContainer.style.flexShrink = '0';
+    // }
 
-    if (gameContainer) {
-        gameContainer.style.flex = '1';
-        gameContainer.style.minWidth = '0';
-    }
+    // if (gameContainer) {
+    //     gameContainer.style.flex = '1';
+    //     gameContainer.style.minWidth = '0';
+    // }
 
     // Создаем контейнер для блока с игроками
     const playersContainer = document.createElement('div');
@@ -256,21 +256,12 @@
         mainContainer.innerHTML = '';
 
         const flexContainer = document.createElement('div');
-        flexContainer.style.cssText = `
-            display: flex;
-            height: calc(100vh - 65px);
-            width: 100%;
-        `;
+        flexContainer.className = 'crash-layout'; // Класс вместо инлайн-стилей
+        flexContainer.id = 'crash-layout';
 
-        betContainer.style.height = '100%';
-        betContainer.style.width = '400px';
-        betContainer.style.flexShrink = '0';
-        betContainer.style.borderRight = '3px solid orange';
-
-        gameContainer.style.height = '100%';
-        gameContainer.style.flex = '1';
-        gameContainer.style.minWidth = '0';
-        gameContainer.style.borderRight = 'none';
+        // Очищаем стили, навязанные ранее
+        betContainer.removeAttribute('style');
+        gameContainer.removeAttribute('style');
 
         flexContainer.appendChild(betContainer);
         flexContainer.appendChild(gameContainer);

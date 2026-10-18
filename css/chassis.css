@@ -175,3 +175,126 @@ main {
     height: 48px;
     margin-right: 24px;
 }
+
+/* ============ АДАПТИВ ШАПКИ САЙТА ============ */
+@media (max-width: 850px) {
+    /* Шапка становится резиновой по высоте */
+    header {
+        position: relative; /* Отпускаем в поток, чтобы она не наезжала */
+        height: auto;
+        padding: 10px 0;
+    }
+    
+    /* main больше не привязан к фиксированной высоте 64px */
+    main {
+        top: 0 !important;
+        height: auto !important;
+        min-height: calc(100vh - 60px);
+        flex-direction: column; /* ГЛАВНОЕ: контент и панель игроков друг под другом */
+    }
+}
+
+/* Планшеты и небольшие ноутбуки */
+@media (max-width: 768px) {
+    header {
+        height: 56px;
+    }
+    main {
+        height: calc(100vh - 56px);
+        top: 56px;
+    }
+    header ul {
+        padding: 0 15px;
+    }
+    header #web-name a {
+        font-size: 20px;
+        padding: 0 10px 0 0;
+    }
+    #web-logo {
+        width: 34px;
+        height: 34px;
+        margin-right: 10px;
+    }
+    header #balance {
+        font-size: 16px;
+        padding: 0 10px;
+    }
+    #refill a {
+        padding: 6px 12px;
+        font-size: 15px;
+    }
+}
+
+/* Мобильные телефоны */
+@media (max-width: 500px) {
+    header {
+        height: 50px;
+    }
+    main {
+        height: calc(100vh - 50px);
+        top: 50px;
+    }
+    header ul {
+        padding: 0 8px;
+    }
+    
+    /* Скрываем текст названия сайта, оставляем только иконку */
+    header #web-name a {
+        font-size: 0;
+        padding: 0;
+    }
+    #web-logo {
+        width: 32px;
+        height: 32px;
+        margin-right: 0;
+    }
+    
+    /* Уменьшаем баланс */
+    header #balance {
+        font-size: 13px;
+        padding: 0 6px;
+    }
+    
+    /* Уменьшаем кнопку пополнения */
+    #refill {
+        margin-left: 6px;
+    }
+    #refill a {
+        font-size: 13px;
+        padding: 6px 8px;
+    }
+    
+    /* Адаптив модального окна пополнения (перебиваем инлайн-стили) */
+    #dep-block {
+        width: 92% !important;
+        padding: 20px 15px !important;
+    }
+    #dep-block h3 {
+        font-size: 20px;
+        margin-bottom: 15px;
+    }
+    #dep-block input {
+        padding: 10px;
+        font-size: 14px;
+        margin: 8px 0;
+    }
+}
+
+/* Очень узкие экраны (например, iPhone SE, старые Android) */
+@media (max-width: 380px) {
+    /* Прячем слово "Баланс:" оставляя только цифры */
+    header #balance {
+        font-size: 0;
+    }
+    #bal-header {
+        font-size: 14px;
+        margin-left: 0;
+    }
+    /* Добавляем значок рубля через псевдоэлемент, так как он был текстом */
+    header #balance::after { 
+        content: ' ₽'; 
+        font-size: 14px; 
+        color: #fff;
+    }
+}
+

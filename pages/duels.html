@@ -7,6 +7,10 @@
     <link rel="stylesheet" href="../css/chassis.css">
     <link rel="stylesheet" href="../css/duels-bg.css">
     <link rel="stylesheet" href="../css/duels.css">
+    <link rel="stylesheet" href="../css/duels-dice.css">
+    <link rel="stylesheet" href="../css/duels-race.css">
+    <link rel="stylesheet" href="../css/duels-blackjack.css">
+    <link rel="stylesheet" href="../css/duels-cardbattle.css">
     <title>DUELS | BETTER-X</title>
     <link rel="icon" href="../img/logo.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -165,28 +169,90 @@
 
             <!-- АРЕНА КАРТОЧНЫХ БОЁВ -->
             <div class="cardbattle-arena" id="cardbattle-arena" style="display: none;">
-                <div class="cb-side cb-opp">
-                    <div class="cb-avatar-row">
-                        <span class="cb-name" id="cb-opp-name">—</span>
-                        <span class="cb-hp-text" id="cb-opp-hp-text">100 / 100</span>
+                <div class="cb-main">
+                    <div class="cb-side cb-opp">
+                        <div class="cb-avatar-row">
+                            <span class="cb-name" id="cb-opp-name">—</span>
+                            <span class="cb-hp-text" id="cb-opp-hp-text">100 / 100</span>
+                        </div>
+                        <div class="cb-hp-bar"><div class="cb-hp-fill" id="cb-opp-hp-fill"></div></div>
+                        <div class="cb-hand cb-hand-opp" id="cb-opp-hand"></div>
                     </div>
-                    <div class="cb-hp-bar"><div class="cb-hp-fill" id="cb-opp-hp-fill"></div></div>
-                    <div class="cb-hand cb-hand-opp" id="cb-opp-hand"></div>
-                </div>
-                <div class="cb-center">
-                    <div class="cb-turn-indicator" id="cb-turn-indicator">Ожидание...</div>
-                    <div class="cb-log" id="cb-log"></div>
-                    <div class="cb-actions-row" id="cb-player-actions" style="display:none;">
-                        <button id="cb-draw-btn" class="cb-action-btn">🃏 Взять 2 карты</button>
-                        <button id="cb-pass-btn" class="cb-action-btn">⏭️ Завершить ход</button>
+
+                    <div class="cb-center">
+                        <div class="cb-turn-row">
+                            <div class="cb-turn-indicator" id="cb-turn-indicator">Ожидание...</div>
+                            <div class="cb-turn-timer" id="cb-turn-timer" style="display:none;">30</div>
+                            <button id="cb-help-btn" class="cb-help-btn" title="Как играть">?</button>
+                        </div>
+                        <div class="cb-actions-row" id="cb-player-actions" style="display:none;">
+                            <button id="cb-draw-btn" class="cb-action-btn">🃏 Взять 2 карты</button>
+                            <button id="cb-pass-btn" class="cb-action-btn">⏭️ Завершить ход</button>
+                        </div>
+                    </div>
+
+                    <div class="cb-side cb-you">
+                        <div class="cb-hand cb-hand-you" id="cb-you-hand"></div>
+                        <div class="cb-hp-bar"><div class="cb-hp-fill" id="cb-you-hp-fill"></div></div>
+                        <div class="cb-avatar-row">
+                            <span class="cb-name">Вы</span>
+                            <span class="cb-hp-text" id="cb-you-hp-text">100 / 100</span>
+                        </div>
                     </div>
                 </div>
-                <div class="cb-side cb-you">
-                    <div class="cb-hand cb-hand-you" id="cb-you-hand"></div>
-                    <div class="cb-hp-bar"><div class="cb-hp-fill" id="cb-you-hp-fill"></div></div>
-                    <div class="cb-avatar-row">
-                        <span class="cb-name">Вы</span>
-                        <span class="cb-hp-text" id="cb-you-hp-text">100 / 100</span>
+
+                <div class="cb-log-panel">
+                    <div class="cb-log-header">📜 Лог боя</div>
+                    <div class="cb-log-scroll" id="cb-log">
+                        <div class="cb-log-empty">Бой начнётся, как только нажмёте «Начать»</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- МОДАЛКА "КАК ИГРАТЬ" -->
+            <div id="cb-help-modal" class="modal-overlay" style="display: none;">
+                <div class="modal-content">
+                    <h2>🃏 Как играть</h2>
+                    <div class="cb-help-body">
+                        <p>Цель — снизить HP соперника до 0. У каждого 100 HP.</p>
+
+                        <h3>Типы карт</h3>
+                        <ul>
+                            <li><b>⚔️ Действия</b> (красная кайма) — атаки, яды, комбо. <b>Завершают ход.</b></li>
+                            <li><b>🛡️ Баффы</b> (зелёная кайма) — щиты, лечение, усиления. <b>Ход не завершают.</b></li>
+                        </ul>
+
+                        <h3>Правила хода</h3>
+                        <ul>
+                            <li>Можно сыграть <b>до 2 баффов</b> за ход.</li>
+                            <li>Если сыграл <b>хотя бы 1 бафф</b> — нельзя атаковать или брать карты.</li>
+                            <li>Можно <b>взять 2 карты</b> вместо действия (тоже завершает ход).</li>
+                            <li>У тебя <b>30 секунд</b> на ход. Не успел — ход переходит.</li>
+                        </ul>
+
+                        <h3>Ключевые механики</h3>
+                        <ul>
+                            <li>🧪 <b>Яд</b> — 5 урона в начале хода цели.</li>
+                            <li>🩸 <b>Кровотечение</b> — 3 урона в начале хода.</li>
+                            <li>🎯 <b>Уязвимость</b> — цель получает +50% урона (3 хода).</li>
+                            <li>😡 <b>Ярость</b> — усиливает следующую атаку на 10.</li>
+                            <li>🌵 <b>Шипы</b> — атакующий получает 10 урона один раз.</li>
+                            <li>🔮 <b>Отражение</b> — 50% следующего урона обратно.</li>
+                            <li>💨 <b>Уклонение</b> — блокирует следующую атаку.</li>
+                        </ul>
+
+                        <h3>Особые карты</h3>
+                        <ul>
+                            <li>🍀 <b>Удача</b> — усиливает следующую атаку на 5 (стакается с яростью).</li>
+                            <li>🧿 <b>Амулет</b> — даёт иммунитет к яду и кровотечению на 3 хода.</li>
+                            <li>☠️ <b>Заражение</b> — 4 урона, но 10, если на враге есть яд или кровь.</li>
+                            <li>🌪️ <b>Вихрь</b> — наносит 3 урона за каждую карту в вашей руке.</li>
+                            <li>👁️ <b>Прозрение</b> — раскрывает руку соперника на 2 хода.</li>
+                            <li>📜 <b>Проклятая книга</b> — берёт сразу 3 карты, но отнимает 5 HP.</li>
+                        </ul>
+                    </div>
+                    <div class="modal-buttons">
+                        <button id="cb-help-close" class="btn-confirm">ПОНЯТНО</button>
                     </div>
                 </div>
             </div>

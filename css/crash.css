@@ -549,54 +549,6 @@ main #game {
     border-color: rgb(50, 50, 50) !important;
 }
 
-/* Адаптивность для мобильных устройств */
-@media (max-width: 1024px) {
-    main #bet {
-        width: 400px;
-    }
-
-    main #game {
-        width: calc(100% - 400px);
-    }
-
-    #bet-place button {
-        min-width: 120px;
-        font-size: 16px;
-    }
-
-    #divstatus {
-        font-size: 14px;
-    }
-}
-
-@media (max-width: 768px) {
-    main #bet {
-        width: 320px;
-    }
-
-    main #game {
-        width: calc(100% - 320px);
-    }
-
-    #game-bc {
-        font-size: 32px;
-    }
-
-    #x {
-        font-size: 48px;
-    }
-
-    .slot {
-        min-width: 70px;
-        font-size: 16px;
-        height: 50px;
-    }
-
-    .hb {
-        font-size: 14px;
-    }
-}
-
 /* ===== Инвентарь в Crash ===== */
 .inventory-section {
     margin: 12px 0 8px 0;
@@ -715,13 +667,183 @@ main #game {
     margin-top: 2px;
 }
 
-/* Адаптация под мобильные */
-@media (max-width: 768px) {
-    .inventory-list {
-        max-height: 120px;
+/* ============ НОВАЯ СТРУКТУРА И АДАПТИВ CRASH ============ */
+
+/* Жесткая структура для десктопа (так как мы убрали стили из JS) */
+main {
+    height: calc(100vh - 64px);
+    width: 100%;
+    top: 64px;
+    position: relative;
+    display: flex;
+    overflow: hidden;
+}
+
+.crash-layout {
+    display: flex;
+    height: 100%;
+    width: 100%;
+}
+
+main #bet {
+    width: 400px;
+    height: 100%;
+    flex-shrink: 0;
+    border-right: 3px solid orange;
+}
+
+main #game {
+    flex: 1;
+    min-width: 0;
+    height: 100%;
+    border-right: none;
+}
+
+#players-container {
+    width: 340px;
+    flex-shrink: 0;
+    height: 100%;
+}
+
+/* --- АДАПТИВ --- */
+
+/* Планшеты: прячем блок игроков, чтобы освободить место */
+@media (max-width: 1200px) {
+    #players-container {
+        display: none !important;
+    }
+    main #bet {
+        width: 360px;
+    }
+    #game-bc { font-size: 40px; }
+    #x { font-size: 64px; }
+}
+
+/* Мобильные устройства: вертикальный стек */
+@media (max-width: 850px) {
+    body {
+        overflow-y: auto; /* Разрешаем скролл всей странице */
     }
 
-    .current-bet-display .amount {
-        font-size: 18px;
+    main {
+        height: auto;
+        min-height: calc(100vh - 64px);
+        overflow: visible;
     }
+
+    .crash-layout {
+        flex-direction: column; /* Игра сверху, ставка снизу */
+    }
+
+    /* Игра наверх и фиксируем высоту */
+    main #game {
+        width: 100%;
+        height: 45vh;
+        min-height: 300px;
+        order: -1; /* Игра всегда первая */
+        border-bottom: 3px solid orange;
+        border-right: none;
+    }
+
+    /* Панель ставок вниз */
+    main #bet {
+        width: 100%;
+        height: auto;
+        flex: 1;
+        border-right: none;
+    }
+
+    #game-bc { font-size: 28px; margin-bottom: 20px; }
+    #x { font-size: 50px; }
+    #crash-text { font-size: 36px; }
+    #timer-container { font-size: 18px; padding: 8px; }
+
+    /* Внутренности панели ставок */
+    #bet-place {
+        padding: 12px;
+        min-height: auto;
+    }
+    
+    #bet-h { font-size: 20px; margin-bottom: 10px; }
+    
+    #history-game {
+        height: auto;
+        min-height: 140px;
+        padding: 12px;
+    }
+    #history-game h2 { font-size: 20px; margin-bottom: 8px; }
+
+    #history-bal {
+        padding: 12px;
+        min-height: 250px;
+    }
+    #history-bal h2 { font-size: 20px; margin-bottom: 8px; }
+    
+    /* Инвентарь в горизонтальную ленту со скроллом */
+    .inventory-list {
+        flex-direction: row;
+        overflow-x: auto;
+        overflow-y: hidden;
+        max-height: none;
+        padding-bottom: 8px;
+        gap: 8px;
+        -webkit-overflow-scrolling: touch;
+    }
+    
+    .inventory-list::-webkit-scrollbar { height: 6px; }
+    .inventory-list::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); border-radius: 3px; }
+    .inventory-list::-webkit-scrollbar-thumb { background: orange; border-radius: 3px; }
+
+    .inventory-item-card {
+        flex-shrink: 0;
+        width: 140px;
+        padding: 6px 10px;
+    }
+    
+    .inventory-empty { width: 100%; text-align: center; padding: 10px; }
+
+    /* Текущая ставка */
+    .current-bet-display {
+        margin: 8px 0;
+        padding: 8px;
+    }
+    .current-bet-display .amount { font-size: 20px; }
+
+    /* Поля ввода в ряд */
+    .inputs-container {
+        flex-direction: row;
+        gap: 8px;
+    }
+
+    .slot { min-width: 75px; font-size: 16px; height: 50px; }
+    .hb { font-size: 13px; padding: 6px; }
+}
+
+/* Очень узкие экраны */
+@media (max-width: 500px) {
+    .inputs-container {
+        flex-direction: column; /* Поля ввода в колонку */
+    }
+
+    #bet-place .bottom-row {
+        flex-direction: column; /* Статус и кнопка друг под другом */
+        align-items: stretch;
+        gap: 8px;
+    }
+
+    #divstatus {
+        width: 100%;
+        justify-content: center;
+    }
+
+    #bet-place button {
+        width: 100%;
+        height: 44px; /* Удобная кнопка для тапа */
+    }
+
+    main #game {
+        height: 40vh;
+        min-height: 260px;
+    }
+    #x { font-size: 44px; }
 }

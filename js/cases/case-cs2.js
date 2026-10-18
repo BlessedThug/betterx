@@ -298,12 +298,19 @@ function createWheelContainer() {
 }
 
 function startWheelSpin(track, winIndex, winItem) {
-    const itemWidth = 200;
+    const firstItem = track.firstElementChild;
+    const itemWidth = firstItem ? firstItem.offsetWidth : 180;
+    const gap = parseFloat(window.getComputedStyle(track).gap) || 20;
+    const totalItemWidth = itemWidth + gap;
+
     const parentWidth = track.parentElement.offsetWidth;
-    const target = -((winIndex * itemWidth) - (parentWidth / 2) + (itemWidth / 2));
-    track.style.transform = 'translate(100px, -50%)';
+    const target = -((winIndex * totalItemWidth) - (parentWidth / 2) + (itemWidth / 2));
+
+    track.style.transition = 'none';
+    track.style.transform = 'translate(0px, -50%)';
+    
     setTimeout(() => {
-        track.style.transition = 'transform 3.5s cubic-bezier(0.1, 0.7, 0.1, 1)';
+        track.style.transition = 'transform 3.5s cubic-bezier(0.1,0.7,0.1,1)';
         track.style.transform = `translate(${target}px, -50%)`;
         setTimeout(() => showWinResult(winItem), 3500);
     }, 100);

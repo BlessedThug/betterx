@@ -194,3 +194,54 @@
         transform: translate(-50%, -50%) scale(1);
     }
 }
+
+/* ============ АДАПТИВ ИНВЕНТАРЯ ============ */
+
+@media (max-width: 768px) {
+    #m-inventory {
+        padding: 20px 10px !important;
+        margin: 10px 0 !important;
+    }
+    #m-inventory h1 {
+        font-size: 32px !important;
+        margin-bottom: 25px !important;
+    }
+    #m-inf-inv {
+        padding: 15px !important;
+        margin-bottom: 15px !important;
+    }
+    #m-inf-inv p {
+        font-size: 16px !important;
+    }
+    #m-inf-inv #rub {
+        font-size: 20px !important;
+    }
+
+    /* Сетка предметов */
+    .inventory-items-container {
+        grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)) !important;
+        gap: 10px !important;
+        padding: 10px 0 !important;
+    }
+    
+    .inventory-item {
+        padding: 10px !important;
+        border-radius: 10px !important;
+    }
+    .inventory-item img {
+        width: 70px !important;
+        height: 70px !important;
+        margin-bottom: 5px !important;
+    }
+    .inventory-item p {
+        font-size: 12px !important;
+    }
+    .inventory-item .item-price {
+        font-size: 14px !important;
+    }
+    .sell-item-btn {
+        padding: 6px 10px !important;
+        font-size: 12px !important;
+        margin-top: 5px !important;
+    }
+}

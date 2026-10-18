@@ -866,129 +866,307 @@
     }
 }
 
-/* Адаптивность панели */
-@media (max-width: 1200px) {
+/* ============ АДАПТИВ КЕЙСОВ И РУЛЕТКИ ============ */
+
+/* Планшеты: прячем боковую панель вниз, если она мешает */
+@media (max-width: 1100px) {
     #live-drop-panel {
-        width: 300px;
+        width: 280px; /* Сужаем панель дропов */
     }
-
+    .drop-item {
+        padding: 8px;
+    }
     .drop-item .drop-icon {
-        width: 40px;
-        height: 40px;
-    }
-
-    .drop-item .drop-nick {
-        font-size: 13px;
-    }
-
-    .drop-item .drop-name {
-        font-size: 12px;
-    }
-
-    .drop-item .drop-price {
-        font-size: 13px;
+        width: 36px;
+        height: 36px;
     }
 }
 
 @media (max-width: 992px) {
-    .cases-main-wrapper {
-        flex-direction: column;
-    }
-
     #live-drop-panel {
-        width: 100%;
-        height: 300px;
-        border-left: none;
+        width: 100% !important; /* Перебиваем инлайн-стили JS */
+        height: 250px !important;
+        position: relative !important; /* Больше не липнет к боку */
+        border-left: none !important;
         border-top: 3px solid orange;
-        position: relative;
-        flex-shrink: 0;
     }
 
+    /* Список дропов становится горизонтальным */
     #live-drop-list {
-        flex-direction: row;
-        overflow-x: auto;
-        overflow-y: hidden;
-        padding: 10px;
-        gap: 12px;
-        flex-wrap: nowrap;
+        flex-direction: row !important;
+        overflow-x: auto !important;
+        overflow-y: hidden !important;
+        flex-wrap: nowrap !important;
+        padding: 10px !important;
     }
 
     .drop-item {
-        min-width: 220px;
+        min-width: 200px;
         flex-shrink: 0;
-        animation: dropSlideInHorizontal 0.4s ease-out;
-    }
-
-    @keyframes dropSlideInHorizontal {
-        from {
-            opacity: 0;
-            transform: translateX(-20px) scale(0.95);
-        }
-
-        to {
-            opacity: 1;
-            transform: translateX(0) scale(1);
-        }
     }
 }
 
+/* Мобильные телефоны */
 @media (max-width: 768px) {
+    .case-base {
+        padding: 20px 10px !important;
+        margin: 10px 0 !important;
+        border-radius: 12px !important;
+    }
+    
+    .case-base h1 {
+        font-size: 28px !important;
+        margin-bottom: 20px !important;
+        letter-spacing: 1px !important;
+    }
+    
+    .case-base h2 {
+        font-size: 22px !important;
+        margin: 30px auto 20px !important;
+    }
+
+    /* Кнопка открытия */
+    .case-open-btn {
+        margin: 30px 0 10px !important;
+    }
+    .case-open-btn button {
+        padding: 14px 20px !important;
+        font-size: 18px !important;
+        min-width: 200px !important;
+        width: 90% !important;
+    }
+
+    /* Перебиваем инлайн-стили рулетки из JS */
+    div[id$="-wheel-container"] {
+        height: 200px !important;
+        margin: 20px auto !important;
+        border-width: 2px !important;
+    }
+    div[id$="-wheel-track"] {
+        height: 140px !important;
+        gap: 10px !important;
+        padding: 0 10px !important;
+    }
+    .wheel-item {
+        min-width: 110px !important;
+        height: 110px !important;
+        padding: 8px !important;
+    }
+    .wheel-item img {
+        width: 60px !important;
+        height: 60px !important;
+    }
+    .wheel-item p {
+        font-size: 12px !important;
+        margin-top: 4px !important;
+        line-height: 1.1 !important;
+    }
+    
+    /* Указатель рулетки */
+    div[id$="-wheel-pointer"], div[id$="-wheel-container"] > div:nth-child(2) {
+        height: 160px !important;
+    }
+
+    /* Содержимое кейса (сетка предметов) */
+    .case-content {
+        grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)) !important;
+        gap: 12px !important;
+        padding: 15px 10px !important;
+    }
+    .content {
+        padding: 10px !important;
+    }
+    .content img {
+        width: 80px !important;
+        height: 80px !important;
+        margin-bottom: 10px !important;
+    }
+    .content p {
+        font-size: 13px !important;
+        padding: 6px 10px !important;
+    }
+
+    /* Перебиваем инлайн-стили окон выигрыша */
+    div[id^="win-choice-dialog"] {
+        min-width: auto !important;
+        width: 92% !important;
+        padding: 20px 15px !important;
+        border-width: 3px !important;
+    }
+    div[id^="win-choice-dialog"] h2 {
+        font-size: 18px !important;
+        margin-bottom: 10px !important;
+    }
+    div[id^="win-choice-dialog"] img {
+        width: 100px !important;
+        height: 100px !important;
+        margin: 10px auto !important;
+    }
+    div[id^="win-choice-dialog"] h3 {
+        font-size: 16px !important;
+    }
+    div[id^="win-choice-dialog"] p {
+        font-size: 16px !important;
+    }
+    /* Кнопки в диалоге ставим друг под другом */
+    div[id^="win-choice-dialog"] > div {
+        flex-direction: column !important;
+        gap: 10px !important;
+    }
+    div[id^="win-choice-dialog"] button {
+        width: 100% !important;
+        padding: 12px !important;
+        font-size: 14px !important;
+    }
+
+    /* Панель последних выигрышей */
     #live-drop-panel {
-        height: 250px;
+        height: 200px !important;
+        border-top-width: 2px !important;
     }
-
+    #live-drop-panel .panel-header {
+        padding: 10px !important;
+        font-size: 14px !important;
+    }
     .drop-item {
-        min-width: 180px;
-        padding: 8px 12px;
+        min-width: 160px !important;
     }
-
-    .drop-item .drop-icon {
-        width: 32px;
-        height: 32px;
+     /* Отменяем маргины, чтобы блоки не сжимались */
+    #m-catalog, #m-inventory, .case-base {
+        margin: 10px 0 !important; 
+        width: 100% !important;
     }
-
-    .drop-item .drop-nick {
-        font-size: 12px;
-    }
-
-    .drop-item .drop-name {
-        font-size: 11px;
-    }
-
-    .drop-item .drop-price {
-        font-size: 12px;
+    
+    /* Обертка multiplayer.js должна занимать 100% ширины */
+    .cases-main-wrapper {
+        width: 100% !important;
+        flex: none !important;
     }
 }
 
 @media (max-width: 480px) {
-    #live-drop-panel {
-        height: 200px;
+    .case-base h1 { font-size: 24px !important; }
+    .case-base h2 { font-size: 18px !important; }
+    
+    .case-content {
+        grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)) !important;
+        gap: 8px !important;
+    }
+    .content img {
+        width: 60px !important;
+        height: 60px !important;
+    }
+    .content p {
+        font-size: 11px !important;
+    }
+}
+
+/* ============ ФИКСЫ ДЛЯ МОБИЛЬНЫХ ============ */
+@media (max-width: 768px) {
+    /* Убираем абсолютное позиционирование у кнопки "Назад". 
+       Обращаемся по классу .back-to-catalog, который точно есть в JS. */
+    .back-to-catalog {
+        position: static !important;
+        margin: 0 0 15px 0 !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        padding: 8px 16px !important;
+        font-size: 14px !important;
+        width: auto !important;
+        border-radius: 8px !important;
+        background: rgba(255, 165, 0, 0.2) !important;
+        color: orange !important;
+        border: 2px solid rgba(255, 165, 0, 0.4) !important;
     }
 
-    .drop-item {
-        min-width: 150px;
-        padding: 6px 10px;
-        gap: 8px;
+    /* Сдвигаем заголовок кейса, чтобы он был под кнопкой */
+    .case-base h1 {
+        margin-top: 0 !important;
+        margin-bottom: 20px !important;
+        font-size: 24px !important;
     }
+}
 
-    .drop-item .drop-icon {
-        width: 28px;
-        height: 28px;
+/* ============ ФИКС ОКНА ВЫИГРЫША (В РУЛЕТКЕ) ============ */
+div[id$="-win-display"] {
+    max-width: 90% !important;
+    width: max-content !important; /* Подстраивается под текст */
+    min-width: 250px !important;
+    box-sizing: border-box !important;
+    padding: 20px 30px !important; /* Уменьшаем отступы */
+    /* УБРАЛИ display: flex !important, чтобы не перебивать display: none из JS */
+}
+
+/* Уменьшаем картинку внутри окна */
+div[id$="-win-display"] img {
+    width: 100px !important;
+    height: 100px !important;
+    margin: 0 auto 10px auto !important;
+    display: block !important;
+    filter: drop-shadow(0 0 10px #ff8a00) !important;
+}
+
+/* Перебиваем огромный шрифт (28px) и разрешаем перенос строк */
+div[id$="-win-display"] div[id$="-win-text"] {
+    font-size: 18px !important;
+    line-height: 1.4 !important;
+    text-align: center !important;
+    word-wrap: break-word !important;
+    white-space: normal !important;
+    max-width: 100% !important;
+    margin: 0 auto !important;
+}
+
+/* Фикс для очень узких экранов */
+@media (max-width: 480px) {
+    div[id$="-win-display"] {
+        padding: 15px !important;
+        min-width: 200px !important;
     }
-
-    .drop-item .drop-nick {
-        font-size: 11px;
+    
+    div[id$="-win-display"] img {
+        width: 80px !important;
+        height: 80px !important;
     }
-
-    .drop-item .drop-name {
-        font-size: 10px;
+    
+    div[id$="-win-display"] div[id$="-win-text"] {
+        font-size: 15px !important;
     }
+}
 
-    .drop-item .drop-price {
-        font-size: 11px;
-    }
+/* ============ СТИЛИ ДЛЯ КНОПКИ "НАЗАД" ============ */
+.back-to-catalog {
+    position: absolute;
+    top: 30px;
+    left: 30px;
+    background: rgba(255, 165, 0, 0.2);
+    color: orange;
+    border: 2px solid rgba(255, 165, 0, 0.4);
+    padding: 10px 20px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    z-index: 10;
+    font-family: 'Noto Sans', sans-serif;
+}
 
-    .drop-item .drop-time {
-        font-size: 10px;
+.back-to-catalog:hover {
+    background: rgba(255, 165, 0, 0.3);
+    transform: translateX(-5px);
+}
+
+/* На мобильных устройствах кнопка становится обычной и встает над заголовком */
+@media (max-width: 768px) {
+    .back-to-catalog {
+        position: static !important;
+        display: inline-flex !important;
+        align-items: center;
+        justify-content: center;
+        width: 100% !important; /* Растягиваем на всю ширину для удобства нажатия */
+        margin: 0 0 15px 0 !important;
+        padding: 10px !important;
     }
 }
