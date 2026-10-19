@@ -25,12 +25,13 @@
         antidote:   { name: 'Антидот',         icon: '💉', desc: 'Снять яд/кровь, +4 HP', type: 'buff',   value: 4,  rarity: 2, weight: 4 },
         thorns:     { name: 'Шипы',            icon: '🌵', desc: '10 урона атакующему',   type: 'buff',   value: 10, rarity: 2, weight: 4 },
         blessing:   { name: 'Благословение',   icon: '🌟', desc: '+8 HP и +5 щита',       type: 'buff',   value: 8,  rarity: 2, weight: 4 },
-        infection:  { name: 'Заражение',       icon: '☠️', desc: '4/10 урона (если есть яд)', type: 'action', value: 4, rarity: 2, weight: 4 },
+        infection:  { name: 'Заражение',       icon: '☠️', desc: '4/10 урона (если есть яд/кровь)', type: 'action', value: 4, rarity: 2, weight: 4 },
         luck:       { name: 'Удача',           icon: '🍀', desc: '+5 к след. атаке',      type: 'buff',   value: 5,  rarity: 2, weight: 4 },
-        insight:    { name: 'Прозрение',       icon: '👁️', desc: 'Видеть руку врага (2 х.)', type: 'buff', value: 0, rarity: 2, weight: 4 },
+        insight:    { name: 'Прозрение',       icon: '👁️', desc: 'Видеть руку врага (3 х.)', type: 'buff', value: 0, rarity: 2, weight: 4 },
+        gamble:     { name: 'Азарт',           icon: '🎰', desc: '50%: 30 урона / 15 себе', type: 'action', value: 0, rarity: 2, weight: 3 },
 
         // Rare
-        fireball:   { name: 'Огненный шар',    icon: '🔥', desc: '12 урона + поджог',     type: 'action', value: 12, rarity: 3, weight: 3 },
+        fireball:   { name: 'Огненный шар',    icon: '🔥', desc: '12 урона + горение',    type: 'action', value: 12, rarity: 3, weight: 3 },
         bleed:      { name: 'Кровотечение',    icon: '🩸', desc: '6 урона + DOT 3×3',     type: 'action', value: 6,  rarity: 3, weight: 3 },
         vulnerable: { name: 'Уязвимость',      icon: '🎯', desc: 'Враг +50% урона (3 х)', type: 'buff',   value: 0,  rarity: 3, weight: 3 },
         ritual:     { name: 'Ритуал',          icon: '💀', desc: '-8 HP, 20 урона',       type: 'action', value: 20, rarity: 3, weight: 3 },
@@ -41,11 +42,14 @@
         whirlwind:  { name: 'Вихрь',           icon: '🌪️', desc: '3 урона за карту в руке', type: 'action', value: 3, rarity: 3, weight: 3 },
         amulet:     { name: 'Амулет',          icon: '🧿', desc: 'Иммунитет к DOT (3 х.)', type: 'buff',  value: 0,  rarity: 3, weight: 3 },
         cursed_book:{ name: 'Проклятая книга', icon: '📜', desc: '+3 карты, -5 HP',       type: 'action', value: 5,  rarity: 3, weight: 2 },
+        mind_read:  { name: 'Чтение мыслей',   icon: '👁️‍🗨️', desc: 'Раскрыть текущие карты', type: 'buff', value: 0, rarity: 3, weight: 3 },
+        frost:      { name: 'Заморозка',       icon: '❄️', desc: 'Пропуск 2 ходов врагом', type: 'action', value: 0,  rarity: 3, weight: 2 },
 
         // Legendary
         execution:  { name: 'Казнь',           icon: '☠️', desc: '30 урона (<50 HP)',     type: 'action', value: 30, rarity: 4, weight: 1 },
         phoenix:    { name: 'Феникс',          icon: '🦅', desc: 'Полн. лечение (<25 HP)', type: 'buff',  value: 100, rarity: 4, weight: 1 },
-        ultimate:   { name: 'Ультиматум',      icon: '⚡', desc: '25 урона, +10 HP',       type: 'action', value: 25, rarity: 4, weight: 1 }
+        ultimate:   { name: 'Ультиматум',      icon: '⚡', desc: '25 урона, +10 HP',       type: 'action', value: 25, rarity: 4, weight: 1 },
+        steal:      { name: 'Кража',           icon: '🦹', desc: 'Украсть 1 карту врага',  type: 'action', value: 0,  rarity: 4, weight: 1 }
     };
 
     function drawCard() {
@@ -60,6 +64,7 @@
     let youHP = 100, oppHP = 100;
     let youShield = 0, oppShield = 0;
     let youPoison = 0, oppPoison = 0;
+    let youBurn = 0, oppBurn = 0;     // Новый статус: Горение
     let youBleed = 0, oppBleed = 0;
     let youVulnerable = 0, oppVulnerable = 0;
     let youAtkBuff = 0, oppAtkBuff = 0;
@@ -68,7 +73,10 @@
     let youReflect = false, oppReflect = false;
     let youEvasion = false, oppEvasion = false;
     let youAmulet = 0, oppAmulet = 0;
+    let youSkipTurns = 0, oppSkipTurns = 0; // Заменили флаг на счётчик ходов
+
     let youHand = [], oppHand = [];
+    
     let currentTurn = 'you';
     let cbPhase = 'idle';
     let cbActionTimer = null;
@@ -112,8 +120,7 @@
     // ============ СЛОЖНОСТЬ ИИ ============
     function pickDifficulty() {
         const r = Math.random();
-        if (r < 0.33) return 'novice';
-        if (r < 0.66) return 'amateur';
+        if (r < 0.5) return 'amateur';
         return 'expert';
     }
 
@@ -177,6 +184,7 @@
             if (youAtkBuff > 0) arr.push(`😡+${youAtkBuff}`);
             if (youLuck > 0) arr.push(`🍀+${youLuck}`);
             if (youPoison > 0) arr.push(`🧪${youPoison}`);
+            if (youBurn > 0) arr.push(`🔥${youBurn}`);
             if (youBleed > 0) arr.push(`🩸${youBleed}`);
             if (youVulnerable > 0) arr.push(`🎯${youVulnerable}`);
             if (youThorns > 0) arr.push(`🌵${youThorns}`);
@@ -188,6 +196,7 @@
             if (oppAtkBuff > 0) arr.push(`😡+${oppAtkBuff}`);
             if (oppLuck > 0) arr.push(`🍀+${oppLuck}`);
             if (oppPoison > 0) arr.push(`🧪${oppPoison}`);
+            if (oppBurn > 0) arr.push(`🔥${oppBurn}`);
             if (oppBleed > 0) arr.push(`🩸${oppBleed}`);
             if (oppVulnerable > 0) arr.push(`🎯${oppVulnerable}`);
             if (oppThorns > 0) arr.push(`🌵${oppThorns}`);
@@ -206,8 +215,8 @@
         DOM.cbOppHPText.innerHTML = `${oppHP} / 100 ${formatStatusIcons(false)}`;
 
         DOM.cbYouHandEl.innerHTML = '';
-        youHand.forEach((cardId, i) => {
-            const card = CARDS[cardId];
+        youHand.forEach((cardObj, i) => {
+            const card = CARDS[cardObj.id];
             const el = document.createElement('div');
             el.className = `cb-card type-${card.type} rarity-${card.rarity}`;
 
@@ -228,10 +237,12 @@
         });
 
         DOM.cbOppHandEl.innerHTML = '';
-        oppHand.forEach((cardId, i) => {
+        oppHand.forEach((cardObj, i) => {
             const el = document.createElement('div');
-            if (oppHandRevealed > 0) {
-                const card = CARDS[cardId];
+            const isRevealed = cardObj.revealed || oppHandRevealed > 0;
+
+            if (isRevealed) {
+                const card = CARDS[cardObj.id];
                 el.className = `cb-card type-${card.type} rarity-${card.rarity} disabled`;
                 el.innerHTML = `
                     <div class="cb-card-icon">${card.icon}</div>
@@ -352,8 +363,8 @@
             }
             case 'Огненный шар': {
                 const res = dealCardDamage(isPlayer, actionValue);
-                if (isPlayer) oppPoison += 2; else youPoison += 2;
-                let msg = `${res.hpLost} урона + поджог`;
+                if (isPlayer) oppBurn += 3; else youBurn += 3;
+                let msg = `${res.hpLost} урона + горение`;
                 if (res.evaded) msg = `уклонился`;
                 else if (res.absorbed > 0) msg += ` (щит: -${res.absorbed})`;
                 logCbMessage(`🔥 ${msg}`, isPlayer ? 'you' : 'opp');
@@ -439,6 +450,49 @@
                 logCbMessage(`💀 Ритуал: -8 HP, ${res.hpLost} урона`, isPlayer ? 'you' : 'opp');
                 break;
             }
+            case 'Азарт': {
+                if (Math.random() < 0.5) {
+                    dealCardDamage(isPlayer, 30);
+                    logCbMessage(`🎰 Азарт: удача! 30 урона врагу!`, isPlayer ? 'you' : 'opp');
+                } else {
+                    if (isPlayer) youHP = Math.max(0, youHP - 15);
+                    else oppHP = Math.max(0, oppHP - 15);
+                    logCbMessage(`🎰 Азарт: не повезло... 15 урона себе.`, isPlayer ? 'you' : 'opp');
+                }
+                break;
+            }
+            case 'Кража': {
+                if (isPlayer) {
+                    if (oppHand.length > 0) {
+                        const idx = Math.floor(Math.random() * oppHand.length);
+                        const stolen = oppHand.splice(idx, 1)[0];
+                        youHand.push(stolen);
+                        logCbMessage(`🦹 Вы украли карту!`, 'you');
+                    } else {
+                        logCbMessage('У соперника нет карт!', 'system');
+                    }
+                } else {
+                    if (youHand.length > 0) {
+                        const idx = Math.floor(Math.random() * youHand.length);
+                        const stolen = youHand.splice(idx, 1)[0];
+                        oppHand.push(stolen);
+                        logCbMessage(`🦹 Соперник украл карту!`, 'opp');
+                    } else {
+                        logCbMessage('Соперник не смог украсть карту!', 'system');
+                    }
+                }
+                break;
+            }
+            case 'Заморозка': {
+                if (isPlayer) {
+                    oppSkipTurns = 2;
+                    logCbMessage(`❄️ Вы заморозили соперника на 2 хода!`, 'you');
+                } else {
+                    youSkipTurns = 2;
+                    logCbMessage(`❄️ Соперник заморозил вас на 2 хода!`, 'opp');
+                }
+                break;
+            }
             case 'Лечение':
             case 'Быстрое лечение': {
                 if (isPlayer) youHP = Math.min(100, youHP + card.value);
@@ -448,13 +502,13 @@
             }
             case 'Антидот': {
                 if (isPlayer) {
-                    const cleansed = youPoison + youBleed;
-                    youPoison = 0; youBleed = 0;
+                    const cleansed = youPoison + youBleed + youBurn;
+                    youPoison = 0; youBleed = 0; youBurn = 0;
                     youHP = Math.min(100, youHP + card.value);
                     logCbMessage(`💉 Антидот (${cleansed} эффектов) +4 HP`, 'you');
                 } else {
-                    const cleansed = oppPoison + oppBleed;
-                    oppPoison = 0; oppBleed = 0;
+                    const cleansed = oppPoison + oppBleed + oppBurn;
+                    oppPoison = 0; oppBleed = 0; oppBurn = 0;
                     oppHP = Math.min(100, oppHP + card.value);
                     logCbMessage(`💉 Соперник: антидот (${cleansed} эффектов)`, 'opp');
                 }
@@ -516,10 +570,20 @@
             }
             case 'Прозрение': {
                 if (isPlayer) {
-                    oppHandRevealed = 2;
-                    logCbMessage(`👁️ Вы видите руку соперника!`, 'you');
+                    oppHandRevealed = 3;
+                    logCbMessage(`👁️ Вы видите руку соперника (3 х.)!`, 'you');
                 } else {
                     logCbMessage(`👁️ Соперник узнал ваши карты!`, 'opp');
+                }
+                break;
+            }
+            case 'Чтение мыслей': {
+                if (isPlayer) {
+                    oppHand.forEach(c => c.revealed = true);
+                    logCbMessage(`👁️‍🗨️ Вы раскрыли текущие карты соперника!`, 'you');
+                } else {
+                    youHand.forEach(c => c.revealed = true);
+                    logCbMessage(`👁️‍🗨️ Соперник раскрыл ваши текущие карты!`, 'opp');
                 }
                 break;
             }
@@ -530,7 +594,7 @@
                 break;
             }
             case 'Заражение': {
-                const hasDot = isPlayer ? (oppPoison > 0 || oppBleed > 0) : (youPoison > 0 || youBleed > 0);
+                const hasDot = isPlayer ? (oppPoison > 0 || oppBleed > 0 || oppBurn > 0) : (youPoison > 0 || youBleed > 0 || youBurn > 0);
                 const dmg = hasDot ? 10 : 4;
                 const res = dealCardDamage(isPlayer, dmg);
                 logCbMessage(`☠️ Заражение: ${res.hpLost} урона${hasDot ? ' (усилено)' : ''}`, isPlayer ? 'you' : 'opp');
@@ -571,7 +635,7 @@
 
     function drawCards(hand, count) {
         for (let i = 0; i < count; i++) {
-            if (hand.length < 7) hand.push(drawCard());
+            if (hand.length < 7) hand.push({ id: drawCard(), revealed: false });
         }
     }
 
@@ -582,9 +646,10 @@
         if (!isPlayer && currentTurn !== 'opp') return;
 
         const hand = isPlayer ? youHand : oppHand;
-        const cardId = hand[index];
-        if (!cardId) return;
+        const cardObj = hand[index];
+        if (!cardObj) return;
 
+        const cardId = cardObj.id;
         const card = CARDS[cardId];
         const buffsThisTurn = isPlayer ? youBuffsThisTurn : oppBuffsThisTurn;
 
@@ -615,7 +680,7 @@
                 if (oppBuffsThisTurn >= D.consts.CB_MAX_BUFFS_PER_TURN) {
                     setTimeout(() => startCbTurn('you'), 500);
                 } else {
-                    const delay = 1000 + Math.random() * 1500;
+                    const delay = oppDifficulty === 'expert' ? 400 : 800;
                     cbActionTimer = setTimeout(botCbTurn, delay);
                 }
             }
@@ -650,15 +715,30 @@
         oppBuffsThisTurn = 0;
 
         if (actor === 'you') {
+            if (youSkipTurns > 0) {
+                youSkipTurns--;
+                logCbMessage(`❄️ Вы пропускаете ход (заморожены, осталось: ${youSkipTurns + 1})!`, 'system');
+                renderCardBattle();
+                setTimeout(() => startCbTurn('opp'), 1500);
+                return;
+            }
             if (youAmulet > 0) {
                 youAmulet--;
                 logCbMessage(`🧿 Амулет блокирует эффекты`, 'you');
             } else {
                 if (youPoison > 0) { youPoison--; youHP = Math.max(0, youHP - 5); logCbMessage('Яд: -5 HP', 'system'); }
+                if (youBurn > 0) { youBurn--; youHP = Math.max(0, youHP - 3); logCbMessage('Горение: -3 HP', 'system'); }
                 if (youBleed > 0) { youBleed--; youHP = Math.max(0, youHP - 3); logCbMessage('Кровотечение: -3 HP', 'system'); }
             }
             if (youVulnerable > 0) youVulnerable--;
         } else {
+            if (oppSkipTurns > 0) {
+                oppSkipTurns--;
+                logCbMessage(`❄️ Соперник пропускает ход (осталось: ${oppSkipTurns + 1})!`, 'system');
+                renderCardBattle();
+                setTimeout(() => startCbTurn('you'), 1500);
+                return;
+            }
             if (oppHandRevealed > 0) oppHandRevealed--;
             
             if (oppAmulet > 0) {
@@ -666,6 +746,7 @@
                 logCbMessage(`🧿 Амулет соперника блокирует эффекты`, 'opp');
             } else {
                 if (oppPoison > 0) { oppPoison--; oppHP = Math.max(0, oppHP - 5); logCbMessage('Яд соперника: -5 HP', 'system'); }
+                if (oppBurn > 0) { oppBurn--; oppHP = Math.max(0, oppHP - 3); logCbMessage('Горение соперника: -3 HP', 'system'); }
                 if (oppBleed > 0) { oppBleed--; oppHP = Math.max(0, oppHP - 3); logCbMessage('Кровотечение соперника: -3 HP', 'system'); }
             }
             if (oppVulnerable > 0) oppVulnerable--;
@@ -679,7 +760,7 @@
 
         if (actor === 'opp') {
             stopTurnTimer();
-            const delay = 1800 + Math.random() * 2200;
+            const delay = oppDifficulty === 'expert' ? 800 : 1500;
             cbActionTimer = setTimeout(botCbTurn, delay);
         } else {
             startTurnTimer();
@@ -694,8 +775,11 @@
         if (card.name === 'Лечение' || card.name === 'Быстрое лечение') {
             const healAmount = card.value;
             const missingHP = 100 - oppHP;
-            if (difficulty === 'novice') score = oppHP < 75 ? 100 : -100;
-            else if (difficulty === 'amateur') {
+            
+            // ЖЕСТКИЙ ЗАПРЕТ: Если хп почти полное, не лечимся
+            if (missingHP < 5) return -999; 
+            
+            if (difficulty === 'amateur') {
                 score = missingHP >= healAmount ? 100 : -20;
                 if (oppHP < 45) score += 50;
             } else {
@@ -706,9 +790,8 @@
             }
         }
         else if (card.name === 'Антидот') {
-            const dotDamage = oppPoison * 5 + oppBleed * 3;
-            if (difficulty === 'novice') score = 50;
-            else if (difficulty === 'amateur') score = dotDamage > 0 ? 100 : -50;
+            const dotDamage = oppPoison * 5 + oppBleed * 3 + oppBurn * 3;
+            if (difficulty === 'amateur') score = dotDamage > 0 ? 100 : -50;
             else {
                 if (dotDamage >= 10) score = 140;
                 else if (dotDamage > 0) score = 20;
@@ -716,30 +799,23 @@
             }
         }
         else if (card.name === 'Феникс') {
-            if (difficulty === 'novice') score = oppHP < 80 ? 80 : -30;
-            else if (difficulty === 'amateur') score = oppHP < 45 ? 400 : -80;
-            else score = oppHP < 25 ? 900 : oppHP < 40 ? 100 : -150;
+            // ЖЕСТКИЙ ЗАПРЕТ: Если хп больше 25, не используем
+            if (oppHP > 25) return -999;
+            
+            if (difficulty === 'amateur') score = 400;
+            else score = 900;
         }
         else if (card.name === 'Ярость' || card.name === 'Удача') {
-            const hasStrongAttack = oppHand.some(c => {
-                const ca = CARDS[c];
-                return ca.type === 'action' && (ca.value || 0) >= 10;
-            });
+            const hasStrongAttack = oppHand.some(c => CARDS[c.id].type === 'action' && (CARDS[c.id].value || 0) >= 10);
             const alreadyBuffed = (card.name === 'Ярость' && oppAtkBuff > 0) || (card.name === 'Удача' && oppLuck > 0);
 
             if (alreadyBuffed) score = -100;
-            else if (hasStrongAttack) {
-                if (difficulty === 'novice') score = 10;
-                else if (difficulty === 'amateur') score = 60;
-                else score = 100;
-            } else {
-                score = difficulty === 'novice' ? 20 : -50;
-            }
+            else if (hasStrongAttack) score = difficulty === 'amateur' ? 60 : 100;
+            else score = -50;
         }
         else if (card.name === 'Блок' || card.name === 'Барьер') {
             const alreadyHasShield = oppShield > 0;
-            if (difficulty === 'novice') score = !alreadyHasShield ? 40 : -20;
-            else if (difficulty === 'amateur') {
+            if (difficulty === 'amateur') {
                 if (oppHP < 50 && !alreadyHasShield) score = 70;
                 else if (oppHP < 50) score = -30;
                 else score = 10;
@@ -752,8 +828,7 @@
         }
         else if (card.name === 'Благословение') {
             const missingHP = 100 - oppHP;
-            if (difficulty === 'novice') score = 40;
-            else if (difficulty === 'amateur') score = missingHP > 15 ? 70 : -10;
+            if (difficulty === 'amateur') score = missingHP > 15 ? 70 : -10;
             else {
                 score = missingHP > 20 ? 90 : -30;
                 if (oppShield === 0 && oppHP < 60) score += 40;
@@ -761,41 +836,37 @@
         }
         else if (card.name === 'Шипы') {
             if (oppThorns > 0) score = -100;
-            else if (difficulty === 'novice') score = 30;
             else if (difficulty === 'amateur') score = oppHP > 40 ? 50 : 20;
             else score = oppHP > 50 && youHP > 40 ? 70 : 20;
         }
         else if (card.name === 'Отражение') {
             if (oppReflect) score = -100;
-            else if (difficulty === 'novice') score = 30;
             else if (difficulty === 'amateur') score = 40;
             else score = oppHP > 40 ? 60 : 10;
         }
         else if (card.name === 'Уклонение') {
             if (oppEvasion) score = -100;
-            else if (difficulty === 'novice') score = 25;
             else if (difficulty === 'amateur') score = oppHP < 50 ? 80 : 20;
             else score = oppHP < 35 ? 150 : oppHP < 60 ? 60 : -20;
         }
         else if (card.name === 'Амулет') {
-            const hasDot = oppPoison > 0 || oppBleed > 0;
+            const hasDot = oppPoison > 0 || oppBleed > 0 || oppBurn > 0;
             if (oppAmulet > 0) score = -100;
             else if (difficulty === 'expert') score = hasDot ? 150 : 20;
-            else if (difficulty === 'amateur') score = hasDot ? 90 : 10;
-            else score = 40;
+            else score = hasDot ? 90 : 10;
         }
-        else if (card.name === 'Прозрение') {
+        else if (card.name === 'Прозрение' || card.name === 'Чтение мыслей') {
             if (oppHandRevealed > 0) score = -100;
-            else if (difficulty === 'expert') score = 50;
-            else if (difficulty === 'amateur') score = 30;
-            else score = 10;
+            else {
+                const hasHiddenCards = oppHand.some(c => !c.revealed);
+                score = hasHiddenCards ? 50 : -50;
+            }
         }
         else if (card.name === 'Уязвимость') {
             if (oppVulnerable > 0) score = -100;
-            else if (difficulty === 'novice') score = 20;
             else if (difficulty === 'amateur') score = 30;
             else {
-                const hasFollowUp = oppHand.some(c => CARDS[c].type === 'action');
+                const hasFollowUp = oppHand.some(c => CARDS[c.id].type === 'action');
                 score = hasFollowUp ? 50 : -20;
             }
         }
@@ -804,18 +875,13 @@
             if (oppAtkBuff > 0) dmg += oppAtkBuff;
             if (oppLuck > 0) dmg += oppLuck;
 
-            if (dmg >= youHP) {
-                score = 2000;
-                if (difficulty === 'novice') score -= 1500;
-            } else {
-                score = dmg;
-            }
+            if (dmg >= youHP) score = 2000;
+            else score = dmg;
 
             if (card.name === 'Казнь') {
                 const realDmg = youHP < 50 ? 30 : 8;
                 if (realDmg >= youHP) score = 2500;
                 else score = realDmg;
-                if (difficulty === 'novice') score = Math.min(score, 20);
             }
             if (card.name === 'Ультиматум') {
                 if (25 >= youHP) score = 2400;
@@ -827,8 +893,7 @@
             }
             if (card.name === 'Возмездие') {
                 const dmgV = 5 + Math.floor((100 - oppHP) / 3);
-                if (difficulty === 'novice') score = 15;
-                else if (difficulty === 'amateur') score = dmgV * 0.7;
+                if (difficulty === 'amateur') score = dmgV * 0.7;
                 else score = dmgV;
             }
             if (card.name === 'Сифон') {
@@ -840,21 +905,28 @@
                 else score = dmgV;
             }
             if (card.name === 'Заражение') {
-                const hasDot = youPoison > 0 || youBleed > 0;
+                const hasDot = youPoison > 0 || youBleed > 0 || youBurn > 0;
                 score = hasDot ? 10 : 4;
             }
             if (card.name === 'Проклятая книга') {
                 if (difficulty === 'expert') score = oppHP > 20 ? 70 : -50;
-                else if (difficulty === 'amateur') score = oppHP > 30 ? 50 : -20;
-                else score = 30;
+                else score = oppHP > 30 ? 50 : -20;
+            }
+            if (card.name === 'Кража') {
+                score = oppHand.length > 0 ? 150 : -100;
+            }
+            if (card.name === 'Заморозка') {
+                score = 120;
+            }
+            if (card.name === 'Азарт') {
+                score = oppHP < 30 ? -100 : 25;
             }
         }
         else {
             score = 10;
         }
 
-        if (difficulty === 'novice') score += Math.random() * 50 - 25;
-        else if (difficulty === 'amateur') score += Math.random() * 20 - 10;
+        if (difficulty === 'amateur') score += Math.random() * 20 - 10;
 
         return score;
     }
@@ -862,7 +934,7 @@
     function pickBotCardIndex() {
         if (oppHand.length === 0) return -1;
 
-        if (oppDifficulty === 'novice' && Math.random() < 0.35) {
+        if (oppDifficulty === 'amateur' && Math.random() < 0.15) {
             return Math.floor(Math.random() * oppHand.length);
         }
 
@@ -870,11 +942,11 @@
         let bestScore = -Infinity;
 
         for (let i = 0; i < oppHand.length; i++) {
-            const s = scoreCard(oppHand[i], oppDifficulty);
+            const s = scoreCard(oppHand[i].id, oppDifficulty);
             if (s > bestScore) { bestScore = s; bestIdx = i; }
         }
 
-        const drawThreshold = oppDifficulty === 'expert' ? 5 : oppDifficulty === 'amateur' ? -20 : -60;
+        const drawThreshold = oppDifficulty === 'expert' ? 5 : -20;
         if (bestScore < drawThreshold) return -1;
 
         return bestIdx;
@@ -888,19 +960,13 @@
             let bestBuffIdx = -1;
             let bestBuffScore = -100;
             for (let i = 0; i < oppHand.length; i++) {
-                if (CARDS[oppHand[i]].type === 'buff') {
-                    const s = scoreCard(oppHand[i], oppDifficulty);
+                if (CARDS[oppHand[i].id].type === 'buff') {
+                    const s = scoreCard(oppHand[i].id, oppDifficulty);
                     if (s > bestBuffScore) { bestBuffScore = s; bestBuffIdx = i; }
                 }
             }
 
-            if (oppDifficulty === 'expert' && bestBuffScore > 40 && bestBuffIdx !== -1) {
-                playCbCard(bestBuffIdx, false); return;
-            }
-            if (oppDifficulty === 'novice' && bestBuffIdx !== -1 && Math.random() < 0.6) {
-                playCbCard(bestBuffIdx, false); return;
-            }
-            if (oppDifficulty === 'amateur' && bestBuffIdx !== -1 && bestBuffScore > 20) {
+            if (bestBuffIdx !== -1 && bestBuffScore > 0) {
                 playCbCard(bestBuffIdx, false); return;
             }
 
@@ -925,6 +991,7 @@
         youHP = 100; oppHP = 100;
         youShield = 0; oppShield = 0;
         youPoison = 0; oppPoison = 0;
+        youBurn = 0; oppBurn = 0;
         youBleed = 0; oppBleed = 0;
         youVulnerable = 0; oppVulnerable = 0;
         youAtkBuff = 0; oppAtkBuff = 0;
@@ -933,14 +1000,16 @@
         youReflect = false; oppReflect = false;
         youEvasion = false; oppEvasion = false;
         youAmulet = 0; oppAmulet = 0;
+        youSkipTurns = 0; oppSkipTurns = 0;
+        
         youBuffsThisTurn = 0;
         oppBuffsThisTurn = 0;
         oppHandRevealed = 0;
 
         oppDifficulty = pickDifficulty();
 
-        youHand = [drawCard(), drawCard(), drawCard()];
-        oppHand = [drawCard(), drawCard(), drawCard()];
+        youHand = [{ id: drawCard(), revealed: false }, { id: drawCard(), revealed: false }, { id: drawCard(), revealed: false }];
+        oppHand = [{ id: drawCard(), revealed: false }, { id: drawCard(), revealed: false }, { id: drawCard(), revealed: false }];
 
         cbPhase = 'playing';
         logMessages = [];
