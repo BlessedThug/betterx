@@ -6,11 +6,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <link rel="stylesheet" href="../css/chassis.css">
     <link rel="stylesheet" href="../css/duels-bg.css">
+    
+    <!-- Основной каркас и стили каждой игры -->
     <link rel="stylesheet" href="../css/duels.css">
     <link rel="stylesheet" href="../css/duels-dice.css">
     <link rel="stylesheet" href="../css/duels-race.css">
     <link rel="stylesheet" href="../css/duels-blackjack.css">
     <link rel="stylesheet" href="../css/duels-cardbattle.css">
+    
     <title>DUELS | BETTER-X</title>
     <link rel="icon" href="../img/logo.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -49,6 +52,8 @@
     </div>
 
     <main class="duels-main duels-game-area">
+
+        <!-- ============ LOBBY VIEW ============ -->
         <section id="lobby-view" class="duels-view">
             <div class="lobby-top">
                 <h1>⚔️ DUELS — ДУЭЛИ</h1>
@@ -63,19 +68,24 @@
 
             <div class="game-filter" id="game-filter">
                 <button class="game-filter-btn active" data-game="all">
-                    <span class="game-filter-icon">🎮</span><span>Все игры</span>
+                    <span class="game-filter-icon">🎮</span>
+                    <span>Все игры</span>
                 </button>
                 <button class="game-filter-btn" data-game="dice">
-                    <span class="game-filter-icon">🎲</span><span>Кости</span>
+                    <span class="game-filter-icon">🎲</span>
+                    <span>Кости</span>
                 </button>
                 <button class="game-filter-btn" data-game="race">
-                    <span class="game-filter-icon">🏁</span><span>Гонки</span>
+                    <span class="game-filter-icon">🏁</span>
+                    <span>Гонки</span>
                 </button>
                 <button class="game-filter-btn" data-game="blackjack">
-                    <span class="game-filter-icon">🃏</span><span>Блэкджек</span>
+                    <span class="game-filter-icon">🃏</span>
+                    <span>Блэкджек</span>
                 </button>
                 <button class="game-filter-btn" data-game="cardbattle">
-                    <span class="game-filter-icon">⚔️</span><span>Карты</span>
+                    <span class="game-filter-icon">⚔️</span>
+                    <span>Карты</span>
                 </button>
             </div>
 
@@ -84,6 +94,7 @@
             </div>
         </section>
 
+        <!-- ============ GAME VIEW ============ -->
         <section id="game-view" class="duels-view" style="display: none;">
             <button id="leave-btn" class="leave-btn">← Выйти из дуэли</button>
 
@@ -97,7 +108,9 @@
                 <div class="dice-side dice-side-you">
                     <div class="player-tag you-tag">ВЫ</div>
                     <div class="player-name-big" id="you-name">Вы</div>
-                    <div class="dice-wrap"><div class="dice" id="you-dice"></div></div>
+                    <div class="dice-wrap">
+                        <div class="dice" id="you-dice"></div>
+                    </div>
                     <div class="bet-tag" id="you-bet-display">0 ₽</div>
                     <div class="chance-tag" id="you-chance">50.0%</div>
                 </div>
@@ -105,7 +118,9 @@
                 <div class="dice-side dice-side-opp">
                     <div class="player-tag opp-tag">СОПЕРНИК</div>
                     <div class="player-name-big" id="opp-name">—</div>
-                    <div class="dice-wrap"><div class="dice" id="opp-dice"></div></div>
+                    <div class="dice-wrap">
+                        <div class="dice" id="opp-dice"></div>
+                    </div>
                     <div class="bet-tag" id="opp-bet-display">0 ₽</div>
                     <div class="chance-tag" id="opp-chance">50.0%</div>
                 </div>
@@ -209,52 +224,6 @@
                 </div>
             </div>
 
-            <!-- МОДАЛКА "КАК ИГРАТЬ" -->
-            <div id="cb-help-modal" class="modal-overlay" style="display: none;">
-                <div class="modal-content">
-                    <h2>🃏 Как играть</h2>
-                    <div class="cb-help-body">
-                        <p>Цель — снизить HP соперника до 0. У каждого 100 HP.</p>
-
-                        <h3>Типы карт</h3>
-                        <ul>
-                            <li><b>⚔️ Действия</b> (красная кайма) — атаки, яды, комбо. <b>Завершают ход.</b></li>
-                            <li><b>🛡️ Баффы</b> (зелёная кайма) — щиты, лечение, усиления. <b>Ход не завершают.</b></li>
-                        </ul>
-
-                        <h3>Правила хода</h3>
-                        <ul>
-                            <li>Можно сыграть <b>до 2 баффов</b> за ход.</li>
-                            <li>Если сыграл <b>хотя бы 1 бафф</b> — нельзя атаковать или брать карты.</li>
-                            <li>Можно <b>взять 2 карты</b> вместо действия (тоже завершает ход).</li>
-                            <li>У тебя <b>30 секунд</b> на ход. Не успел — ход переходит.</li>
-                        </ul>
-
-                        <h3>Ключевые механики</h3>
-                        <ul>
-                            <li>🧪 <b>Яд</b> — 5 урона в начале хода цели.</li>
-                            <li>🔥 <b>Горение</b> — 3 урона в начале хода цели.</li>
-                            <li>🩸 <b>Кровотечение</b> — 3 урона в начале хода.</li>
-                            <li>🎯 <b>Уязвимость</b> — цель получает +50% урона (3 хода).</li>
-                            <li>❄️ <b>Заморозка</b> — цель пропускает 2 хода.</li>
-                        </ul>
-
-                        <h3>Особые карты</h3>
-                        <ul>
-                            <li>👁️ <b>Прозрение</b> — раскрывает руку соперника на 3 хода.</li>
-                            <li>👁️‍🗨️ <b>Чтение мыслей</b> — раскрывает текущие карты навсегда.</li>
-                            <li>☠️ <b>Заражение</b> — 4 урона (10 урона, если на враге есть яд, кровь или горение).</li>
-                            <li>🦹 <b>Кража</b> — забирает случайную карту из руки врага.</li>
-                            <li>🎰 <b>Азарт</b> — 50% шанс на 30 урона, иначе 15 урона себе.</li>
-                            <li>📜 <b>Проклятая книга</b> — берёт 3 карты, но отнимает 5 HP.</li>
-                        </ul>
-                    </div>
-                    <div class="modal-buttons">
-                        <button id="cb-help-close" class="btn-confirm">ПОНЯТНО</button>
-                    </div>
-                </div>
-            </div>
-
             <div class="bank-info">
                 <div class="bank-label">БАНК ДУЭЛИ</div>
                 <div class="bank-value" id="bank-value">0 ₽</div>
@@ -267,7 +236,7 @@
             </div>
         </section>
 
-        <!-- CREATE LOBBY MODAL -->
+        <!-- ============ CREATE LOBBY MODAL ============ -->
         <div id="create-modal" class="modal-overlay" style="display: none;">
             <div class="modal-content">
                 <h2>Создать лобби</h2>
@@ -300,7 +269,7 @@
             </div>
         </div>
 
-        <!-- JOIN LOBBY MODAL -->
+        <!-- ============ JOIN LOBBY MODAL ============ -->
         <div id="join-modal" class="modal-overlay" style="display: none;">
             <div class="modal-content">
                 <h2>Принять дуэль</h2>
@@ -335,7 +304,7 @@
             </div>
         </div>
 
-        <!-- WAITING MODAL -->
+        <!-- ============ WAITING MODAL ============ -->
         <div id="waiting-modal" class="modal-overlay" style="display: none;">
             <div class="modal-content modal-waiting">
                 <div class="spinner"></div>
@@ -346,6 +315,67 @@
                 <button id="cancel-waiting-btn" class="btn-cancel">ОТМЕНИТЬ</button>
             </div>
         </div>
+
+        <!-- ============ МОДАЛКА "КАК ИГРАТЬ" ============ -->
+        <div id="cb-help-modal" class="modal-overlay" style="display: none;">
+            <div class="modal-content">
+                <h2>🃏 Как играть</h2>
+                <div class="cb-help-body">
+                    <p>Цель — снизить HP соперника до 0. У каждого 100 HP.</p>
+
+                    <h3>Типы карт</h3>
+                    <ul>
+                        <li><b>⚔️ Действия</b> (красная кайма) — атаки, яды, комбо. <b>Завершают ход.</b></li>
+                        <li><b>🛡️ Баффы</b> (зелёная кайма) — щиты, лечение, усиления. <b>Ход не завершают.</b></li>
+                    </ul>
+
+                    <h3>Правила хода</h3>
+                    <ul>
+                        <li>Можно сыграть <b>до 2 баффов</b> за ход.</li>
+                        <li>Если сыграл <b>хотя бы 1 бафф</b> — нельзя атаковать или брать карты.</li>
+                        <li>Можно <b>взять 2 карты</b> вместо действия (тоже завершает ход).</li>
+                        <li>У тебя <b>30 секунд</b> на ход. Не успел — ход переходит.</li>
+                    </ul>
+
+                    <h3>Ключевые механики</h3>
+                    <ul>
+                        <li>🧪 <b>Яд</b> — 5 урона (по щиту 50%, по HP 100%).</li>
+                        <li>🔥 <b>Горение</b> — 3 урона, растёт каждый ход. При продлении урон не сбрасывается.</li>
+                        <li>🩸 <b>Кровотечение</b> — 3 урона (игнорирует щиты).</li>
+                        <li>🎯 <b>Уязвимость</b> — +50% урона (3 хода).</li>
+                        <li>🧱 <b>Броня</b> — снижает входящий урон по HP на 50% (3 хода).</li>
+                        <li>🥀 <b>Слабость</b> — враг наносит на 50% меньше урона (3 хода).</li>
+                        <li>❄️ <b>Заморозка</b> — цель пропускает 2 хода.</li>
+                    </ul>
+
+                    <h3>Особые карты</h3>
+                    <ul>
+                        <li>👁️ <b>Прозрение</b> — раскрывает руку соперника на 3 хода.</li>
+                        <li>👁️‍🗨️ <b>Чтение мыслей</b> — раскрывает текущие карты навсегда.</li>
+                        <li>☠️ <b>Заражение</b> — 4 урона (12 урона, если на враге есть яд/кровь/огонь).</li>
+                        <li>🦹 <b>Кража</b> — крадет 1 случайную карту врага.</li>
+                        <li>💖 <b>Регенерация</b> — лечит 5 HP в течение 3 ходов.</li>
+                        <li>🌫️ <b>Слепота</b> — заставляет врага промахнуться (1 атака).</li>
+                        <li>📜 <b>Проклятая книга</b> — берет 3 карты, но отнимает 5 HP.</li>
+                    </ul>
+
+                    <h3>Новые карты</h3>
+                    <ul>
+                        <li>🌪️🔥 <b>Огненный вихрь</b> — 8 урона, вешает горение.</li>
+                        <li>🩸🥀 <b>Кровавый ритуал</b> — 10 урона (20, если на враге есть кровь).</li>
+                        <li>🔥🧠 <b>Выжигание</b> — урон равен текущему горению врага × 2 (минимум 5).</li>
+                        <li>🔥🧱 <b>Стена огня</b> — 15 щита, враг получает 2 горения.</li>
+                        <li>💪✨ <b>Прилив сил</b> — +5 к атаке и удаче.</li>
+                        <li>🍀⚔️ <b>Счастливый случай</b> — 6 урона, +10 удачи.</li>
+                        <li>🛡️🩸 <b>Кровавый щит</b> — тратит 10 HP, дает 25 щита.</li>
+                    </ul>
+                </div>
+                <div class="modal-buttons">
+                    <button id="cb-help-close" class="btn-confirm">ПОНЯТНО</button>
+                </div>
+            </div>
+        </div>
+
     </main>
 
     <script src="../js/deposit.js"></script>
@@ -359,4 +389,5 @@
     <script src="../js/duels/blackjack.js"></script>
     <script src="../js/duels/cardbattle.js"></script>
 </body>
+
 </html>

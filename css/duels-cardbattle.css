@@ -39,6 +39,8 @@
     align-items: center;
     position: relative;
     z-index: 1;
+    width: 100%;
+    flex-shrink: 0;
 }
 
 .cb-avatar-row {
@@ -49,6 +51,7 @@
     font-weight: 700;
     font-size: 14px;
     color: #fff;
+    flex-shrink: 0;
 }
 
 .cb-hp-bar {
@@ -59,6 +62,7 @@
     border-radius: 10px;
     overflow: hidden;
     border: 1px solid rgba(255,255,255,0.1);
+    flex-shrink: 0;
 }
 
 .cb-hp-fill {
@@ -75,25 +79,30 @@
     gap: 8px;
     justify-content: center;
     flex-wrap: wrap;
-    min-height: 140px;
+    min-height: 155px; /* Увеличили под новую высоту карты */
+    align-items: flex-start; /* Карты прижаты к верху, не растягивают контейнер */
+    width: 100%;
 }
 
 /* Карты */
 .cb-card {
-    width: 85px;
-    height: 130px;
+    width: 95px;
+    height: 145px;
+    flex-shrink: 0; /* Карта не сжимается */
     background: linear-gradient(145deg, #2a2a35, #1a1a22);
     border: 2px solid rgba(255,255,255,0.1);
     border-radius: 12px;
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: center;
+    justify-content: space-between;
     cursor: pointer;
     transition: all 0.2s;
     position: relative;
-    padding: 6px;
+    padding: 4px 6px;
     text-align: center;
+    box-sizing: border-box;
+    overflow: hidden; /* Обрезаем всё, что вылезает */
 }
 
 .cb-card:hover:not(.disabled) {
@@ -102,18 +111,107 @@
     box-shadow: 0 10px 20px rgba(0,0,0,0.5);
 }
 
+/* Верхний бейдж (Тип карты) */
+.cb-card-type {
+    font-size: 8px;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    width: 100%;
+    padding: 2px 0;
+    border-radius: 4px;
+    margin-bottom: 2px;
+    flex-shrink: 0;
+}
+
+.cb-card.type-buff .cb-card-type {
+    color: #4CAF50;
+    background: rgba(76, 175, 80, 0.15);
+    border: 1px solid rgba(76, 175, 80, 0.3);
+}
+
+.cb-card.type-action .cb-card-type {
+    color: #ff3333;
+    background: rgba(255, 51, 51, 0.15);
+    border: 1px solid rgba(255, 51, 51, 0.3);
+}
+
 .cb-card.disabled { opacity: 0.5; cursor: not-allowed; }
-.cb-card .cb-card-icon { font-size: 26px; margin-bottom: 4px; }
-.cb-card .cb-card-name { font-size: 10px; font-weight: bold; color: #fff; line-height: 1.1; }
-.cb-card .cb-card-desc { font-size: 9px; color: #aaa; margin-top: 4px; line-height: 1.2; }
 
 .cb-card.type-action { border-bottom: 4px solid #ff3333; }
 .cb-card.type-buff { border-bottom: 4px solid #4CAF50; }
 
 .cb-card.rarity-3 { box-shadow: 0 0 10px rgba(156, 39, 176, 0.4); border-color: rgba(156, 39, 176, 0.5); }
 .cb-card.rarity-4 { box-shadow: 0 0 15px rgba(255, 193, 7, 0.6); border-color: rgba(255, 193, 7, 0.8); }
-.cb-card.card-back { background: repeating-linear-gradient(45deg, #111 0 10px, #222 10px 20px); border-color: rgba(255,180,0,0.3); }
+.cb-card.card-back { 
+    background: repeating-linear-gradient(45deg, #111 0 10px, #222 10px 20px); 
+    border-color: rgba(255,180,0,0.3); 
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
 
+/* Центральная часть (иконка, название, описание) */
+.cb-card-center {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    flex: 1;
+    width: 100%;
+    min-height: 0; /* Позволяет flex-контенту сжиматься */
+    overflow: hidden;
+}
+
+.cb-card-icon {
+    font-size: 24px;
+    margin-bottom: 2px;
+    line-height: 1;
+    flex-shrink: 0;
+}
+
+.cb-card-name {
+    font-size: 9px;
+    font-weight: bold;
+    color: #fff;
+    line-height: 1.1;
+    width: 100%;
+    word-wrap: break-word;
+    flex-shrink: 0;
+}
+
+.cb-card-desc {
+    font-size: 8px;
+    color: #aaa;
+    margin-top: 2px;
+    line-height: 1.1;
+    text-align: center;
+    width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 3; /* Максимум 3 строки описания */
+    -webkit-box-orient: vertical;
+}
+
+/* Нижний бейдж (Кол-во ходов) */
+.cb-card-turns {
+    font-size: 8px;
+    font-weight: 800;
+    color: #ffb400;
+    width: 100%;
+    padding: 2px 0;
+    background: rgba(255, 180, 0, 0.15);
+    border: 1px solid rgba(255, 180, 0, 0.3);
+    border-radius: 4px;
+    margin-top: 2px;
+    flex-shrink: 0;
+}
+
+.cb-card-turns.empty {
+    visibility: hidden; /* Скрываем, если ходов нет, но оставляем место для ровности */
+}
+
+/* Центральный блок управления */
 .cb-center {
     display: flex;
     flex-direction: column;
@@ -123,6 +221,8 @@
     position: relative;
     z-index: 1;
     padding: 10px 0;
+    width: 100%;
+    min-height: 120px; /* Фиксированная высота, чтобы не прыгало */
 }
 
 .cb-turn-row {
@@ -187,10 +287,26 @@
     color: #fff;
 }
 
-.cb-statuses { display: inline-flex; gap: 4px; margin-left: 6px; font-size: 13px; font-weight: 700; }
+.cb-statuses { 
+    display: inline-flex; 
+    gap: 4px; 
+    margin-left: 6px; 
+    font-size: 13px; 
+    font-weight: 700; 
+}
+
 .cb-statuses span { color: #fff; }
 
-.cb-actions-row { display: flex; gap: 10px; margin-top: 6px; }
+/* Кнопки действий (Взять карты / Пропустить) */
+.cb-actions-row { 
+    display: flex; 
+    gap: 10px; 
+    margin-top: 6px; 
+    min-height: 40px; /* Резервируем место под кнопки */
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+}
 
 .cb-action-btn {
     padding: 10px 16px;
@@ -347,7 +463,7 @@
         overflow-x: auto;
         justify-content: flex-start;
         padding-bottom: 8px;
-        min-height: 120px;
+        min-height: 125px; /* Под новую высоту 115px + запас */
         width: 100%;
         -webkit-overflow-scrolling: touch;
     }
@@ -364,7 +480,8 @@
 
     .cb-card .cb-card-icon { font-size: 22px; }
     .cb-card .cb-card-name { font-size: 9px; }
-    .cb-card .cb-card-desc { font-size: 8px; margin-top: 2px; }
+    .cb-card .cb-card-desc { font-size: 8px; margin-top: 2px; -webkit-line-clamp: 2; }
+    .cb-card-type, .cb-card-turns { font-size: 7px; padding: 1px 0; }
 
     /* Кнопки и таймер */
     .cb-turn-row {
