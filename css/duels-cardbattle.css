@@ -3,7 +3,7 @@
     display: flex;
     align-items: stretch;
     gap: 16px;
-    max-width: 1200px;
+    max-width: 1280px;
     margin: 0 auto 30px;
     position: relative;
     z-index: 1;
@@ -47,7 +47,7 @@
     display: flex;
     justify-content: space-between;
     width: 100%;
-    max-width: 600px;
+    max-width: 700px;
     font-weight: 700;
     font-size: 14px;
     color: #fff;
@@ -56,7 +56,7 @@
 
 .cb-hp-bar {
     width: 100%;
-    max-width: 600px;
+    max-width: 700px;
     height: 20px;
     background: rgba(0,0,0,0.6);
     border-radius: 10px;
@@ -76,22 +76,22 @@
 
 .cb-hand {
     display: flex;
-    gap: 8px;
+    gap: 10px;
     justify-content: center;
     flex-wrap: wrap;
-    min-height: 155px; /* Увеличили под новую высоту карты */
-    align-items: flex-start; /* Карты прижаты к верху, не растягивают контейнер */
+    min-height: 200px; /* Увеличили под новую высоту карты */
+    align-items: flex-start;
     width: 100%;
 }
 
 /* Карты */
 .cb-card {
-    width: 95px;
-    height: 145px;
-    flex-shrink: 0; /* Карта не сжимается */
+    width: 130px;
+    height: 190px;
+    flex-shrink: 0;
     background: linear-gradient(145deg, #2a2a35, #1a1a22);
     border: 2px solid rgba(255,255,255,0.1);
-    border-radius: 12px;
+    border-radius: 14px;
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -99,10 +99,10 @@
     cursor: pointer;
     transition: all 0.2s;
     position: relative;
-    padding: 4px 6px;
+    padding: 6px 8px;
     text-align: center;
     box-sizing: border-box;
-    overflow: hidden; /* Обрезаем всё, что вылезает */
+    overflow: hidden;
 }
 
 .cb-card:hover:not(.disabled) {
@@ -113,13 +113,13 @@
 
 /* Верхний бейдж (Тип карты) */
 .cb-card-type {
-    font-size: 8px;
+    font-size: 10px;
     font-weight: 800;
-    letter-spacing: 0.5px;
+    letter-spacing: 1px;
     width: 100%;
-    padding: 2px 0;
-    border-radius: 4px;
-    margin-bottom: 2px;
+    padding: 3px 0;
+    border-radius: 5px;
+    margin-bottom: 4px;
     flex-shrink: 0;
 }
 
@@ -142,15 +142,15 @@
 
 .cb-card.rarity-3 { box-shadow: 0 0 10px rgba(156, 39, 176, 0.4); border-color: rgba(156, 39, 176, 0.5); }
 .cb-card.rarity-4 { box-shadow: 0 0 15px rgba(255, 193, 7, 0.6); border-color: rgba(255, 193, 7, 0.8); }
-.cb-card.card-back { 
-    background: repeating-linear-gradient(45deg, #111 0 10px, #222 10px 20px); 
-    border-color: rgba(255,180,0,0.3); 
+.cb-card.card-back {
+    background: repeating-linear-gradient(45deg, #111 0 10px, #222 10px 20px);
+    border-color: rgba(255,180,0,0.3);
     display: flex;
     align-items: center;
     justify-content: center;
 }
 
-/* Центральная часть (иконка, название, описание) */
+/* Центральная часть */
 .cb-card-center {
     display: flex;
     flex-direction: column;
@@ -158,58 +158,56 @@
     justify-content: center;
     flex: 1;
     width: 100%;
-    min-height: 0; /* Позволяет flex-контенту сжиматься */
+    min-height: 0;
     overflow: hidden;
 }
 
 .cb-card-icon {
-    font-size: 24px;
-    margin-bottom: 2px;
+    font-size: 36px;
+    margin-bottom: 4px;
     line-height: 1;
     flex-shrink: 0;
 }
 
 .cb-card-name {
-    font-size: 9px;
-    font-weight: bold;
+    font-size: 12px;
+    font-weight: 800;
     color: #fff;
-    line-height: 1.1;
+    line-height: 1.15;
     width: 100%;
     word-wrap: break-word;
     flex-shrink: 0;
 }
 
 .cb-card-desc {
-    font-size: 8px;
-    color: #aaa;
-    margin-top: 2px;
-    line-height: 1.1;
+    font-size: 10px;
+    color: #bbb;
+    margin-top: 4px;
+    line-height: 1.25;
     text-align: center;
     width: 100%;
     overflow: hidden;
     text-overflow: ellipsis;
     display: -webkit-box;
-    -webkit-line-clamp: 3; /* Максимум 3 строки описания */
+    -webkit-line-clamp: 3;
     -webkit-box-orient: vertical;
 }
 
-/* Нижний бейдж (Кол-во ходов) */
+/* Нижний бейдж */
 .cb-card-turns {
-    font-size: 8px;
+    font-size: 10px;
     font-weight: 800;
     color: #ffb400;
     width: 100%;
-    padding: 2px 0;
+    padding: 3px 0;
     background: rgba(255, 180, 0, 0.15);
     border: 1px solid rgba(255, 180, 0, 0.3);
-    border-radius: 4px;
-    margin-top: 2px;
+    border-radius: 5px;
+    margin-top: 4px;
     flex-shrink: 0;
 }
 
-.cb-card-turns.empty {
-    visibility: hidden; /* Скрываем, если ходов нет, но оставляем место для ровности */
-}
+.cb-card-turns.empty { visibility: hidden; }
 
 /* Центральный блок управления */
 .cb-center {
@@ -222,7 +220,7 @@
     z-index: 1;
     padding: 10px 0;
     width: 100%;
-    min-height: 120px; /* Фиксированная высота, чтобы не прыгало */
+    min-height: 120px;
 }
 
 .cb-turn-row {
@@ -287,22 +285,14 @@
     color: #fff;
 }
 
-.cb-statuses { 
-    display: inline-flex; 
-    gap: 4px; 
-    margin-left: 6px; 
-    font-size: 13px; 
-    font-weight: 700; 
-}
-
+.cb-statuses { display: inline-flex; gap: 4px; margin-left: 6px; font-size: 13px; font-weight: 700; }
 .cb-statuses span { color: #fff; }
 
-/* Кнопки действий (Взять карты / Пропустить) */
-.cb-actions-row { 
-    display: flex; 
-    gap: 10px; 
-    margin-top: 6px; 
-    min-height: 40px; /* Резервируем место под кнопки */
+.cb-actions-row {
+    display: flex;
+    gap: 10px;
+    margin-top: 6px;
+    min-height: 40px;
     align-items: center;
     justify-content: center;
     width: 100%;
@@ -325,7 +315,7 @@
 
 /* ============ ЧАТ-ЛОГ ============ */
 .cb-log-panel {
-    width: 320px;
+    width: 340px;
     flex-shrink: 0;
     background: linear-gradient(145deg, rgba(20, 25, 35, 0.9), rgba(10, 15, 25, 0.95));
     border: 2px solid rgba(100, 150, 255, 0.35);
@@ -356,7 +346,7 @@
     flex-direction: column;
     gap: 8px;
     min-height: 420px;
-    max-height: 640px;
+    max-height: 720px;
 }
 
 .cb-log-scroll::-webkit-scrollbar { width: 6px; }
@@ -430,20 +420,17 @@
 .cb-help-body ul li::before { content: '•'; position: absolute; left: 6px; color: #ffb400; font-weight: 800; }
 .cb-help-body b { color: #fff; }
 
-/* ============ АДАПТИВ КАРТОЧНЫХ БОЁВ ============ */
+/* ============ АДАПТИВ ============ */
 
 @media (max-width: 1024px) {
-    /* Лог уезжает под арену */
-    .cardbattle-arena {
-        flex-direction: column;
-    }
-    
+    .cardbattle-arena { flex-direction: column; }
+
     .cb-log-panel {
         width: 100%;
         max-width: 100%;
         margin-top: 10px;
     }
-    
+
     .cb-log-scroll {
         min-height: 150px;
         max-height: 220px;
@@ -457,38 +444,32 @@
         border-radius: 14px;
     }
 
-    /* Карты в руке становятся горизонтальным скроллом */
     .cb-hand {
         flex-wrap: nowrap;
         overflow-x: auto;
         justify-content: flex-start;
         padding-bottom: 8px;
-        min-height: 125px; /* Под новую высоту 115px + запас */
+        min-height: 150px;
         width: 100%;
         -webkit-overflow-scrolling: touch;
     }
-    
+
     .cb-hand::-webkit-scrollbar { height: 4px; }
     .cb-hand::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 2px; }
 
     .cb-card {
-        flex-shrink: 0; /* Карты не сжимаются */
-        width: 75px;
-        height: 115px;
-        padding: 4px;
+        flex-shrink: 0;
+        width: 90px;
+        height: 135px;
+        padding: 5px;
     }
 
-    .cb-card .cb-card-icon { font-size: 22px; }
-    .cb-card .cb-card-name { font-size: 9px; }
-    .cb-card .cb-card-desc { font-size: 8px; margin-top: 2px; -webkit-line-clamp: 2; }
-    .cb-card-type, .cb-card-turns { font-size: 7px; padding: 1px 0; }
+    .cb-card .cb-card-icon { font-size: 26px; }
+    .cb-card .cb-card-name { font-size: 10px; }
+    .cb-card .cb-card-desc { font-size: 9px; margin-top: 2px; -webkit-line-clamp: 2; }
+    .cb-card-type, .cb-card-turns { font-size: 8px; padding: 2px 0; }
 
-    /* Кнопки и таймер */
-    .cb-turn-row {
-        flex-wrap: wrap;
-        gap: 8px;
-    }
-
+    .cb-turn-row { flex-wrap: wrap; gap: 8px; }
     .cb-turn-indicator { font-size: 13px; text-align: center; width: 100%; }
     .cb-turn-timer { min-width: 34px; height: 34px; font-size: 16px; }
     .cb-help-btn { width: 34px; height: 34px; font-size: 16px; }
@@ -496,13 +477,11 @@
     .cb-actions-row { width: 100%; flex-direction: column; gap: 6px; }
     .cb-action-btn { width: 100%; padding: 10px; font-size: 12px; }
 
-    /* Лог */
     .cb-log-panel { border-radius: 14px; }
     .cb-log-header { padding: 10px; font-size: 12px; }
     .cb-log-scroll { padding: 8px; gap: 6px; min-height: 120px; max-height: 180px; }
     .cb-log-entry { font-size: 11px; padding: 6px 10px; max-width: 95%; }
 
-    /* Модалка помощи */
     .cb-help-body { font-size: 12px; max-height: 60vh; }
     .cb-help-body h3 { font-size: 13px; }
 }

@@ -327,7 +327,6 @@
                 dmg = Math.floor(dmg * 0.5);
             }
             if (youVulnerable > 0) dmg = Math.floor(dmg * 1.5);
-            if (youWeak > 0 && !isStatus) dmg = Math.floor(dmg * 0.5);
             youHP = Math.max(0, youHP - dmg);
             return { hpLost: dmg, absorbed: absorbed };
         } else {
@@ -342,13 +341,13 @@
                 dmg = Math.floor(dmg * 0.5);
             }
             if (oppVulnerable > 0) dmg = Math.floor(dmg * 1.5);
-            if (oppWeak > 0 && !isStatus) dmg = Math.floor(dmg * 0.5);
             oppHP = Math.max(0, oppHP - dmg);
             return { hpLost: dmg, absorbed: absorbed };
         }
     }
 
     function dealCardDamage(attackerIsPlayer, amount) {
+        // Слепота: проверяем у АТАКУЮЩЕГО (промах)
         if (attackerIsPlayer && youBlind > 0) {
             youBlind--;
             return { hpLost: 0, absorbed: 0, evaded: true, blindMiss: true };
@@ -358,6 +357,12 @@
             return { hpLost: 0, absorbed: 0, evaded: true, blindMiss: true };
         }
 
+        // Слабость: проверяем у АТАКУЮЩЕГО (снижает его урон на 50%)
+        let dmg = amount;
+        if (attackerIsPlayer && youWeak > 0) dmg = Math.floor(dmg * 0.5);
+        if (!attackerIsPlayer && oppWeak > 0) dmg = Math.floor(dmg * 0.5);
+
+        // Уклонение: проверяем у ЦЕЛИ (защитника)
         if (attackerIsPlayer && oppEvasion > 0) {
             oppEvasion--;
             return { hpLost: 0, absorbed: 0, evaded: true };
@@ -368,7 +373,7 @@
         }
 
         const target = attackerIsPlayer ? 'opp' : 'you';
-        const result = applyCbDamage(target, amount);
+        const result = applyCbDamage(target, dmg);
         const actualDamage = result.hpLost;
 
         if (actualDamage > 0) {
