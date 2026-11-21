@@ -27,6 +27,7 @@ header ul {
     width: 100%;
     padding: 0 32px;
     height: 100%;
+    position: relative; /* ВАЖНО для абсолютного позиционирования навигации */
 }
 
 header li {
@@ -77,6 +78,7 @@ header #refill {
 
 #refill a {
     color: azure;
+    font-size: 20px;
     text-decoration: none;
     padding: 8px 16px;
     border-radius: 4px;
@@ -176,125 +178,80 @@ main {
     margin-right: 24px;
 }
 
-/* ============ АДАПТИВ ШАПКИ САЙТА ============ */
-@media (max-width: 850px) {
-    /* Шапка становится резиновой по высоте */
-    header {
-        position: relative; /* Отпускаем в поток, чтобы она не наезжала */
-        height: auto;
-        padding: 10px 0;
-    }
-    
-    /* main больше не привязан к фиксированной высоте 64px */
-    main {
-        top: 0 !important;
-        height: auto !important;
-        min-height: calc(100vh - 60px);
-        flex-direction: column; /* ГЛАВНОЕ: контент и панель игроков друг под другом */
-    }
+/* ============ ЦЕНТРАЛЬНАЯ НАВИГАЦИЯ ============ */
+.nav-center {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 10px;
+    height: 100%;
+    align-items: center;
+    z-index: 1;
 }
 
-/* Планшеты и небольшие ноутбуки */
+.nav-center a {
+    color: azure;
+    font-size: 20px;
+    text-decoration: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    height: 100%;
+}
+
+.nav-center a img {
+    height: 32px;
+    width: 32px;
+    filter: invert(100%);
+    margin: 0 8px;
+    flex-shrink: 0;
+}
+
+.nav-center a:hover {
+    color: orange;
+    background: rgba(255, 165, 0, 0.1);
+    cursor: pointer;
+}
+
 @media (max-width: 768px) {
-    header {
-        height: 56px;
+    .nav-center {
+        position: static;
+        transform: none;
+        gap: 0;
     }
-    main {
-        height: calc(100vh - 56px);
-        top: 56px;
-    }
-    header ul {
-        padding: 0 15px;
-    }
-    header #web-name a {
-        font-size: 20px;
-        padding: 0 10px 0 0;
-    }
-    #web-logo {
-        width: 34px;
-        height: 34px;
-        margin-right: 10px;
-    }
-    header #balance {
-        font-size: 16px;
-        padding: 0 10px;
-    }
-    #refill a {
+    .nav-center a {
+        font-size: 14px;
         padding: 6px 12px;
-        font-size: 15px;
+    }
+    .nav-center a img {
+        height: 22px;
+        width: 22px;
+        margin: 0 6px 0 0;
     }
 }
 
-/* Мобильные телефоны */
-@media (max-width: 500px) {
-    header {
-        height: 50px;
-    }
-    main {
-        height: calc(100vh - 50px);
-        top: 50px;
-    }
-    header ul {
-        padding: 0 8px;
-    }
-    
-    /* Скрываем текст названия сайта, оставляем только иконку */
-    header #web-name a {
-        font-size: 0;
-        padding: 0;
-    }
-    #web-logo {
-        width: 32px;
-        height: 32px;
-        margin-right: 0;
-    }
-    
-    /* Уменьшаем баланс */
-    header #balance {
-        font-size: 13px;
-        padding: 0 6px;
-    }
-    
-    /* Уменьшаем кнопку пополнения */
-    #refill {
-        margin-left: 6px;
-    }
-    #refill a {
-        font-size: 13px;
-        padding: 6px 8px;
-    }
-    
-    /* Адаптив модального окна пополнения (перебиваем инлайн-стили) */
-    #dep-block {
-        width: 92% !important;
-        padding: 20px 15px !important;
-    }
-    #dep-block h3 {
-        font-size: 20px;
-        margin-bottom: 15px;
-    }
-    #dep-block input {
-        padding: 10px;
-        font-size: 14px;
-        margin: 8px 0;
-    }
+/* ============ УБИРАЕМ ДЁРГАЮЩИЙСЯ СКРОЛЛ В WHEEL/SLOTS/MEMORY ============ */
+.wheel-game-area .inventory-list,
+.slots-game-area .inventory-list,
+.memory-game-area .inventory-list {
+    scrollbar-width: none;        /* Firefox */
+    -ms-overflow-style: none;     /* IE/Edge */
 }
 
-/* Очень узкие экраны (например, iPhone SE, старые Android) */
-@media (max-width: 380px) {
-    /* Прячем слово "Баланс:" оставляя только цифры */
-    header #balance {
-        font-size: 0;
-    }
-    #bal-header {
-        font-size: 14px;
-        margin-left: 0;
-    }
-    /* Добавляем значок рубля через псевдоэлемент, так как он был текстом */
-    header #balance::after { 
-        content: ' ₽'; 
-        font-size: 14px; 
-        color: #fff;
-    }
+.wheel-game-area .inventory-list::-webkit-scrollbar,
+.slots-game-area .inventory-list::-webkit-scrollbar,
+.memory-game-area .inventory-list::-webkit-scrollbar {
+    display: none;
+    width: 0;
+    height: 0;
 }
 
+/* Дополнительно убираем возможный горизонтальный оверфлоу у игровых контейнеров */
+.wheel-game-area,
+.slots-game-area,
+.memory-game-area {
+    overflow-x: hidden;
+}

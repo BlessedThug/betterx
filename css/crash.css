@@ -847,3 +847,30 @@ main #game {
     }
     #x { font-size: 44px; }
 }
+
+/* ============ КРАСИВЫЙ СКРОЛЛ ИНВЕНТАРЯ ============ */
+.inventory-list::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+}
+
+.inventory-list::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.04);
+    border-radius: 3px;
+}
+
+.inventory-list::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, #ff8a00, #ffb400);
+    border-radius: 3px;
+    transition: background 0.2s;
+}
+
+.inventory-list::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(180deg, #ffb400, #ff8a00);
+}
+
+/* Firefox */
+.inventory-list {
+    scrollbar-width: thin;
+    scrollbar-color: #ffb400 rgba(255, 255, 255, 0.04);
+}

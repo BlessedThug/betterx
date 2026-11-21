@@ -426,8 +426,11 @@
 
     function highlightSelectedInv(container, item) {
         container.querySelectorAll('.inv-item').forEach(row => {
-            if (item && row.dataset.id === item.id) row.classList.add('selected');
-            else row.classList.remove('selected');
+            const isSelected = item && String(row.dataset.id) === String(item.id);
+            row.classList.toggle('selected', !!isSelected);
+            // Обновляем галочку/стрелку
+            const checkEl = row.querySelector('.inv-item-check');
+            if (checkEl) checkEl.textContent = isSelected ? '✓' : '→';
         });
     }
 

@@ -254,6 +254,11 @@
         DOM.cbYouHPText.innerHTML = `${youHP} / 100 ${formatStatusIcons(true)}`;
         DOM.cbOppHPText.innerHTML = `${oppHP} / 100 ${formatStatusIcons(false)}`;
 
+        const youCountEl = document.getElementById('cb-you-hand-count');
+        const oppCountEl = document.getElementById('cb-opp-hand-count');
+        if (youCountEl) youCountEl.textContent = `${youHand.length} / 10`;
+        if (oppCountEl) oppCountEl.textContent = `${oppHand.length} / 10`;
+
         // --- Рука игрока ---
         DOM.cbYouHandEl.innerHTML = '';
         youHand.forEach((cardObj, i) => {
@@ -382,14 +387,14 @@
                     oppReflect--;
                     const reflected = Math.floor(actualDamage / 2);
                     if (reflected > 0) {
-                        applyCbDamage('you', reflected, true);
+                        applyCbDamage('you', reflected, false);
                         logCbMessage(`🔮 Соперник отражает ${reflected} урона`, 'opp');
                     }
                 }
                 if (oppThorns > 0) {
                     const thornsDmg = oppThorns;
                     oppThorns = 0;
-                    applyCbDamage('you', thornsDmg, true);
+                    applyCbDamage('you', thornsDmg, false);
                     logCbMessage(`🌵 Шипы соперника: ${thornsDmg} урона вам`, 'opp');
                 }
             } else {
@@ -397,14 +402,14 @@
                     youReflect--;
                     const reflected = Math.floor(actualDamage / 2);
                     if (reflected > 0) {
-                        applyCbDamage('opp', reflected, true);
+                        applyCbDamage('opp', reflected, false);
                         logCbMessage(`🔮 Вы отражаете ${reflected} урона`, 'you');
                     }
                 }
                 if (youThorns > 0) {
                     const thornsDmg = youThorns;
                     youThorns = 0;
-                    applyCbDamage('opp', thornsDmg, true);
+                    applyCbDamage('opp', thornsDmg, false);
                     logCbMessage(`🌵 Ваши шипы: ${thornsDmg} урона сопернику`, 'you');
                 }
             }
@@ -665,8 +670,8 @@
                 break;
             }
             case 'Регенерация': {
-                if (isPlayer) { youRegen = 3; }
-                else { oppRegen = 3; }
+                if (isPlayer) { youRegen += 3; }
+                else { oppRegen += 3; }
                 logCbMessage(`💖 Регенерация (+5 HP / 3 хода)`, isPlayer ? 'you' : 'opp');
                 break;
             }
@@ -790,7 +795,8 @@
                 const hasDot = isPlayer ? (oppPoison > 0 || oppBleed > 0 || oppBurn > 0) : (youPoison > 0 || youBleed > 0 || youBurn > 0);
                 const dmg = hasDot ? 12 : 4;
                 const res = dealBuffedDamage(isPlayer, card, dmg);
-                logDamage(`☠️ Заражение${hasDot ? ' (усилено)' : ''}`, res, isPlayer);
+                if (isPlayer) oppPoison += 2; else youPoison += 2;
+                logDamage(`☠️ Заражение${hasDot ? ' (усилено)' : ''} (+2 яда)`, res, isPlayer);
                 break;
             }
             case 'Проклятая книга': {
@@ -806,7 +812,7 @@
             }
             case 'Вихрь': {
                 const handSize = isPlayer ? youHand.length : oppHand.length;
-                const dmg = Math.min(15, handSize * 3);
+                const dmg = 4 + (handSize * 3);
                 const res = dealBuffedDamage(isPlayer, card, dmg);
                 logDamage(`🌪️ Вихрь`, res, isPlayer);
                 break;
@@ -828,7 +834,7 @@
 
     function drawCards(hand, count) {
         for (let i = 0; i < count; i++) {
-            if (hand.length < 7) hand.push({ id: drawCard(), revealed: false });
+            if (hand.length < 10) hand.push({ id: drawCard(), revealed: false });
         }
     }
 

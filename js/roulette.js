@@ -1068,8 +1068,14 @@
         if (!wrapper) return;
 
         const wrapperWidth = wrapper.clientWidth || 420;
-        const maxSize = Math.min(wrapperWidth, window.innerHeight * 0.55, 480);
-        const size = Math.max(280, maxSize);
+        const isMobile = window.innerWidth <= 900;
+        
+        // На мобилках жестко ограничиваем максимальный размер колеса (320px)
+        const maxSize = isMobile 
+            ? Math.min(wrapperWidth, 320) 
+            : Math.min(wrapperWidth, window.innerHeight * 0.55, 480);
+            
+        const size = Math.max(240, maxSize); // Минимум 240px
 
         canvas.width = size;
         canvas.height = size;

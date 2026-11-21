@@ -485,3 +485,45 @@
     .cb-help-body { font-size: 12px; max-height: 60vh; }
     .cb-help-body h3 { font-size: 13px; }
 }
+
+/* ============ СЧЁТЧИК КАРТ В РУКЕ ============ */
+.cb-hand-info {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+    font-weight: 700;
+    color: #aaa;
+    padding: 4px 12px;
+    background: rgba(0, 0, 0, 0.45);
+    border: 1px solid rgba(100, 150, 255, 0.25);
+    border-radius: 8px;
+    letter-spacing: 0.5px;
+    flex-shrink: 0;
+}
+
+.cb-hand-info b {
+    color: #ffb400;
+    font-size: 15px;
+    font-weight: 800;
+    text-shadow: 0 0 8px rgba(255, 180, 0, 0.4);
+}
+
+.cb-you .cb-hand-info {
+    border-color: rgba(76, 175, 80, 0.3);
+}
+
+.cb-you .cb-hand-info b {
+    color: #7fe08a;
+    text-shadow: 0 0 8px rgba(76, 175, 80, 0.5);
+}
+
+@media (max-width: 600px) {
+    .cb-hand-info {
+        font-size: 11px;
+        padding: 3px 10px;
+    }
+    .cb-hand-info b {
+        font-size: 13px;
+    }
+}
