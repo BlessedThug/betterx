@@ -1,6 +1,4 @@
 /* ============ ФОН СТРАНИЦЫ ИНВЕНТАРЯ ============ */
-/* Этот CSS подключается только на inventory.html */
-
 body {
     background:
         radial-gradient(ellipse 60% 50% at 78% 12%, rgba(255, 140, 0, 0.22), transparent 60%),
@@ -14,8 +12,8 @@ body {
 
 /* ============ ОСНОВНОЙ КОНТЕЙНЕР ИНВЕНТАРЯ ============ */
 #m-inventory {
-    width: 100%;
-    height: 100%;
+    flex: 1; /* ИСПРАВЛЕНИЕ: Растягивание вместо жестких размеров */
+    min-height: 0; /* ИСПРАВЛЕНИЕ: Убирает выталкивание контента вниз */
     padding: 40px 20px;
     overflow-y: auto;
     background: linear-gradient(135deg, rgba(20, 20, 20, 0.55) 0%, rgba(30, 30, 30, 0.72) 100%) !important;
@@ -54,7 +52,6 @@ body {
     border-radius: 2px;
 }
 
-/* Анимация появления (перекрывается инлайн-стилем в HTML) */
 #m-inventory {
     opacity: 0;
     transform: translateY(10px);
@@ -62,20 +59,10 @@ body {
 }
 
 /* Скроллбар */
-#m-inventory::-webkit-scrollbar {
-    width: 8px;
-}
-#m-inventory::-webkit-scrollbar-track {
-    background: rgba(255, 255, 255, 0.05);
-    border-radius: 10px;
-}
-#m-inventory::-webkit-scrollbar-thumb {
-    background: linear-gradient(180deg, #ff8a00, #ffcc00);
-    border-radius: 10px;
-}
-#m-inventory::-webkit-scrollbar-thumb:hover {
-    background: linear-gradient(180deg, #ffcc00, #ff8a00);
-}
+#m-inventory::-webkit-scrollbar { width: 8px; }
+#m-inventory::-webkit-scrollbar-track { background: rgba(255, 255, 255, 0.05); border-radius: 10px; }
+#m-inventory::-webkit-scrollbar-thumb { background: linear-gradient(180deg, #ff8a00, #ffcc00); border-radius: 10px; }
+#m-inventory::-webkit-scrollbar-thumb:hover { background: linear-gradient(180deg, #ffcc00, #ff8a00); }
 
 /* ============ ИНФО-БЛОК ============ */
 #m-inf-inv {
@@ -90,17 +77,8 @@ body {
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
 }
 
-#m-inf-inv p {
-    color: #fff;
-    font-size: 24px;
-    margin: 0;
-}
-
-#m-inf-inv #rub {
-    color: #4CAF50;
-    font-weight: bold;
-    font-size: 28px;
-}
+#m-inf-inv p { color: #fff; font-size: 24px; margin: 0; }
+#m-inf-inv #rub { color: #4CAF50; font-weight: bold; font-size: 28px; }
 
 /* ============ СЕТКА ПРЕДМЕТОВ ============ */
 .inventory-items-container {
@@ -127,28 +105,10 @@ body {
     box-shadow: 0 10px 25px rgba(0, 0, 0, 0.5), 0 0 20px rgba(255, 165, 0, 0.15);
 }
 
-.inventory-item img {
-    width: 100px;
-    height: 100px;
-    object-fit: contain;
-    margin-bottom: 10px;
-}
-
-.inventory-item p {
-    margin: 5px 0;
-    font-size: 16px;
-}
-
-.inventory-item .item-price {
-    color: #4CAF50;
-    font-weight: bold;
-    font-size: 18px;
-}
-
-.inventory-item .item-date {
-    color: #888;
-    font-size: 12px;
-}
+.inventory-item img { width: 100px; height: 100px; object-fit: contain; margin-bottom: 10px; }
+.inventory-item p { margin: 5px 0; font-size: 16px; }
+.inventory-item .item-price { color: #4CAF50; font-weight: bold; font-size: 18px; }
+.inventory-item .item-date { color: #888; font-size: 12px; }
 
 /* Кнопка продажи */
 .sell-item-btn {
@@ -164,100 +124,46 @@ body {
     transition: opacity 0.3s ease;
 }
 
-.sell-item-btn:hover {
-    opacity: 0.9;
-}
-
-.sell-item-btn:active {
-    transform: scale(0.98);
-}
-
-/* ============ ДИАЛОГ ВЫБОРА ============ */
-#win-choice-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: rgba(0, 0, 0, 0.8);
-    z-index: 999;
-}
-
-#win-choice-dialog {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background: linear-gradient(135deg, rgba(30, 30, 40, 0.98), rgba(40, 40, 50, 0.98));
-    padding: 40px;
-    border-radius: 20px;
-    border: 4px solid #ff4081;
-    text-align: center;
-    z-index: 1000;
-    box-shadow:
-        0 0 50px rgba(255, 64, 129, 0.5),
-        inset 0 0 30px rgba(255, 64, 129, 0.2);
-    min-width: 500px;
-    max-width: 90%;
-    animation: dialogAppear 0.3s ease;
-}
-
-@keyframes dialogAppear {
-    from {
-        opacity: 0;
-        transform: translate(-50%, -50%) scale(0.9);
-    }
-    to {
-        opacity: 1;
-        transform: translate(-50%, -50%) scale(1);
-    }
-}
+.sell-item-btn:hover { opacity: 0.9; }
+.sell-item-btn:active { transform: scale(0.98); }
 
 /* ============ АДАПТИВ ============ */
 @media (max-width: 768px) {
     #m-inventory {
-        padding: 20px 10px !important;
-        margin: 10px 0 !important;
+        padding: 20px 10px;
+        margin: 10px; /* ИСПРАВЛЕНИЕ: Убран margin: 0, чтобы блок не прилипал к краям */
     }
     #m-inventory h1 {
-        font-size: 32px !important;
-        margin-bottom: 25px !important;
+        font-size: 32px;
+        margin-bottom: 25px;
     }
     #m-inf-inv {
-        padding: 15px !important;
-        margin-bottom: 15px !important;
+        padding: 15px;
+        margin-bottom: 15px;
     }
-    #m-inf-inv p {
-        font-size: 16px !important;
-    }
-    #m-inf-inv #rub {
-        font-size: 20px !important;
-    }
+    #m-inf-inv p { font-size: 16px; }
+    #m-inf-inv #rub { font-size: 20px; }
 
     .inventory-items-container {
-        grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)) !important;
-        gap: 10px !important;
-        padding: 10px 0 !important;
+        grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+        gap: 10px;
+        padding: 10px 0;
     }
 
     .inventory-item {
-        padding: 10px !important;
-        border-radius: 10px !important;
+        padding: 10px;
+        border-radius: 10px;
     }
     .inventory-item img {
-        width: 70px !important;
-        height: 70px !important;
-        margin-bottom: 5px !important;
+        width: 70px;
+        height: 70px;
+        margin-bottom: 5px;
     }
-    .inventory-item p {
-        font-size: 12px !important;
-    }
-    .inventory-item .item-price {
-        font-size: 14px !important;
-    }
+    .inventory-item p { font-size: 12px; }
+    .inventory-item .item-price { font-size: 14px; }
     .sell-item-btn {
-        padding: 6px 10px !important;
-        font-size: 12px !important;
-        margin-top: 5px !important;
+        padding: 6px 10px;
+        font-size: 12px;
+        margin-top: 5px;
     }
 }

@@ -272,3 +272,36 @@
         height: 24px;
     }
 }
+
+#catalog.active,
+#inventory.active,
+.nav-center a.active {
+    color: orange !important;
+    background: rgba(255, 165, 0, 0.2) !important;
+    border-radius: 4px;
+    position: relative;
+}
+
+#catalog.active::after,
+#inventory.active::after,
+.nav-center a.active::after {
+    content: '';
+    position: absolute;
+    bottom: -8px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 80%;
+    height: 3px;
+    background: linear-gradient(90deg, transparent, orange, transparent);
+    border-radius: 2px;
+}
+
+/* На мобильных подчёркивание не должно вылезать за ряд навигации */
+@media (max-width: 900px) {
+    #catalog.active::after,
+    #inventory.active::after,
+    .nav-center a.active::after {
+        bottom: 2px;
+        height: 2px;
+    }
+}

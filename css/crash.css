@@ -1,21 +1,53 @@
-body {
-    overflow-y: hidden;
-    font-family: 'Noto Sans', sans-serif;
-}
-
+/* ============ БАЗОВЫЕ СТИЛИ ============ */
 main #bet {
-    height: calc(100vh - 65px);
-    width: 512px;
-    color: azure;
-    font-size: 24px;
-    background: rgb(27, 27, 27);
+    width: 400px;
+    height: 100%;
+    flex-shrink: 0;
     border-right: 3px solid orange;
-    padding: 0;
-    overflow: hidden;
     display: flex;
     flex-direction: column;
+    padding: 0;
+    overflow-y: auto; /* Внутренний скролл на десктопе, если контента много */
+    background: rgb(27, 27, 27);
+    color: azure;
+    font-size: 24px;
 }
 
+main #game {
+    flex: 1;
+    min-width: 0;
+    height: 100%;
+    border-right: none;
+    position: relative;
+    background: rgb(20, 20, 20);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+}
+
+/* Обертка, создаваемая в multiplayer.js */
+.crash-layout {
+    display: flex;
+    flex: 1;
+    height: 100%;
+    width: 100%;
+    min-height: 0;
+}
+
+#players-container {
+    width: 340px;
+    flex-shrink: 0;
+    height: 100%;
+}
+
+/* Кастомизация скроллбара панели ставок */
+main #bet::-webkit-scrollbar { width: 6px; }
+main #bet::-webkit-scrollbar-track { background: rgba(0, 0, 0, 0.2); }
+main #bet::-webkit-scrollbar-thumb { background: orange; border-radius: 3px; }
+
+/* ============ ВНУТРЕННИЕ ЭЛЕМЕНТЫ ============ */
 #bet-place {
     width: 100%;
     height: auto;
@@ -106,19 +138,6 @@ main #bet {
     text-overflow: ellipsis;
 }
 
-/* Анимация для статуса "Ожидание" */
-@keyframes status-pulse {
-    0% {
-        opacity: 0.7;
-        text-shadow: 0 0 5px rgba(255, 165, 0, 0.3);
-    }
-
-    100% {
-        opacity: 1;
-        text-shadow: 0 0 10px rgba(255, 165, 0, 0.5);
-    }
-}
-
 #status {
     transition: all 0.3s ease;
 }
@@ -134,6 +153,11 @@ main #bet {
 
 #status.status-finished {
     color: orange;
+}
+
+@keyframes status-pulse {
+    0% { opacity: 0.7; text-shadow: 0 0 5px rgba(255, 165, 0, 0.3); }
+    100% { opacity: 1; text-shadow: 0 0 10px rgba(255, 165, 0, 0.5); }
 }
 
 #bet-place button {
@@ -163,23 +187,16 @@ main #bet {
     transform: translateY(1px);
 }
 
-/* Стиль для кнопки когда ставка подтверждена */
 #startBtn.confirmed {
     background: linear-gradient(45deg, #4CAF50, #45a049);
     animation: btn-glow 1s infinite alternate;
 }
 
 @keyframes btn-glow {
-    from {
-        box-shadow: 0 4px 8px rgba(76, 175, 80, 0.3);
-    }
-
-    to {
-        box-shadow: 0 4px 15px rgba(76, 175, 80, 0.6);
-    }
+    from { box-shadow: 0 4px 8px rgba(76, 175, 80, 0.3); }
+    to { box-shadow: 0 4px 15px rgba(76, 175, 80, 0.6); }
 }
 
-/* Стили для заблокированной кнопки */
 #startBtn:disabled {
     opacity: 0.5 !important;
     cursor: not-allowed !important;
@@ -194,36 +211,7 @@ main #bet {
     border-color: rgb(50, 50, 50) !important;
 }
 
-/* Анимация для статуса */
-@keyframes status-pulse {
-    0% {
-        opacity: 0.7;
-        text-shadow: 0 0 5px rgba(255, 165, 0, 0.3);
-    }
-
-    100% {
-        opacity: 1;
-        text-shadow: 0 0 10px rgba(255, 165, 0, 0.5);
-    }
-}
-
-#status {
-    transition: all 0.3s ease;
-}
-
-#status.status-waiting {
-    color: orange;
-    animation: status-pulse 1s infinite alternate;
-}
-
-#status.status-game {
-    color: orange;
-}
-
-#status.status-finished {
-    color: orange;
-}
-
+/* История игры */
 #history-game {
     width: 100%;
     height: 180px;
@@ -258,21 +246,10 @@ main #bet {
     scrollbar-color: orange rgb(40, 40, 40);
 }
 
-#slots::-webkit-scrollbar {
-    height: 8px;
-}
+#slots::-webkit-scrollbar { height: 8px; }
+#slots::-webkit-scrollbar-track { background: rgb(40, 40, 40); border-radius: 4px; }
+#slots::-webkit-scrollbar-thumb { background: orange; border-radius: 4px; }
 
-#slots::-webkit-scrollbar-track {
-    background: rgb(40, 40, 40);
-    border-radius: 4px;
-}
-
-#slots::-webkit-scrollbar-thumb {
-    background: orange;
-    border-radius: 4px;
-}
-
-/* Стили для ячеек истории */
 .slot {
     background: rgb(20, 20, 20);
     border: orange 2px solid;
@@ -292,29 +269,12 @@ main #bet {
     margin: 0 4px 4px 0;
 }
 
-.slot:hover {
-    transform: translateY(-2px);
-}
+.slot:hover { transform: translateY(-2px); }
+.slot.low-mult { color: #ff3333; border-color: #ff3333; box-shadow: 0 4px 6px rgba(255, 51, 51, 0.2); }
+.slot.medium-mult { color: orange; border-color: orange; box-shadow: 0 4px 6px rgba(255, 165, 0, 0.2); }
+.slot.high-mult { color: #4CAF50; border-color: #4CAF50; box-shadow: 0 4px 6px rgba(76, 175, 80, 0.2); }
 
-/* Классы для разных цветов множителей */
-.slot.low-mult {
-    color: #ff3333;
-    border-color: #ff3333;
-    box-shadow: 0 4px 6px rgba(255, 51, 51, 0.2);
-}
-
-.slot.medium-mult {
-    color: orange;
-    border-color: orange;
-    box-shadow: 0 4px 6px rgba(255, 165, 0, 0.2);
-}
-
-.slot.high-mult {
-    color: #4CAF50;
-    border-color: #4CAF50;
-    box-shadow: 0 4px 6px rgba(76, 175, 80, 0.2);
-}
-
+/* История баланса */
 #history-bal {
     flex: 1;
     min-height: 200px;
@@ -352,18 +312,7 @@ main #bet {
     font-size: 18px;
 }
 
-main #game {
-    height: calc(100vh - 65px);
-    width: calc(100% - 512px);
-    position: relative;
-    background: rgb(20, 20, 20);
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    overflow: hidden;
-}
-
+/* Игровое поле */
 #game-bc {
     color: orange;
     font-size: 48px;
@@ -380,7 +329,6 @@ main #game {
     margin-top: 20px;
 }
 
-/* Оригинальная анимация множителя */
 #x {
     font-size: 72px;
     color: orange;
@@ -390,39 +338,23 @@ main #game {
     animation: pulse 2s infinite;
 }
 
-/* Класс для красного состояния множителя */
 #x.crash-active {
     color: #ff3333 !important;
     text-shadow: 0 0 30px rgba(255, 51, 51, 0.9) !important;
     animation: crash-pulse 0.5s infinite alternate !important;
 }
 
-/* Анимация для CRASH состояния */
 @keyframes crash-pulse {
-    from {
-        text-shadow: 0 0 30px rgba(255, 51, 51, 0.9);
-    }
-
-    to {
-        text-shadow: 0 0 50px rgba(255, 51, 51, 1);
-    }
+    from { text-shadow: 0 0 30px rgba(255, 51, 51, 0.9); }
+    to { text-shadow: 0 0 50px rgba(255, 51, 51, 1); }
 }
 
 @keyframes pulse {
-    0% {
-        text-shadow: 0 0 30px rgba(255, 165, 0, 0.7);
-    }
-
-    50% {
-        text-shadow: 0 0 50px rgba(255, 165, 0, 0.9);
-    }
-
-    100% {
-        text-shadow: 0 0 30px rgba(255, 165, 0, 0.7);
-    }
+    0% { text-shadow: 0 0 30px rgba(255, 165, 0, 0.7); }
+    50% { text-shadow: 0 0 50px rgba(255, 165, 0, 0.9); }
+    100% { text-shadow: 0 0 30px rgba(255, 165, 0, 0.7); }
 }
 
-/* Стили для таймера */
 #timer-container {
     text-align: center;
     margin: 10px 0;
@@ -436,15 +368,8 @@ main #game {
 }
 
 @keyframes timer-glow {
-    from {
-        box-shadow: 0 0 10px rgba(255, 165, 0, 0.3);
-        border-color: orange;
-    }
-
-    to {
-        box-shadow: 0 0 20px rgba(255, 165, 0, 0.6);
-        border-color: #ffb400;
-    }
+    from { box-shadow: 0 0 10px rgba(255, 165, 0, 0.3); border-color: orange; }
+    to { box-shadow: 0 0 20px rgba(255, 165, 0, 0.6); border-color: #ffb400; }
 }
 
 #timer-text {
@@ -464,92 +389,7 @@ main #game {
     transition: opacity 0.5s;
 }
 
-/* Стили для модального окна */
-#dep-block {
-    display: none;
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background: rgb(30, 30, 30);
-    padding: 30px;
-    border-radius: 12px;
-    border: 3px solid orange;
-    z-index: 1000;
-    width: 400px;
-    box-shadow: 0 0 40px rgba(255, 165, 0, 0.3);
-}
-
-#dep-block h3 {
-    color: orange;
-    text-align: center;
-    margin-bottom: 20px;
-    font-size: 24px;
-}
-
-#dep-block input {
-    display: block;
-    width: 100%;
-    margin: 12px 0;
-    padding: 12px;
-    background: rgb(20, 20, 20);
-    border: 2px solid rgb(50, 50, 50);
-    border-radius: 6px;
-    color: azure;
-    font-size: 16px;
-    box-sizing: border-box;
-}
-
-#dep-block input:focus {
-    border-color: orange;
-    outline: none;
-}
-
-#dep-block button {
-    padding: 10px;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    font-weight: bold;
-    transition: all 0.3s;
-}
-
-#dep-block button:hover {
-    transform: translateY(-1px);
-}
-
-/* Стили для кнопки подтверждения ставки */
-#startBtn.confirmed {
-    background: linear-gradient(45deg, #4CAF50, #45a049);
-    animation: btn-glow 1s infinite alternate;
-}
-
-@keyframes btn-glow {
-    from {
-        box-shadow: 0 4px 8px rgba(76, 175, 80, 0.3);
-    }
-
-    to {
-        box-shadow: 0 4px 15px rgba(76, 175, 80, 0.6);
-    }
-}
-
-/* Стили для заблокированных элементов */
-#startBtn:disabled {
-    opacity: 0.5 !important;
-    cursor: not-allowed !important;
-    transform: none !important;
-}
-
-#betAmount:disabled,
-#betMultiplier:disabled {
-    opacity: 0.5 !important;
-    cursor: not-allowed !important;
-    background: rgb(30, 30, 30) !important;
-    border-color: rgb(50, 50, 50) !important;
-}
-
-/* ===== Инвентарь в Crash ===== */
+/* Инвентарь в Crash */
 .inventory-section {
     margin: 12px 0 8px 0;
     padding: 8px 0;
@@ -571,7 +411,14 @@ main #game {
     flex-direction: column;
     gap: 6px;
     padding-right: 4px;
+    scrollbar-width: thin;
+    scrollbar-color: #ffb400 rgba(255, 255, 255, 0.04);
 }
+
+.inventory-list::-webkit-scrollbar { width: 6px; height: 6px; }
+.inventory-list::-webkit-scrollbar-track { background: rgba(255, 255, 255, 0.04); border-radius: 3px; }
+.inventory-list::-webkit-scrollbar-thumb { background: linear-gradient(180deg, #ff8a00, #ffb400); border-radius: 3px; }
+.inventory-list::-webkit-scrollbar-thumb:hover { background: linear-gradient(180deg, #ffb400, #ff8a00); }
 
 .inventory-empty {
     text-align: center;
@@ -617,28 +464,11 @@ main #game {
     background: rgba(0, 0, 0, 0.3);
 }
 
-.inventory-item-info {
-    flex: 1;
-}
+.inventory-item-info { flex: 1; }
+.inventory-item-name { font-size: 13px; font-weight: bold; margin-bottom: 2px; }
+.inventory-item-price { font-size: 11px; color: #4CAF50; }
+.inventory-item-select { color: orange; font-size: 18px; font-weight: bold; }
 
-.inventory-item-name {
-    font-size: 13px;
-    font-weight: bold;
-    margin-bottom: 2px;
-}
-
-.inventory-item-price {
-    font-size: 11px;
-    color: #4CAF50;
-}
-
-.inventory-item-select {
-    color: orange;
-    font-size: 18px;
-    font-weight: bold;
-}
-
-/* Текущая ставка */
 .current-bet-display {
     background: rgba(10, 10, 15, 0.85);
     border-radius: 8px;
@@ -667,119 +497,84 @@ main #game {
     margin-top: 2px;
 }
 
-/* ============ НОВАЯ СТРУКТУРА И АДАПТИВ CRASH ============ */
-
-/* Жесткая структура для десктопа (так как мы убрали стили из JS) */
-main {
-    height: calc(100vh - 64px);
-    width: 100%;
-    top: 64px;
-    position: relative;
-    display: flex;
-    overflow: hidden;
-}
-
-.crash-layout {
-    display: flex;
-    height: 100%;
-    width: 100%;
-}
-
-main #bet {
+/* Модальное окно */
+#dep-block {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: rgb(30, 30, 30);
+    padding: 30px;
+    border-radius: 12px;
+    border: 3px solid orange;
+    z-index: 1000;
     width: 400px;
-    height: 100%;
-    flex-shrink: 0;
-    border-right: 3px solid orange;
+    box-shadow: 0 0 40px rgba(255, 165, 0, 0.3);
 }
 
-main #game {
-    flex: 1;
-    min-width: 0;
-    height: 100%;
-    border-right: none;
+#dep-block h3 { color: orange; text-align: center; margin-bottom: 20px; font-size: 24px; }
+#dep-block input {
+    display: block; width: 100%; margin: 12px 0; padding: 12px;
+    background: rgb(20, 20, 20); border: 2px solid rgb(50, 50, 50);
+    border-radius: 6px; color: azure; font-size: 16px; box-sizing: border-box;
 }
+#dep-block input:focus { border-color: orange; outline: none; }
+#dep-block button { padding: 10px; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; transition: all 0.3s; }
+#dep-block button:hover { transform: translateY(-1px); }
 
-#players-container {
-    width: 340px;
-    flex-shrink: 0;
-    height: 100%;
-}
-
-/* --- АДАПТИВ --- */
-
-/* Планшеты: прячем блок игроков, чтобы освободить место */
+/* ============ АДАПТИВ ============ */
 @media (max-width: 1200px) {
-    #players-container {
-        display: none !important;
-    }
-    main #bet {
-        width: 360px;
-    }
+    #players-container { display: none !important; }
+    main #bet { width: 360px; }
     #game-bc { font-size: 40px; }
     #x { font-size: 64px; }
 }
 
-/* Мобильные устройства: вертикальный стек */
 @media (max-width: 850px) {
-    body {
-        overflow-y: auto; /* Разрешаем скролл всей странице */
-    }
-
+    /* Позволяем main скроллиться */
     main {
-        height: auto;
-        min-height: calc(100vh - 64px);
-        overflow: visible;
+        height: auto !important;
+        min-height: calc(100vh - var(--header-h));
+        overflow-y: auto !important;
     }
 
+    /* Переводим макет в колонку */
     .crash-layout {
-        flex-direction: column; /* Игра сверху, ставка снизу */
+        flex-direction: column;
+        height: auto;
+        min-height: calc(100vh - var(--header-h));
     }
 
-    /* Игра наверх и фиксируем высоту */
+    /* Игра наверх */
     main #game {
         width: 100%;
         height: 45vh;
         min-height: 300px;
-        order: -1; /* Игра всегда первая */
+        flex: none;
+        order: -1;
         border-bottom: 3px solid orange;
         border-right: none;
     }
 
-    /* Панель ставок вниз */
+    /* Панель ставок вниз, разрешаем расти */
     main #bet {
         width: 100%;
         height: auto;
         flex: 1;
         border-right: none;
+        overflow: visible;
     }
 
-    #game-bc { font-size: 28px; margin-bottom: 20px; }
-    #x { font-size: 50px; }
-    #crash-text { font-size: 36px; }
-    #timer-container { font-size: 18px; padding: 8px; }
-
-    /* Внутренности панели ставок */
-    #bet-place {
-        padding: 12px;
-        min-height: auto;
-    }
-    
+    #bet-place { padding: 12px; min-height: auto; }
     #bet-h { font-size: 20px; margin-bottom: 10px; }
-    
-    #history-game {
-        height: auto;
-        min-height: 140px;
-        padding: 12px;
-    }
+
+    #history-game { height: auto; min-height: 140px; padding: 12px; }
     #history-game h2 { font-size: 20px; margin-bottom: 8px; }
 
-    #history-bal {
-        padding: 12px;
-        min-height: 250px;
-    }
+    #history-bal { padding: 12px; min-height: 250px; flex: none; }
     #history-bal h2 { font-size: 20px; margin-bottom: 8px; }
-    
-    /* Инвентарь в горизонтальную ленту со скроллом */
+
     .inventory-list {
         flex-direction: row;
         overflow-x: auto;
@@ -789,88 +584,28 @@ main #game {
         gap: 8px;
         -webkit-overflow-scrolling: touch;
     }
-    
-    .inventory-list::-webkit-scrollbar { height: 6px; }
-    .inventory-list::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); border-radius: 3px; }
-    .inventory-list::-webkit-scrollbar-thumb { background: orange; border-radius: 3px; }
-
-    .inventory-item-card {
-        flex-shrink: 0;
-        width: 140px;
-        padding: 6px 10px;
-    }
-    
+    .inventory-item-card { flex-shrink: 0; width: 140px; padding: 6px 10px; }
     .inventory-empty { width: 100%; text-align: center; padding: 10px; }
 
-    /* Текущая ставка */
-    .current-bet-display {
-        margin: 8px 0;
-        padding: 8px;
-    }
+    .current-bet-display { margin: 8px 0; padding: 8px; }
     .current-bet-display .amount { font-size: 20px; }
 
-    /* Поля ввода в ряд */
-    .inputs-container {
-        flex-direction: row;
-        gap: 8px;
-    }
+    .inputs-container { flex-direction: row; gap: 8px; }
 
     .slot { min-width: 75px; font-size: 16px; height: 50px; }
     .hb { font-size: 13px; padding: 6px; }
+
+    #game-bc { font-size: 28px; margin-bottom: 20px; }
+    #x { font-size: 50px; }
+    #crash-text { font-size: 36px; }
+    #timer-container { font-size: 18px; padding: 8px; }
 }
 
-/* Очень узкие экраны */
 @media (max-width: 500px) {
-    .inputs-container {
-        flex-direction: column; /* Поля ввода в колонку */
-    }
-
-    #bet-place .bottom-row {
-        flex-direction: column; /* Статус и кнопка друг под другом */
-        align-items: stretch;
-        gap: 8px;
-    }
-
-    #divstatus {
-        width: 100%;
-        justify-content: center;
-    }
-
-    #bet-place button {
-        width: 100%;
-        height: 44px; /* Удобная кнопка для тапа */
-    }
-
-    main #game {
-        height: 40vh;
-        min-height: 260px;
-    }
+    .inputs-container { flex-direction: column; }
+    #bet-place .bottom-row { flex-direction: column; align-items: stretch; gap: 8px; }
+    #divstatus { width: 100%; justify-content: center; }
+    #bet-place button { width: 100%; height: 44px; }
+    main #game { height: 40vh; min-height: 260px; }
     #x { font-size: 44px; }
-}
-
-/* ============ КРАСИВЫЙ СКРОЛЛ ИНВЕНТАРЯ ============ */
-.inventory-list::-webkit-scrollbar {
-    width: 6px;
-    height: 6px;
-}
-
-.inventory-list::-webkit-scrollbar-track {
-    background: rgba(255, 255, 255, 0.04);
-    border-radius: 3px;
-}
-
-.inventory-list::-webkit-scrollbar-thumb {
-    background: linear-gradient(180deg, #ff8a00, #ffb400);
-    border-radius: 3px;
-    transition: background 0.2s;
-}
-
-.inventory-list::-webkit-scrollbar-thumb:hover {
-    background: linear-gradient(180deg, #ffb400, #ff8a00);
-}
-
-/* Firefox */
-.inventory-list {
-    scrollbar-width: thin;
-    scrollbar-color: #ffb400 rgba(255, 255, 255, 0.04);
 }

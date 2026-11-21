@@ -1,8 +1,8 @@
 /* Стили каталога */
 
 #m-catalog {
-    width: 100%;
-    height: 100%;
+    flex: 1; /* ИСПРАВЛЕНИЕ: Растягивается на весь доступный размер родителя */
+    min-height: 0; /* ИСПРАВЛЕНИЕ: Позволяет блоку скроллиться внутри, а не растягивать страницу */
     padding: 40px 20px;
     overflow-y: auto;
     background: linear-gradient(135deg, rgba(20, 20, 20, 0.9) 0%, rgba(30, 30, 30, 0.95) 100%);
@@ -132,61 +132,21 @@
 }
 
 /* Индивидуальные стили для каждого кейса */
-#block-money {
-    border-top: 4px solid #4CAF50;
-}
+#block-money { border-top: 4px solid #4CAF50; }
+#block-money p { color: #4CAF50; border: 2px solid rgba(76, 175, 80, 0.3); }
+.block-choose:hover #block-money p { background: rgba(76, 175, 80, 0.2); border-color: #4CAF50; }
 
-#block-money p {
-    color: #4CAF50;
-    border: 2px solid rgba(76, 175, 80, 0.3);
-}
+#block-items { border-top: 4px solid #2196F3; }
+#block-items p { color: #2196F3; border: 2px solid rgba(33, 150, 243, 0.3); }
+.block-choose:hover #block-items p { background: rgba(33, 150, 243, 0.2); border-color: #2196F3; }
 
-.block-choose:hover #block-money p {
-    background: rgba(76, 175, 80, 0.2);
-    border-color: #4CAF50;
-}
+#block-games { border-top: 4px solid #9C27B0; }
+#block-games p { color: #9C27B0; border: 2px solid rgba(156, 39, 176, 0.3); }
+.block-choose:hover #block-games p { background: rgba(156, 39, 176, 0.2); border-color: #9C27B0; }
 
-#block-items {
-    border-top: 4px solid #2196F3;
-}
-
-#block-items p {
-    color: #2196F3;
-    border: 2px solid rgba(33, 150, 243, 0.3);
-}
-
-.block-choose:hover #block-items p {
-    background: rgba(33, 150, 243, 0.2);
-    border-color: #2196F3;
-}
-
-#block-games {
-    border-top: 4px solid #9C27B0;
-}
-
-#block-games p {
-    color: #9C27B0;
-    border: 2px solid rgba(156, 39, 176, 0.3);
-}
-
-.block-choose:hover #block-games p {
-    background: rgba(156, 39, 176, 0.2);
-    border-color: #9C27B0;
-}
-
-#block-cs2 {
-    border-top: 4px solid #FF9800;
-}
-
-#block-cs2 p {
-    color: #FF9800;
-    border: 2px solid rgba(255, 152, 0, 0.3);
-}
-
-.block-choose:hover #block-cs2 p {
-    background: rgba(255, 152, 0, 0.2);
-    border-color: #FF9800;
-}
+#block-cs2 { border-top: 4px solid #FF9800; }
+#block-cs2 p { color: #FF9800; border: 2px solid rgba(255, 152, 0, 0.3); }
+.block-choose:hover #block-cs2 p { background: rgba(255, 152, 0, 0.2); border-color: #FF9800; }
 
 /* Эффект свечения */
 .block-choose::after {
@@ -211,98 +171,11 @@
     100% { opacity: 0.3; }
 }
 
-/* Индикатор цены (можно добавить позже) */
-.price-tag {
-    position: absolute;
-    top: 20px;
-    right: 20px;
-    background: rgba(255, 140, 0, 0.9);
-    color: #fff;
-    padding: 8px 15px;
-    border-radius: 20px;
-    font-size: 18px;
-    font-weight: bold;
-    box-shadow: 0 4px 10px rgba(255, 140, 0, 0.3);
-}
-
-/* Адаптивность */
-@media (max-width: 1200px) {
-    #case-choose {
-        grid-template-columns: repeat(2, 1fr);
-        gap: 30px;
-    }
-}
-
-@media (max-width: 768px) {
-    #m-catalog {
-        padding: 30px 15px;
-        margin: 10px;
-    }
-    
-    #m-catalog h1 {
-        font-size: 48px;
-        margin-bottom: 40px;
-    }
-    
-    #case-choose {
-        grid-template-columns: 1fr;
-        gap: 25px;
-        max-width: 500px;
-    }
-    
-    #block-money, #block-items, #block-games, #block-cs2 {
-        height: 320px;
-    }
-    
-    #block-money img, #block-items img, #block-games img, #block-cs2 img {
-        width: 160px;
-        height: 160px;
-    }
-    
-    #block-money p, #block-items p, #block-games p, #block-cs2 p {
-        font-size: 24px;
-    }
-}
-
-@media (max-width: 480px) {
-    #m-catalog h1 {
-        font-size: 36px;
-    }
-    
-    #block-money, #block-items, #block-games, #block-cs2 {
-        height: 280px;
-        padding: 20px;
-    }
-    
-    #block-money img, #block-items img, #block-games img, #block-cs2 img {
-        width: 140px;
-        height: 140px;
-    }
-    
-    #block-money p, #block-items p, #block-games p, #block-cs2 p {
-        font-size: 20px;
-        padding: 12px 15px;
-    }
-}
-
 /* Прокрутка для каталога */
-#m-catalog::-webkit-scrollbar {
-    width: 8px;
-}
-
-#m-catalog::-webkit-scrollbar-track {
-    background: rgba(255, 255, 255, 0.05);
-    border-radius: 10px;
-}
-
-#m-catalog::-webkit-scrollbar-thumb {
-    background: linear-gradient(180deg, #ff8a00, #ffcc00);
-    border-radius: 10px;
-}
-
-#m-catalog::-webkit-scrollbar-thumb:hover {
-    background: linear-gradient(180deg, #ffcc00, #ff8a00);
-}
+#m-catalog::-webkit-scrollbar { width: 8px; }
+#m-catalog::-webkit-scrollbar-track { background: rgba(255, 255, 255, 0.05); border-radius: 10px; }
+#m-catalog::-webkit-scrollbar-thumb { background: linear-gradient(180deg, #ff8a00, #ffcc00); border-radius: 10px; }
+#m-catalog::-webkit-scrollbar-thumb:hover { background: linear-gradient(180deg, #ffcc00, #ff8a00); }
 
 /* Анимация для каталога */
 #m-catalog {
@@ -312,34 +185,35 @@
 }
 
 /* ============ АДАПТИВ КАТАЛОГА ============ */
+@media (max-width: 1200px) {
+    #case-choose { grid-template-columns: repeat(2, 1fr); gap: 30px; }
+}
 
 @media (max-width: 768px) {
     #m-catalog {
-        padding: 20px 10px !important;
-        margin: 10px 0 !important;
+        padding: 20px 10px;
+        margin: 10px; /* ИСПРАВЛЕНИЕ: Равномерный отступ */
     }
     #m-catalog h1 {
-        font-size: 32px !important;
-        margin-bottom: 25px !important;
+        font-size: 32px;
+        margin-bottom: 25px;
     }
     #case-choose {
-        grid-template-columns: 1fr !important;
-        gap: 15px !important;
-        padding: 10px 0 !important;
+        grid-template-columns: 1fr;
+        gap: 15px;
+        padding: 10px 0;
     }
-    
-    /* Уменьшаем блоки кейсов */
     #block-money, #block-items, #block-games, #block-cs2 {
-        height: 260px !important;
-        padding: 15px !important;
+        height: 260px;
+        padding: 15px;
     }
     #block-money img, #block-items img, #block-games img, #block-cs2 img {
-        width: 120px !important;
-        height: 120px !important;
-        margin-bottom: 15px !important;
+        width: 120px;
+        height: 120px;
+        margin-bottom: 15px;
     }
     #block-money p, #block-items p, #block-games p, #block-cs2 p {
-        font-size: 18px !important;
-        padding: 10px !important;
+        font-size: 18px;
+        padding: 10px;
     }
 }

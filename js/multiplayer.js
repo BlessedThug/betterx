@@ -26,7 +26,7 @@
         display: flex;
         flex-direction: column;
         overflow: hidden;
-        height: calc(100vh - 65px);
+        height: 100%;
     `;
 
     // Заголовок блока
@@ -240,7 +240,17 @@
         }
         main > div {
             display: flex;
-            height: calc(100vh - 65px);
+            height: 100%;
+            min-height: 0;
+        }
+        @media (max-width: 850px) {
+            main > div {
+                flex-direction: column;
+                height: auto;
+            }
+            #bet, #game {
+                height: auto;
+            }
         }
     `;
     document.head.appendChild(style);

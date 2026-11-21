@@ -1,15 +1,21 @@
-* {margin: 0; padding: 0; box-sizing: border-box}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+/* Высота шапки в одном месте */
+:root { --header-h: 64px; }
+
 body {
-    background: rgb(37, 37, 37); 
+    background: rgb(37, 37, 37);
     font-family: "Noto Sans", sans-serif;
     overflow-x: hidden;
 }
 
+/* ============ ШАПКА ============ */
 header {
     width: 100%;
-    height: 64px;
+    height: var(--header-h);
     position: fixed;
     top: 0;
+    left: 0;
     background: rgb(30, 30, 30);
     border-bottom: solid 3px orange;
     color: azure;
@@ -25,9 +31,9 @@ header ul {
     align-items: center;
     justify-content: space-between;
     width: 100%;
-    padding: 0 32px;
     height: 100%;
-    position: relative; /* ВАЖНО для абсолютного позиционирования навигации */
+    padding: 0 32px;
+    position: relative;
 }
 
 header li {
@@ -38,6 +44,7 @@ header li {
 
 header #web-name {
     margin-right: auto;
+    flex-shrink: 0;
 }
 
 header #web-name a {
@@ -54,10 +61,12 @@ header #web-name a {
     display: flex;
     align-items: center;
     height: 100%;
+    white-space: nowrap;
 }
+
 @keyframes textflow {
-    from {background-position: 0% center}         
-    to {background-position: 200% center}
+    from { background-position: 0% center; }
+    to   { background-position: 200% center; }
 }
 
 header #balance {
@@ -67,6 +76,8 @@ header #balance {
     display: flex;
     align-items: center;
     height: 100%;
+    white-space: nowrap;
+    flex-shrink: 0;
 }
 
 header #refill {
@@ -74,6 +85,7 @@ header #refill {
     display: flex;
     align-items: center;
     height: 100%;
+    flex-shrink: 0;
 }
 
 #refill a {
@@ -86,6 +98,7 @@ header #refill {
     display: flex;
     align-items: center;
     height: 100%;
+    white-space: nowrap;
 }
 
 #refill a:hover {
@@ -100,15 +113,77 @@ header #refill {
     font-weight: bold;
 }
 
-main {
-    height: calc(100vh - 64px);
-    width: 100%;
-    top: 64px;
-    position: relative;
-    display: flex;
+#web-logo {
+    width: 48px;
+    height: 48px;
+    margin-right: 24px;
+    flex-shrink: 0;
 }
 
-/* Стили для модального окна пополнения */
+/* ============ ЦЕНТРАЛЬНАЯ НАВИГАЦИЯ ============ */
+.nav-center {
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    gap: 10px;
+    height: 100%;
+    align-items: center;
+    z-index: 1;
+}
+
+.nav-center a {
+    color: azure;
+    font-size: 20px;
+    text-decoration: none;
+    padding: 8px 16px;
+    border-radius: 4px;
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    height: 100%;
+    white-space: nowrap;
+}
+
+.nav-center a img {
+    height: 32px;
+    width: 32px;
+    filter: invert(100%);
+    flex-shrink: 0;
+}
+
+.nav-center a:hover {
+    color: orange;
+    background: rgba(255, 165, 0, 0.1);
+    cursor: pointer;
+}
+
+/* ============ ОСНОВНОЙ КОНТЕНТ ============ */
+main {
+    height: calc(100vh - var(--header-h));
+    width: 100%;
+    top: var(--header-h);
+    position: relative;
+    display: flex;
+    overflow-y: auto; /* ИСПРАВЛЕНИЕ: Разрешает вертикальный скролл для главной и др. страниц */
+    overflow-x: hidden; /* ИСПРАВЛЕНИЕ: Отключает горизонтальный скролл */
+}
+
+/* Обертка для каталога кейсов (создается скриптом) */
+.cases-main-wrapper {
+    min-width: 0;
+    min-height: 0;
+}
+
+/* Убеждаемся, что контент главной страницы не обрезается */
+#general {
+    flex: 1;
+    width: 100%;
+    min-height: min-content;
+}
+
+/* ============ МОДАЛКА ПОПОЛНЕНИЯ ============ */
 #dep-block {
     display: none;
     position: fixed;
@@ -121,6 +196,7 @@ main {
     border: 3px solid orange;
     z-index: 1000;
     width: 400px;
+    max-width: 92%;
     box-shadow: 0 0 40px rgba(255, 165, 0, 0.3);
 }
 
@@ -154,93 +230,107 @@ main {
     gap: 10px;
 }
 
-#confirmDep {
+#confirmDep,
+#confirmDepBtn {
     background: linear-gradient(45deg, #ff7e33, #ffb400) !important;
     color: rgb(30, 30, 30) !important;
     font-weight: bold !important;
     transition: all 0.3s !important;
 }
 
-#confirmDep:hover {
+#confirmDep:hover,
+#confirmDepBtn:hover {
     background: linear-gradient(45deg, #ffb400, #ff7e33) !important;
     transform: translateY(-2px) !important;
     box-shadow: 0 4px 12px rgba(255, 165, 0, 0.4) !important;
 }
 
-#closeDep:hover {
+#closeDep:hover,
+#closeDepBtn:hover {
     background: #666 !important;
     transform: translateY(-2px) !important;
 }
 
-#web-logo {
-    width: 48px;
-    height: 48px;
-    margin-right: 24px;
+/* ============ АДАПТИВ ШАПКИ ============ */
+@media (max-width: 1100px) {
+    header ul { padding: 0 20px; }
+    header #web-name a { font-size: 24px; }
+    #web-logo { width: 40px; height: 40px; margin-right: 16px; }
+    .nav-center a { font-size: 18px; padding: 6px 12px; gap: 6px; }
+    .nav-center a img { height: 28px; width: 28px; }
+    header #balance { font-size: 17px; padding: 0 10px; }
+    header #refill { margin-left: 8px; }
+    #refill a { font-size: 18px; padding: 6px 12px; }
 }
 
-/* ============ ЦЕНТРАЛЬНАЯ НАВИГАЦИЯ ============ */
-.nav-center {
-    position: absolute;
-    left: 50%;
-    transform: translateX(-50%);
-    display: flex;
-    gap: 10px;
-    height: 100%;
-    align-items: center;
-    z-index: 1;
-}
+@media (max-width: 900px) {
+    :root { --header-h: 110px; }
 
-.nav-center a {
-    color: azure;
-    font-size: 20px;
-    text-decoration: none;
-    padding: 8px 16px;
-    border-radius: 4px;
-    transition: all 0.3s;
-    display: flex;
-    align-items: center;
-    height: 100%;
-}
-
-.nav-center a img {
-    height: 32px;
-    width: 32px;
-    filter: invert(100%);
-    margin: 0 8px;
-    flex-shrink: 0;
-}
-
-.nav-center a:hover {
-    color: orange;
-    background: rgba(255, 165, 0, 0.1);
-    cursor: pointer;
-}
-
-@media (max-width: 768px) {
-    .nav-center {
-        position: static;
-        transform: none;
-        gap: 0;
-    }
-    .nav-center a {
-        font-size: 14px;
+    header ul {
+        flex-wrap: wrap;
+        align-content: center;
         padding: 6px 12px;
     }
-    .nav-center a img {
-        height: 22px;
-        width: 22px;
-        margin: 0 6px 0 0;
+
+    header #web-name { order: 1; height: 48px; margin-right: auto; }
+    header #web-name a { font-size: 20px; padding: 0 8px; }
+    #web-logo { width: 32px; height: 32px; margin-right: 8px; }
+
+    header #balance { order: 2; height: 48px; font-size: 14px; padding: 0 8px; }
+    header #refill { order: 2; height: 48px; margin-left: 4px; }
+    #refill a { font-size: 14px; padding: 4px 10px; }
+
+    .nav-center {
+        order: 3;
+        position: static;
+        transform: none;
+        flex-basis: 100%;
+        width: 100%;
+        height: 44px;
+        justify-content: center;
+        gap: 8px;
+    }
+    .nav-center a { font-size: 15px; padding: 4px 10px; gap: 4px; }
+    .nav-center a img { height: 22px; width: 22px; }
+    
+    /* Панель выигрышей съезжает вниз на мобильных */
+    main { flex-direction: column; }
+    .cases-main-wrapper { flex: 1; width: 100%; }
+    #live-drop-panel {
+        width: 100% !important;
+        height: auto;
+        max-height: 220px;
+        flex-shrink: 0;
+        border-left: none !important;
+        border-top: 2px solid orange;
+        display: flex;
+        flex-direction: column;
     }
 }
 
-/* ============ УБИРАЕМ ДЁРГАЮЩИЙСЯ СКРОЛЛ В WHEEL/SLOTS/MEMORY ============ */
+@media (max-width: 480px) {
+    :root { --header-h: 100px; }
+    header ul { padding: 4px 8px; }
+    header #web-name { height: 44px; }
+    header #web-name a { font-size: 16px; padding: 0 4px; }
+    #web-logo { width: 28px; height: 28px; margin-right: 6px; }
+    header #balance { height: 44px; font-size: 12px; padding: 0 4px; }
+    #bal-header { margin-left: 4px; }
+    header #refill { height: 44px; margin-left: 2px; }
+    #refill a { font-size: 13px; padding: 4px 8px; }
+    .nav-center { height: 44px; gap: 4px; }
+    .nav-center a { font-size: 13px; padding: 4px 8px; gap: 3px; }
+    .nav-center a img { height: 18px; width: 18px; }
+    #dep-block { padding: 20px !important; }
+}
+
+/* Убираем дёргающийся скролл */
 .wheel-game-area .inventory-list,
 .slots-game-area .inventory-list,
 .memory-game-area .inventory-list {
-    scrollbar-width: none;        /* Firefox */
-    -ms-overflow-style: none;     /* IE/Edge */
+    scrollbar-width: none;
+    -ms-overflow-style: none;
 }
-
 .wheel-game-area .inventory-list::-webkit-scrollbar,
 .slots-game-area .inventory-list::-webkit-scrollbar,
 .memory-game-area .inventory-list::-webkit-scrollbar {
@@ -248,10 +338,4 @@ main {
     width: 0;
     height: 0;
 }
-
-/* Дополнительно убираем возможный горизонтальный оверфлоу у игровых контейнеров */
-.wheel-game-area,
-.slots-game-area,
-.memory-game-area {
-    overflow-x: hidden;
-}
+.wheel-game-area, .slots-game-area, .memory-game-area { overflow-x: hidden; }
