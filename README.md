@@ -12,9 +12,9 @@ BETTER-X — это полностью виртуальная симуляция
 
 ##
 
-Author: BlessedThug | Telegram: @blessed_thug
+Author: BlessedThug
 
-Версия: 0.4.2
+Версия: 0.5.0
 
 Доступные игры: Crash, Cases, Wheel, Slots, Roulette, Memory, Duels.
 
