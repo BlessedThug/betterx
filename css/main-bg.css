@@ -128,6 +128,7 @@ main {
 .block-choose:nth-child(4) { animation-delay: 1.5s; }
 .block-choose:nth-child(5) { animation-delay: 2.0s; }
 
+
 /* Отключаем idle-анимацию при hover, чтобы не конфликтовала */
 .block-choose:hover {
     animation-play-state: paused;

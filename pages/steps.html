@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <link rel="stylesheet" href="../css/steps.css">
+    <link rel="stylesheet" href="../css/chassis.css">
+    <link rel="stylesheet" href="../css/game-bg.css">
+    <title>STEPS | BETTER-X</title>
+    <link rel="icon" href="../img/logo.png">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <header>
+        <ul>
+            <li id="web-name">
+                <a href="../index.html"><img src="../img/logo.png" alt="logo" id="web-logo">BETTER-X</a>
+            </li>
+            <li id="balance">Баланс: <span id="bal-header">0.00</span> ₽</li>
+            <li id="refill"><a href="#" id="depBtn">Пополнение</a></li>
+        </ul>
+    </header>
+
+    <!-- Оверлей и модальное окно пополнения -->
+    <div id="dep-overlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 999;"></div>
+    <div id="dep-block" style="display: none; position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgb(30, 30, 30); padding: 30px; border-radius: 12px; border: 3px solid orange; z-index: 1000; width: 400px; max-width: 92%; box-shadow: 0 0 40px rgba(255, 165, 0, 0.3);">
+        <h3 style="color: orange; text-align: center; margin-bottom: 20px; font-size: 24px;">Пополнение баланса</h3>
+        <input type="number" placeholder="Сумма, руб" id="depAmount" min="10" max="100000">
+        <input type="text" placeholder="Номер карты" id="cardNumber" maxlength="19">
+        <input type="text" placeholder="CVV-код" id="cardCvv" maxlength="3">
+        <input type="text" placeholder="Срок действия (MM/YY)" id="cardExpiry" maxlength="5">
+        <div style="display: flex; justify-content: space-between; gap: 10px; margin-top: 20px;">
+            <button id="confirmDepBtn" style="background: linear-gradient(45deg, #ff7e33, #ffb400); color: black; padding: 10px; border: none; border-radius: 6px; width: 48%; cursor: pointer; font-weight: bold;">Пополнить</button>
+            <button id="closeDepBtn" style="background: #555; color: white; padding: 10px; border: none; border-radius: 6px; width: 48%; cursor: pointer;">Отмена</button>
+        </div>
+    </div>
+
+    <!-- Модальное окно результата игры -->
+    <div id="steps-result-modal">
+        <div class="modal-content">
+            <h2 id="steps-result-title">ПОБЕДА</h2>
+            <p id="steps-result-text">Вы забрали 1000 ₽</p>
+            <button id="steps-result-btn" class="btn-primary">ОК</button>
+        </div>
+    </div>
+
+    <main>
+        <div id="steps-container">
+            <!-- Панель управления -->
+            <aside id="steps-panel">
+                <div class="panel-section">
+                    <h3>💰 СТАВКА</h3>
+                    <input type="number" id="stepBetAmount" min="10" placeholder="Введите сумму">
+                    <div class="quick-bets" id="quick-bets">
+                        <button class="quick-bet" data-amount="100">100</button>
+                        <button class="quick-bet" data-amount="500">500</button>
+                        <button class="quick-bet" data-amount="1000">1k</button>
+                        <button class="quick-bet" data-amount="5000">5k</button>
+                    </div>
+                </div>
+
+                <div class="panel-section">
+                    <h3>🎒 ИНВЕНТАРЬ</h3>
+                    <div id="inventory-list" class="inventory-list">
+                        <div class="inventory-empty">🎒 Нет предметов</div>
+                    </div>
+                </div>
+
+                <div class="panel-section">
+                    <h3>📊 СТАТИСТИКА</h3>
+                    <div class="step-stats">
+                        <div class="stat-box">
+                            <span>Текущий выигрыш</span>
+                            <div id="step-current-win">0.00 ₽</div>
+                        </div>
+                        <div class="stat-box">
+                            <span>Шагов пройдено</span>
+                            <div id="step-count">0</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="step-actions">
+                    <button id="stepStartBtn" class="btn-primary">СДЕЛАТЬ СТАВКУ</button>
+                    <button id="stepCashoutBtn" class="btn-success" style="display: none;">💰 ЗАБРАТЬ</button>
+                </div>
+
+                <div id="step-status">Статус: <span id="step-status-text">Ожидание ставки</span></div>
+            </aside>
+
+            <!-- Игровое поле -->
+            <section id="steps-board-wrapper">
+                <div id="steps-board">
+                    <div id="player-avatar"></div>
+                    <!-- Клетки будут генерироваться через JS -->
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <!-- Базы данных предметов для дропа -->
+    <script src="../js/cases/case-items-data.js"></script>
+    <script src="../js/cases/cs2-skins-data.js"></script>
+    <script src="../js/cases/case-games-data.js"></script>
+    
+    <!-- Системные скрипты -->
+    <script src="../js/deposit.js"></script>
+    <script src="../js/inventory.js"></script>
+    <script src="../js/steps.js"></script>
+</body>
+
+</html>
