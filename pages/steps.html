@@ -82,6 +82,11 @@
                             <div id="step-count">0</div>
                         </div>
                     </div>
+                    <!-- Полоса риска перенесена сюда -->
+                    <div id="risk-bar-container">
+                        <div id="risk-bar"></div>
+                    </div>
+                    <div style="font-size: 10px; color: #666; text-align: center; margin-top: 5px; letter-spacing: 1px;">УРОВЕНЬ РИСКА</div>
                 </div>
 
                 <div id="step-actions">
@@ -95,7 +100,7 @@
             <!-- Игровое поле -->
             <section id="steps-board-wrapper">
                 <div id="steps-board">
-                    <div id="player-avatar"></div>
+                    <div id="player-avatar">🐺</div>
                     <!-- Клетки будут генерироваться через JS -->
                 </div>
             </section>
@@ -103,6 +108,7 @@
     </main>
 
     <!-- Базы данных предметов для дропа -->
+    <script src="../js/cases/case-money-data.js"></script>
     <script src="../js/cases/case-items-data.js"></script>
     <script src="../js/cases/cs2-skins-data.js"></script>
     <script src="../js/cases/case-games-data.js"></script>
