@@ -14,8 +14,8 @@ BETTER-X — это полностью виртуальная симуляция
 
 Author: BlessedThug
 
-Версия: 0.5.0
+Версия: 0.5.1
 
-Доступные игры: Crash, Cases, Wheel, Slots, Roulette, Memory, Duels.
+Доступные игры: Crash, Cases, Wheel, Slots, Roulette, Memory, Duels, Steps
 
 [📋 Список изменений](./CHANGELOGS.md)
